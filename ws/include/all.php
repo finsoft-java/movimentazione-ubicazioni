@@ -10,3 +10,4 @@ require 'vendor/autoload.php';
 include("config.php");
 include("functions.php");
 include("class_panthera.php");
+include("class_ubicazioni.php");
