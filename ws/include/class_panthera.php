@@ -8,6 +8,23 @@ class PantheraManager {
         $this->mock = (MOCK_PANTHERA == 'true');
         $this->conn = null;
     }
+
+    function connect() {
+        if (!$this->mock) {
+            // echo "Connecting..." . DB_PTH_HOST;
+            $this->conn = sqlsrv_connect(DB_PTH_HOST, array(
+                                    "Database" => DB_PTH_NAME,  
+                                    "UID" => DB_PTH_USER,
+                                    "PWD" => DB_PTH_PASS,
+                                    "ReturnDatesAsStrings" => true, 
+                                    "CharacterSet" => "UTF-8"));
+            // echo "Done.";
+            // var_dump($this->conn);
+            if ($this->conn == false) {
+                print_error(500, "Failed to connect: " . $this->fmt_errors());
+            }
+        }
+    }
     
     function escape_string($s) {
         // there is no conn->escape_string() in sql server
@@ -40,21 +57,6 @@ class PantheraManager {
         }
     }
 
-    function connect() {
-        if (!$this->mock) {
-            // echo "Connecting..." . DB_PTH_HOST;
-            $this->conn = sqlsrv_connect(DB_PTH_HOST, array(
-                                    "Database" => DB_PTH_NAME,  
-                                    "UID" => DB_PTH_USER,
-                                    "PWD" => DB_PTH_PASS));
-            // echo "Done.";
-            // var_dump($this->conn);
-            if ($this->conn == false) {
-                print_error(500, "Failed to connect: " . $this->fmt_errors());
-            }
-        }
-    }
-
     /*
     Esegue un comado SQL SELECT e lo ritorna come array di oggetti, oppure lancia un print_error
     */
@@ -68,6 +70,9 @@ class PantheraManager {
             {
                 $arr[] = $row;
             }
+			if ($row === false) {
+				print_error(500, $this->fmt_errors());
+			}
             return $arr;
         } else {
             print_error(500, $this->fmt_errors());
@@ -84,6 +89,9 @@ class PantheraManager {
             {
                 $arr[] = $row[0];
             }
+			if ($row === false) {
+				print_error(500, $this->fmt_errors());
+			}
             return $arr;
         } else {
             print_error(500, $this->fmt_errors());
@@ -95,10 +103,12 @@ class PantheraManager {
     */
     function select_single($sql) {
         if ($result = sqlsrv_query($this->conn, $sql)) {
-            if ($row = sqlsrv_fetch_array($result))
+            if ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC))
             {
                 return $row;
-            } else {
+            } elseif ($row === false) {
+				print_error(500, $this->fmt_errors());
+			} else {
                 return null;
             }
         } else {
@@ -114,7 +124,9 @@ class PantheraManager {
             if ($row = sqlsrv_fetch_array($result))
             {
                 return $row[0];
-            } else {
+            } elseif ($row === false) {
+				print_error(500, $this->fmt_errors());
+			} else {
                 return null;
             }
         } else {
