@@ -23,10 +23,9 @@ class UbicazioniManager {
                       ON U.ID_AZIENDA=S.ID_AZIENDA AND U.ID_UBICAZIONE=S.ID_UBICAZIONE AND U.ID_MAGAZZINO=S.ID_MAGAZZINO
                     JOIN THIP.ARTICOLI A
                       ON S.ID_ARTICOLO=A.ID_ARTICOLO
-                    WHERE U.ID_AZIENDA='001' AND U.ID_UBICAZIONE='$codUbicazione' AND S.QTA_GIAC_PRM <> 0
-                    ORDER BY ID_ARTICOLO";
+                    WHERE U.ID_AZIENDA='001' AND U.ID_UBICAZIONE='$codUbicazione' AND S.QTA_GIAC_PRM <> 0 AND S.TRASFERIBILE='Y'
+                    ORDER BY S.ID_ARTICOLO";
             $count = $this->select_single_value($sql0 . $sql2);
-// FIXME IN TEORIA DOVREBBE ESSERCI UN FLAG CHE DICE QUALE E' IL MAGAZZINO VALIDO
             $data = $this->select_list($sql1 . $sql2);
         }
         
