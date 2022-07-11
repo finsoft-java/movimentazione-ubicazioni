@@ -8,20 +8,25 @@ class UbicazioniManager {
         global $panthera;
 
         if ($panthera->mock) {
-            $data = [ [ 'R_ARTICOLO' => 'AAAAA', 'R_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'XXX', 'QTY' => 10 ],
-                      [ 'R_ARTICOLO' => 'BBBB', 'R_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'YYY', 'QTY' => 100 ],
-                      [ 'R_ARTICOLO' => 'ZZZZZZ', 'R_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'ZZZ', 'QTY' => 0 ]
+            $data = [ [ 'ID_ARTICOLO' => 'AAAAA', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'XXX', 'QTA_GIAC_PRM' => 10 ],
+                      [ 'ID_ARTICOLO' => 'BBBB', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'YYY', 'QTA_GIAC_PRM' => 100 ],
+                      [ 'ID_ARTICOLO' => 'ZZZZZZ', 'ID_MAGAZZINO' => 'D1', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'ZZZ', 'QTA_GIAC_PRM' => 0 ]
                      ];
             $count = 1000;
         } else {
             $sql0 = "SELECT COUNT(*) AS cnt ";
-            $sql1 = "SELECT * ";
-            $sql2 = "FROM THIP.UBICAZIONI_LL A
-                    JOIN THIPPERS.YUBICAZIONI_LL B ON  
-                    WHERE ID_AZIENDA='001' AND R_UBICAZIONE='$codUbicazione' AND QTY > 0
-                    ORDER BY 1";
+            $sql1 = "SELECT U.ID_UBICAZIONE, U.ID_MAGAZZINO, S.ID_ARTICOLO, A.DESCRIZIONE, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
+            $sql2 = "FROM THIP.UBICAZIONI_LL U
+                    JOIN THIPPERS.YUBICAZIONI_LL YU
+                      ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
+                    JOIN THIP.SALDI_UBICAZIONE_V01 S
+                      ON U.ID_AZIENDA=S.ID_AZIENDA AND U.ID_UBICAZIONE=S.ID_UBICAZIONE AND U.ID_MAGAZZINO=S.ID_MAGAZZINO
+                    JOIN THIP.ARTICOLI A
+                      ON S.ID_ARTICOLO=A.ID_ARTICOLO
+                    WHERE U.ID_AZIENDA='001' AND U.ID_UBICAZIONE='$codUbicazione' AND S.QTA_GIAC_PRM <> 0
+                    ORDER BY ID_ARTICOLO";
             $count = $this->select_single_value($sql0 . $sql2);
-
+// FIXME IN TEORIA DOVREBBE ESSERCI UN FLAG CHE DICE QUALE E' IL MAGAZZINO VALIDO
             $data = $this->select_list($sql1 . $sql2);
         }
         

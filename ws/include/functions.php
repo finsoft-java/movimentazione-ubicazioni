@@ -299,4 +299,66 @@ function random_probability($probabilities) {
     return null; // tutti zeri!!!
 }
 
+
+function print_query_html($records) {
+    $s = "<table border=1>\r\n";
+    if ($records && count($records) > 0 && count($records[0] > 0)) {
+        $columns = array_keys($records[0]);
+        foreach ($columns as $id => $c) {
+            if (is_int($c)) {
+                unset($columns[$id]);
+            }
+        }
+        $s .= "<thead style='font-weight: bold'><tr>";
+        foreach ($columns as $c) {
+            $s .= "<td>$c</td>";
+        }
+        $s .= "</tr></thead>\r\n<tbody>\r\n";
+        foreach ($records as $r) {
+            $s .= "<tr>";
+            foreach ($columns as $c) {
+                $value = $r[$c];
+                if ($value === null) {
+                    $value = "(null)";
+                }
+                if (get_class($value) == 'DateTime') {
+                    $value = $value->format('Y-m-d H:i:s');
+                }
+                $s .= "<td>" . $value . "</td>";
+            }
+            $s .= "</tr>\r\n";
+        }
+    } else {
+        $s .= "<tr><td>No data found.</td></tr>\r\n";
+    }
+    $s .= "</tbody>\r\n</table>\r\n";
+    return $s;
+}
+
+/**
+ * Create a map with given keys, whose values are $array elements
+ * 
+ * e.g. [[NOME=>Carlo, COGNOME=>Rossi],[NOME=>Paolo, COGNOME=>Bianchi]]
+ * con columns=[NOME,COGNOME]
+ * risultato:
+ * map[Carlo][Rossi]   =  [NOME=>Carlo, COGNOME=>Rossi]
+ * map[Paolo][Bianchi] =  [NOME=>Paolo, COGNOME=>Bianchi]
+ */
+function array_group_by($array, $columns) {
+    $map = [];
+    foreach($array as $elm) {
+        $father = &$map;
+        foreach ($columns as $col) {
+            $value = $elm[$col];
+            if (!isset($father[$value])) {
+                $father[$value] = [];
+            }
+            $father = &$father[$value];
+        }
+        $father[]= $elm;
+    }
+    return $map;
+}
+
+
 ?>
