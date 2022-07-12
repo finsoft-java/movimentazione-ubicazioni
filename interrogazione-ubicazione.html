@@ -16,8 +16,12 @@
         <div class="interrogaUbiOsai red">
             <div><a class="nav-link" style="text-transform: uppercase;" href="./index.html">Torna al Menu</a></div>
         </div>
+        <h3 class="titleOsai">Interrogazione Ubicazione</h3>
         <div class="qrcode">
             <input type="password" class="form-control focus" id="qrcode" placeholder="QRCODE" aria-describedby="basic-addon2">
+        </div>
+        <div class="listaOsai">
+
         </div>
         <script src="assets/js/jquery-3.6.0.min.js"></script>
         <script src="assets/js/popper.min.js"></script>
@@ -30,31 +34,47 @@
                     $("#qrcode").get(0).focus();
                 }, 1000);
             });
-            
+            /**
+            let i = 0;
             document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 if (event.keyCode === 13) {
                     event.preventDefault();
+                    i++;
                     barCode = $("#qrcode").val();
-                    if(sessionStorage.getItem('n') == null){
-                        sessionStorage.setItem('n',0);
+                    if(i == 1) {
+                        sessionStorage.setItem('ubicazione', barCode);
                     }
-                    sessionStorage.setItem('n', 1+parseInt(sessionStorage.getItem('n')));
-                    if(sessionStorage.getItem('n') == 1){
-                        sessionStorage.setItem('barCode', barCode);
+                    if(i == 2) {
+                        sessionStorage.setItem('articolo', barCode);
                     }
-                    if(sessionStorage.getItem('n') == 2){
-                        sessionStorage.setItem('barCode2', barCode);
+                    if(i == 3) {
+                        sessionStorage.setItem('ubicazione-destinazione', barCode);
+                        $("#qrcode").attr('disabled',true);
                     }
-                    if(sessionStorage.getItem('n') == 3){
-                        sessionStorage.setItem('barCode3', barCode);
-                    }
-                    if(sessionStorage.getItem('n') > 3){
-                        var answer = window.confirm("Hai già inserito 3 codici, vuoi resettare?");
-                        if (answer) {
-                            sessionStorage.clear();
-                            $("#qrcode").val('');
+                }
+            });
+            */
+            document.getElementById("qrcode").addEventListener("keyup", function(event) {
+                if (event.keyCode === 13) {
+                    $.get({
+                        url: "./ws/Interrogazione.php?codUbicazione=" + $("#qrcode").val(),
+                        dataType: 'json',
+                        //headers: {
+                         //   'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                        //},
+                        success: function(data, status) {
+                            let dati = data["data"];
+                            let datiStampati = "";
+                            for(let i = 0; i < Object.keys(dati).length;i++){
+                                datiStampati += "<p>Articolo: <strong>"+dati[i].ID_ARTICOLO+"</strong></p>";
+                                datiStampati += "<p>Magazzino: <strong>"+dati[i].ID_MAGAZZINO+"</strong> | Quantita: <strong>"+dati[i].QTA_GIAC_PRM+" pz. </strong></p>";
+                                datiStampati += "<hr/>";
+                            }
+                            $(".listaOsai").html(datiStampati);
                         }
-                    }
+                    });
+                    //hide_errors();
+                    $("#qrcode").attr("disabled", true);
                 }
             });
         </script>

@@ -13,6 +13,12 @@ class UbicazioniManager {
         if ($panthera->mock) {
             $data = [ [ 'ID_ARTICOLO' => 'AAAAA', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'XXX', 'QTA_GIAC_PRM' => 10, 'TRASFERIBILE' => 'Y' ],
                       [ 'ID_ARTICOLO' => 'BBBB', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'YYY', 'QTA_GIAC_PRM' => 100, 'TRASFERIBILE' => 'Y' ],
+                      [ 'ID_ARTICOLO' => 'ZZZZZZ', 'ID_MAGAZZINO' => 'D1', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'ZZZ', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y' ],
+                      [ 'ID_ARTICOLO' => 'BBBB', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'YYY', 'QTA_GIAC_PRM' => 100, 'TRASFERIBILE' => 'Y' ],
+                      [ 'ID_ARTICOLO' => 'ZZZZZZ', 'ID_MAGAZZINO' => 'D1', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'ZZZ', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y' ],
+                      [ 'ID_ARTICOLO' => 'BBBB', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'YYY', 'QTA_GIAC_PRM' => 100, 'TRASFERIBILE' => 'Y' ],
+                      [ 'ID_ARTICOLO' => 'ZZZZZZ', 'ID_MAGAZZINO' => 'D1', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'ZZZ', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y' ],
+                      [ 'ID_ARTICOLO' => 'BBBB', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'YYY', 'QTA_GIAC_PRM' => 100, 'TRASFERIBILE' => 'Y' ],
                       [ 'ID_ARTICOLO' => 'ZZZZZZ', 'ID_MAGAZZINO' => 'D1', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'ZZZ', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y' ]
                      ];
             $count = 1000;
