@@ -4,7 +4,28 @@
   html {
     background-color: #56baed;
   }
-  
+  .menuOsai {
+    position: relative;
+    border-bottom: 4px solid #000;
+  }
+  .red{
+    background-color: #ff000085;
+  }
+  .green{
+    background-color: #00800085;
+  }
+  .blue{
+    background-color: #0000ff85;
+  }
+  .menuOsai a{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    text-align: center;
+    color:#000;
+    font-weight: bold;
+}
   body {
     font-family: "Verdana", sans-serif;
     height: 100vh;
