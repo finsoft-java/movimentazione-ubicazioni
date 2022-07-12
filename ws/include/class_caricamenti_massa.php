@@ -7,38 +7,22 @@ $DATE = date('Y-m-d');
 
 class CaricamentiMassaManager {
 
-    function getIdCaricamento() {
-        global $panthera;
-
-        // FIXME ROLLBACK necessario? 
-        $panthera->conn->sqlsrv_begin_transaction();
-        $panthera->executeUpdate("UPDATE THERA.NUMERATOR SET LAST_NUMBER=LAST_NUMBER+1 WHERE NUMERATOR_ID='MOVUBI'");
-        $id = $panthera->select_single_value("SELECT LAST_NUMBER FROM THERA.NUMERATOR WHERE NUMERATOR_ID='MOVUBI'");
-        if ($id == null) {
-            // first run
-            $id = 1;
-            $panthera->executeUpdate("INSERT INTO THERA.NUMERATOR(NUMERATOR_ID,LAST_NUMBER) VALUES ('MOVUBI',$id)");  
-        }
-        $panthera->conn->sqlsrv_commit();
-        return $id;
-    }
-
-    function trasferisciUbicazione($codUbicazioneSrc, $codMagazzinoDest) {
+    function trasferisciUbicazione($codUbicazione, $codMagazzinoDest) {
         global $panthera, $CAU_TESTATA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE, $ubicazioniManager;
 
         if ($panthera->mock) {
             return;
         }
 
-        $id = $this->getIdCaricamento();
-        $magazzinoSrc = $ubicazioniManager->getMagazzinoUbicazione($codUbicazioneSrc);
-        $magazzinoDest = $ubicazioniManager->getMagazzinoUbicazione($codUbicazioneDest);
+        $codMagazzinoSrc = $ubicazioniManager->getMagazzinoUbicazione($codUbicazione);
+        $commessa= "?!?!"; // FIXME
+        $id = $panthera->get_numeratore('MOVUBI');
 
         // CM_DOC_TRA_TES
-        $this->creaTestataDocumento($id, $magazzinoSrc, $magazzinoDest, $commessa);
+        $this->creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa);
 
         // CM_DOC_TRA_RIG
-        $this->creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo, $qty);
+        $this->creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazione, $codMagazzinoDest, $codUbicazione, $commessa);
 
         // ora dovrei invocare il webservice che innesca il job CM
     }
@@ -50,12 +34,13 @@ class CaricamentiMassaManager {
             return;
         }
 
-        $id = $this->getIdCaricamento();
-        $magazzinoSrc = $ubicazioniManager->getMagazzinoUbicazione($codUbicazioneSrc);
-        $magazzinoDest = $ubicazioniManager->getMagazzinoUbicazione($codUbicazioneDest);
+        $codMagazzinoSrc = $ubicazioniManager->getMagazzinoUbicazione($codUbicazioneSrc);
+        $codMagazzinoDest = $ubicazioniManager->getMagazzinoUbicazione($codUbicazioneDest);
+        $commessa= "?!?!"; // FIXME
+        $id = $panthera->get_numeratore('MOVUBI');
 
         // CM_DOC_TRA_TES
-        $this->creaTestataDocumento($id, $magazzinoSrc, $magazzinoDest, $commessa);
+        $this->creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa);
 
         // CM_DOC_TRA_RIG
         $this->creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo, $qty);
@@ -195,8 +180,12 @@ class CaricamentiMassaManager {
         $this->execute_update($sql);
     }
 
-    function creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo, $qty) {
+    function creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo=null, $qty=null) {
       global $panthera;
+
+      if (isempty($articolo) || isempty($qty)) {
+        $qty = 'S.QTY';
+      }
 
       $sql = "INSERT INTO THIP.CM_DOC_TRA_RIG (
         DATA_ORIGIN,              -- 1
@@ -261,7 +250,7 @@ class CaricamentiMassaManager {
         R_CLIENTE_ARR,                    -- 60
         R_FORNITORE,
         R_FORNITORE_ARR)
-      VALUES (
+      SELECT
         '',             -- 1
         '',
         '',
@@ -272,17 +261,17 @@ class CaricamentiMassaManager {
         '$YEAR',
         null,
         '$id',             -- 10
-        ROW NUMBER OVER BLA BLA,
+        ROW_NUMBER() OVER(ORDER BY S.ID_ARTICOLO),
         1,
         1,
-        ROW NUMBER * 10,
+        (ROW_NUMBER() OVER(ORDER BY S.ID_ARTICOLO)) * 10,
         '$CAU_RIGA',
         '$DATE',
         '$codMagazzinoSrc',
         '$codMagazzinoDest',
-        '$articolo',
-        0,              -- 20
-        null,                         -- versione/cfg gestite ???
+        S.ID_ARTICOLO,
+        S.ID_VERSIONE,              -- 20
+        S.COD_CONFIGURAZIONE,
         null,
         '$commessa',
         null,
@@ -291,12 +280,12 @@ class CaricamentiMassaManager {
         null,
         null,
         null,
-        '',              -- 30
-        '',
-        '',
-        '',
-        '',
-        'M',
+        A.R_UM_PRM_MAG,              -- 30
+        $qty,
+        A.R_UM_SEC_MAG,
+        $qty * A.FTT_CONVER_UM,   -- FIXME errato dipende dall'operatore di conversione
+        A.FTT_CONVER_UM,
+        A.OPER_CONVER_UM,
         null,
         null,
         null,
@@ -324,8 +313,15 @@ class CaricamentiMassaManager {
         null,              -- 60
         null,
         null
-      )
+      FROM THIP.SALDI_UBICAZIONE_V01 S
+      JOIN THIP.ARTICOLI A ON A.ID_AZIENDA=S.ID_AZIENDA AND A.ID_ARTICOLO=S.ID_ARTICOLO
+      WHERE S.ID_AZIENDA='$ID_AZIENDA' AND S.ID_UBICAZIONE='$codUbicazioneSrc'
       ";
+
+      if ($articolo) {
+        $sql .= " AND S.ID_ARTICOLO='$articolo' ";
+      }
+      
       $this->execute_update($sql);
     }
 }

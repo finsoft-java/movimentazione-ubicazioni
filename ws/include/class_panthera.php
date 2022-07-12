@@ -185,5 +185,20 @@ class PantheraManager {
             return $this->select_single($query);
         }
     }
+
+    function get_numeratore($codNumeratore) {
+
+        // FIXME serve gestire il ROLLBACK? o la transazione locka la tabella?
+        $this->conn->sqlsrv_begin_transaction();
+        $this->executeUpdate("UPDATE THERA.NUMERATOR SET LAST_NUMBER=LAST_NUMBER+1 WHERE NUMERATOR_ID='$codNumeratore'");
+        $id = $this->select_single_value("SELECT LAST_NUMBER FROM THERA.NUMERATOR WHERE NUMERATOR_ID='$codNumeratore'");
+        if ($id == null) {
+            // first run
+            $id = 1;
+            $this->execute_update("INSERT INTO THERA.NUMERATOR(NUMERATOR_ID,LAST_NUMBER) VALUES ('$codNumeratore',$id)");  
+        }
+        $this->conn->sqlsrv_commit();
+        return $id;
+    }
 }
 ?>
