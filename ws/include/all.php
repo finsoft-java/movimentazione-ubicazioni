@@ -11,3 +11,4 @@ include("config.php");
 include("functions.php");
 include("class_panthera.php");
 include("class_ubicazioni.php");
+include("class_caricamenti_massa.php");

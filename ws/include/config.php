@@ -1,5 +1,4 @@
-<?php 
-
+<?php
 
 define('JWT_SECRET_KEY', 'OSAISECRET2021');
 
@@ -25,5 +24,13 @@ define('DB_PTH_NAME', 'PANTH01');
 /* PARAMETRI PER LETTURA BARCODE CSV */
 define('POS_UBICAZIONE', '1');
 define('POS_ARTICOLO', '0');
+
+
+/* costanti per il documento di trasferimento */
+$CAU_TESTATA = 'XXX';
+$CAU_RIGA = 'CCC';
+$ID_AZIENDA = '001';
+$UTENTE = 'ADMIN_001';
+
 
 ?>
