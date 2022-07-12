@@ -8,6 +8,20 @@
     position: relative;
     border-bottom: 4px solid #000;
   }
+  .interrogaUbiOsai{
+    position: relative;
+    padding:10px 0px;
+    border-bottom: 4px solid #000;
+  }
+  .interrogaUbiOsai a{
+    width: 100%;
+    text-align: center;
+    color:#000;
+    font-weight: bold;
+  }
+  input:focus{
+    border-color: red ;  
+  }
   .red{
     background-color: #ff000085;
   }
@@ -25,6 +39,7 @@
     text-align: center;
     color:#000;
     font-weight: bold;
+    text-transform: uppercase;
 }
   body {
     font-family: "Verdana", sans-serif;
@@ -386,15 +401,13 @@
     float: right;
   }
   div.qrcode {
-    position: absolute;
-    top: 60px;
-    left: 15px;
-    width: 55%;
+    width: 100%;    
+    text-align: center;
+    margin: 30px 0px;
   }
   div.qrcode > input {
     height: 42px
   }
-
   div.main-container {
     position: relative;
     height: 100%;

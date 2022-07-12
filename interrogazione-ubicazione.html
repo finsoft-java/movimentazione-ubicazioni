@@ -13,21 +13,30 @@
         <link rel="stylesheet" href="assets/css/v4-font-face.css">
     </head>
     <body>
-        <div class="menuOsai red">
-            <div><a class="nav-link" href="./interrogazione-ubicazione.html">Interrogazione Ubicazione</a></div>
+        <div class="interrogaUbiOsai red">
+            <div><a class="nav-link" style="text-transform: uppercase;" href="./index.html">Torna al Menu</a></div>
         </div>
-        <div class="menuOsai green">
-            <div><a class="nav-link" href="#">Cambio magazzino Ubicazione</a></div>
-        </div>
-        <div class="menuOsai blue">
-            <div><a class="nav-link" href="#">Trasferimento Articoli</a></div>
+        <div class="qrcode">
+            <input type="password" class="form-control focus" id="qrcode" placeholder="QRCODE" aria-describedby="basic-addon2">
         </div>
         <script src="assets/js/jquery-3.6.0.min.js"></script>
         <script src="assets/js/popper.min.js"></script>
         <script src="assets/js/bootstrap.min.js"></script>
         <script>
             $(document).ready(function(){
-                $('.menuOsai').css('height',(window.innerHeight/3));
+                //disabilitaLettoreBadge();
+                //var user = sessionStorage.getItem('user');
+                //if (user) {
+                //    $("#user_box p").append(user);
+                //   $("#logout").show();
+                //    scheduleLogout();
+                //}
+                //$(".focus").removeAttr("disabled");
+                $(".focus").focus();
+                setInterval(function() {
+                    console.log("Focusing esaurimento");
+                    $("#qrcode").get(0).focus();
+                }, 1000);
             });
         </script>
     </body>
