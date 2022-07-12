@@ -14,8 +14,9 @@ class CaricamentiMassaManager {
             return;
         }
 
-        $codMagazzinoSrc = $ubicazioniManager->getMagazzinoUbicazione($codUbicazione);
-        $commessa= "?!?!"; // FIXME
+        $ubi1 = $ubicazioniManager->getUbicazione($codUbicazioneSrc);
+        $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
+        $commessa = $ubi1['R_COMMESSA'];
         $id = $panthera->get_numeratore('MOVUBI');
 
         // CM_DOC_TRA_TES
@@ -34,9 +35,13 @@ class CaricamentiMassaManager {
             return;
         }
 
-        $codMagazzinoSrc = $ubicazioniManager->getMagazzinoUbicazione($codUbicazioneSrc);
-        $codMagazzinoDest = $ubicazioniManager->getMagazzinoUbicazione($codUbicazioneDest);
-        $commessa= "?!?!"; // FIXME
+        $ubi1 = $ubicazioniManager->getUbicazione($codUbicazioneSrc);
+        $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
+        $commessa = $ubi1['R_COMMESSA'];
+
+        $ubi2 = $ubicazioniManager->getUbicazione($codUbicazioneDest);
+        $codMagazzinoDest = $ubi2['ID_MAGAZZINO'];
+
         $id = $panthera->get_numeratore('MOVUBI');
 
         // CM_DOC_TRA_TES

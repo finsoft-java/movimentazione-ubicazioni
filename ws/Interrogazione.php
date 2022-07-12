@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         print_error(400, "Missing argument codUbicazione");
     }
 
-    [$data, $count] = $ubicazioniManager->getUbicazioni($codUbicazione);
+    [$data, $count] = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
         
     header('Content-Type: application/json');
     echo json_encode(['data' => $data, 'count' => $count]);
