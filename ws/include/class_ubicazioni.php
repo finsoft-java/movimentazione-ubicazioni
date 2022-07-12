@@ -5,7 +5,7 @@ $ubicazioniManager = new UbicazioniManager();
 class UbicazioniManager {
     
     function getUbicazioni($codUbicazione) {
-        global $panthera;
+        global $panthera, $ID_AZIENDA;
 
         if ($panthera->mock) {
             $data = [ [ 'ID_ARTICOLO' => 'AAAAA', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'XXX', 'QTA_GIAC_PRM' => 10 ],
@@ -23,12 +23,22 @@ class UbicazioniManager {
                       ON U.ID_AZIENDA=S.ID_AZIENDA AND U.ID_UBICAZIONE=S.ID_UBICAZIONE AND U.ID_MAGAZZINO=S.ID_MAGAZZINO
                     JOIN THIP.ARTICOLI A
                       ON S.ID_ARTICOLO=A.ID_ARTICOLO
-                    WHERE U.ID_AZIENDA='001' AND U.ID_UBICAZIONE='$codUbicazione' AND S.QTA_GIAC_PRM <> 0 AND S.TRASFERIBILE='Y'
+                    WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND S.QTA_GIAC_PRM <> 0 AND YU.TRASFERIBILE='Y'
                     ORDER BY S.ID_ARTICOLO";
             $count = $this->select_single_value($sql0 . $sql2);
             $data = $this->select_list($sql1 . $sql2);
         }
         
         return [$data, $count];
+    }
+
+    function getMagazzinoUbicazione($codUbicazione) {
+      global $panthera, $ID_AZIENDA;
+
+      return $panthera->select_list("SELECT ID_MAGAZZINO
+                                      FROM THIP.YUBICAZIONI_LL
+                                      WHERE ID_AZIENDA='$ID_AZIENDA'
+                                          AND ID_UBICAZIONE='$codUbicazione'
+                                          AND TRASFERIBILE='Y'");
     }
 }
