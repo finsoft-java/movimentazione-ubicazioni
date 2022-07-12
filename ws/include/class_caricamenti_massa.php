@@ -23,6 +23,26 @@ class CaricamentiMassaManager {
         return $id;
     }
 
+    function trasferisciUbicazione($codUbicazioneSrc, $codMagazzinoDest) {
+        global $panthera, $CAU_TESTATA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE, $ubicazioniManager;
+
+        if ($panthera->mock) {
+            return;
+        }
+
+        $id = $this->getIdCaricamento();
+        $magazzinoSrc = $ubicazioniManager->getMagazzinoUbicazione($codUbicazioneSrc);
+        $magazzinoDest = $ubicazioniManager->getMagazzinoUbicazione($codUbicazioneDest);
+
+        // CM_DOC_TRA_TES
+        $this->creaTestataDocumento($id, $magazzinoSrc, $magazzinoDest, $commessa);
+
+        // CM_DOC_TRA_RIG
+        $this->creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo, $qty);
+
+        // ora dovrei invocare il webservice che innesca il job CM
+    }
+
     function trasferisciArticolo($codUbicazioneSrc, $codUbicazioneDest, $articolo, $qty) {
         global $panthera, $CAU_TESTATA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE, $ubicazioniManager;
 

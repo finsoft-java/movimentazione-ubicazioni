@@ -35,10 +35,10 @@ class UbicazioniManager {
     function getMagazzinoUbicazione($codUbicazione) {
       global $panthera, $ID_AZIENDA;
 
-      return $panthera->select_list("SELECT ID_MAGAZZINO
-                                      FROM THIP.YUBICAZIONI_LL
-                                      WHERE ID_AZIENDA='$ID_AZIENDA'
-                                          AND ID_UBICAZIONE='$codUbicazione'
-                                          AND TRASFERIBILE='Y'");
+      return $panthera->select_single_value("SELECT ID_MAGAZZINO
+                                              FROM THIP.YUBICAZIONI_LL
+                                              WHERE ID_AZIENDA='$ID_AZIENDA'
+                                                  AND ID_UBICAZIONE='$codUbicazione'
+                                                  AND TRASFERIBILE='Y'");
     }
 }
