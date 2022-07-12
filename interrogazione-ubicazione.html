@@ -23,7 +23,6 @@
         <script src="assets/js/popper.min.js"></script>
         <script src="assets/js/bootstrap.min.js"></script>
         <script>
-            
             $(document).ready(function(){
                 $(".focus").focus();
                 setInterval(function() {
@@ -31,7 +30,7 @@
                     $("#qrcode").get(0).focus();
                 }, 1000);
             });
-
+            
             document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 if (event.keyCode === 13) {
                     event.preventDefault();
@@ -48,6 +47,13 @@
                     }
                     if(sessionStorage.getItem('n') == 3){
                         sessionStorage.setItem('barCode3', barCode);
+                    }
+                    if(sessionStorage.getItem('n') > 3){
+                        var answer = window.confirm("Hai già inserito 3 codici, vuoi resettare?");
+                        if (answer) {
+                            sessionStorage.clear();
+                            $("#qrcode").val('');
+                        }
                     }
                 }
             });
