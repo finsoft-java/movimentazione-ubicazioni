@@ -24,19 +24,38 @@
         <script src="assets/js/bootstrap.min.js"></script>
         <script>
             $(document).ready(function(){
-                //disabilitaLettoreBadge();
-                //var user = sessionStorage.getItem('user');
-                //if (user) {
-                //    $("#user_box p").append(user);
-                //   $("#logout").show();
-                //    scheduleLogout();
-                //}
-                //$(".focus").removeAttr("disabled");
                 $(".focus").focus();
                 setInterval(function() {
                     console.log("Focusing esaurimento");
                     $("#qrcode").get(0).focus();
                 }, 1000);
+            });
+            
+            document.getElementById("qrcode").addEventListener("keyup", function(event) {
+                if (event.keyCode === 13) {
+                    event.preventDefault();
+                    barCode = $("#qrcode").val();
+                    if(sessionStorage.getItem('n') == null){
+                        sessionStorage.setItem('n',0);
+                    }
+                    sessionStorage.setItem('n', 1+parseInt(sessionStorage.getItem('n')));
+                    if(sessionStorage.getItem('n') == 1){
+                        sessionStorage.setItem('barCode', barCode);
+                    }
+                    if(sessionStorage.getItem('n') == 2){
+                        sessionStorage.setItem('barCode2', barCode);
+                    }
+                    if(sessionStorage.getItem('n') == 3){
+                        sessionStorage.setItem('barCode3', barCode);
+                    }
+                    if(sessionStorage.getItem('n') > 3){
+                        var answer = window.confirm("Hai già inserito 3 codici, vuoi resettare?");
+                        if (answer) {
+                            sessionStorage.clear();
+                            $("#qrcode").val('');
+                        }
+                    }
+                }
             });
         </script>
     </body>
