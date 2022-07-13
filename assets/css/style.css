@@ -8,6 +8,16 @@
     position: relative;
     border-bottom: 4px solid #000;
   }
+
+  .inputOsai {
+    max-width: 150px;
+    float: left;
+  }
+
+  .btnTrasferimento {
+
+  }
+
   .interrogaUbiOsai{
     position: relative;
     padding:10px 0px;
