@@ -12,12 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 
 $user = '';
-$postdata = file_get_contents("php://input");
-$request = json_decode($postdata);
-
-if($request != ''){
-    $username = $request->username;
-    $password = $request->password;
+$postdata = $_POST;
+if($postdata != ''){
+    $username = $postdata["username"];
+    $password = $postdata["password"];
     $user = check_and_load_user($username, $password);
 }
 
@@ -50,8 +48,8 @@ function check_and_load_user($username, $pwd) {
     }
 
     // POI, proviamo su LDAP
-    global $ldapManager;
-    return $ldapManager->login($username, $pwd);
+    //global $ldapManager;
+    //return $ldapManager->login($username, $pwd);
 }
 
 

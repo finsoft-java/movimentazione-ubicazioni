@@ -27,8 +27,12 @@
             <form>
                 <input style="display:none" comment="QUESTO BOTTONE SERVE A PREVENIRE IL SUBMIT">
                 <div class="input-group input-group-sm mb-3">
-                    <input type="password" class="form-control" id="rfid" placeholder="RFID" aria-label="RFID" aria-describedby="basic-addon2">
+                  <input type="text" class="form-control" id="username" placeholder="Nome Utente" aria-label="username" aria-describedby="basic-addon2">
                 </div>
+                <div class="input-group input-group-sm mb-3">
+                  <input type="password" class="form-control" id="password" placeholder="Password" aria-label="password" aria-describedby="basic-addon2">
+                </div>
+                <button type="button" class="btn" style="margin:15px 0px" onclick="login()">Login</button>
             </form>
         </div>
     </div>
@@ -36,6 +40,57 @@
     <script src="assets/js/popper.min.js"></script>
     <script src="assets/js/bootstrap.min.js"></script>
     <script src="assets/js/script.js?v=5"></script>
-    <script src="assets/js/login.js?v=3"></script>
+    <script>
+      function login () {
+          if($("#username").val() == null && $("#password").val() == null){
+            $("#error_message p").html("Inserire Username e password");
+            $("#error_message").css("display","block");
+          }
+          const rfid = $("#rfid").val();
+          $("#error_message p").html("");
+          $("#error_message").css("display","");
+          $.post({
+              url: "./ws/login.php",
+              dataType: 'json',
+              data: {
+                  username: 'finsoft',//$("#username").val()
+                  password: 'finsoft2022'//$("#password").val()
+              },
+              success: function(data, status) {
+                console.log('data', data);
+                console.log(sessionStorage.getItem('requiredRole'));
+                  if (sessionStorage.getItem('requiredRole') && data["value"]["ruolo"] != sessionStorage.getItem('requiredRole')) {
+                    $("#error_message p").html(msg);
+                    $("#error_message").css("display","block");
+                    $("#username").val("");
+                    $("#password").val("");
+                    $("#rfid").removeAttr("disabled");
+                  } else {
+                    console.log(sessionStorage);
+                    sessionStorage.setItem( "user", (data["value"]["nome"] || '') + ' ' + (data["value"]["cognome"] || ''));
+                    sessionStorage.setItem( "token", data["value"]["username"] );
+                    sessionStorage.setItem( "role", data["value"]["ruolo"] );
+                    console.log(sessionStorage);
+                    location.href = sessionStorage.getItem('redirectPage') || 'index.html';
+                  }
+              },
+              error:  function (xhr, ajaxOptions, thrownError) {
+                  console.log(xhr);
+                  var msg = (xhr.responseJSON && xhr.responseJSON.error && xhr.responseJSON.error.value) ? xhr.responseJSON.error.value
+                      : (xhr.responseText) ? xhr.responseText
+                      : "Network error";
+                  show_error(msg);
+                  $("#username").val("");
+                  $("#password").val("");
+                  localStorage.setItem('trials', ++trials);
+                  if (trials >= 5) {
+                      wait();
+                  } else {
+                      //$("#rfid").removeAttr("disabled");
+                  }
+              }
+          });
+      }
+    </script>
   </body>
 </html>
