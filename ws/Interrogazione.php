@@ -11,13 +11,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 //require_logged_user_JWT();
 
 $codUbicazione = isset($_GET['codUbicazione']) ? $panthera->escape_string($_GET['codUbicazione']) : null;
+$codArticolo = isset($_GET['codArticolo']) ? $panthera->escape_string($_GET['codArticolo']) : null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (empty($codUbicazione)) {
         print_error(400, "Missing argument codUbicazione");
     }
-
-    [$data, $count] = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
+    if (!empty($codArticolo)){
+        [$data, $count] = $ubicazioniManager->getContenutoUbicazioneArticolo($codUbicazione,$codArticolo);
+    } else {
+        [$data, $count] = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
+    }
+    
         
     header('Content-Type: application/json');
     echo json_encode(['data' => $data, 'count' => $count]);

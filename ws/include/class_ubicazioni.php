@@ -4,6 +4,39 @@ $ubicazioniManager = new UbicazioniManager();
 
 class UbicazioniManager {
     
+/**
+     * Restituisce tutti gli articoli contenuti in una certa ubicazione
+     */
+    function getContenutoUbicazioneArticolo($codUbicazione,$codArticolo) {
+      global $panthera, $ID_AZIENDA;
+
+      if ($panthera->mock) {
+          $data = [ [ 'ID_ARTICOLO' => 'AAAA', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'QTA_GIAC_PRM' => 10, 'TRASFERIBILE' => 'Y' ],
+                    ]; 
+          $count = 1;
+      } else {
+          /*
+          $sql0 = "SELECT COUNT(*) AS cnt ";
+          $sql1 = "SELECT U.ID_UBICAZIONE, U.ID_MAGAZZINO, S.ID_ARTICOLO, A.DESCRIZIONE, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
+          
+          $sql2 = "FROM THIP.UBICAZIONI_LL U
+                  JOIN THIPPERS.YUBICAZIONI_LL YU
+                    ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
+                  JOIN THIP.SALDI_UBICAZIONE_V01 S
+                    ON U.ID_AZIENDA=S.ID_AZIENDA AND U.ID_UBICAZIONE=S.ID_UBICAZIONE AND U.ID_MAGAZZINO=S.ID_MAGAZZINO
+                  JOIN THIP.ARTICOLI A
+                    ON S.ID_ARTICOLO=A.ID_ARTICOLO
+                  WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND S.QTA_GIAC_PRM <> 0 AND YU.TRASFERIBILE='Y' AND U.STATO='V' ";
+          
+          $sql3 = " ORDER BY S.ID_ARTICOLO";
+          $count = $panthera->select_single_value($sql0 . $sql2);
+          $data = $panthera->select_list($sql1 . $sql2 . $sql3);
+          */
+      }
+      
+      return [$data, $count];
+  }
+
     /**
      * Restituisce tutti gli articoli contenuti in una certa ubicazione
      */
