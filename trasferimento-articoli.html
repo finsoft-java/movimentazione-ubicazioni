@@ -13,16 +13,18 @@
         <link rel="stylesheet" href="assets/css/v4-font-face.css">
     </head>
     <body>
-        <div class="interrogaUbiOsai red">
+        <div class="interrogaUbiOsai blue">
             <div><a class="nav-link" style="text-transform: uppercase;" href="./index.html">Torna al Menu</a></div>
         </div>
+        <h3 class="titleOsai">Trasferimento Articoli</h3>
+
         <div class="qrcode">
             <input type="password" class="form-control focus" id="qrcode" placeholder="QRCODE" aria-describedby="basic-addon2">
         </div>
         <div id="appendData"></div>
         <div id="magazzinoDest"></div>
-        <div>
-            <button onclick="trasferimentoArticoli()" type="button" id="btnTrasferimento" class="btn" style="float: left; width:100%; padding: 0px 15px" disabled="true"> Invia </button>
+        <div class="btnDiv">
+            <button onclick="trasferimentoArticoli()" type="button" id="btnTrasferimento" class="btn btnOsai" disabled="true"> Invia </button>
         </div>
         <script src="assets/js/jquery-3.6.0.min.js"></script>
         <script src="assets/js/popper.min.js"></script>
@@ -55,10 +57,11 @@
                                 let dati = data["data"];
                                 console.log(data);
                                 let datiStampati = "";
-                                    datiStampati += "<p style='float: left; width:100%; padding: 0px 15px'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong> </p>";
-                                    datiStampati += "<div style='float: left; width:100%; padding: 0px 15px'><p style='float: left'>";
-                                    datiStampati += " <input id='qty' class='inputOsai' type='number' value='1' min='1' max='" + dati[0].QTA_GIAC_PRM + "'/>  </p> <p style='float: right'>Quantita: <strong>"+dati[0].QTA_GIAC_PRM+"</strong>  </p> </div>";
-                                    datiStampati += "<hr/>";                                
+                                datiStampati += "<p > Articolo: <strong>"+dati[0].ID_MAGAZZINO+"</strong> </p>";
+                                datiStampati += "<p > Descrizione: <strong>"+dati[0].DESCRIZIONE+"</strong> </p>";
+                                datiStampati += "<p > Magazzino: <strong>"+dati[0].ID_ARTICOLO+"</strong> </p>";
+                                    datiStampati += "<div><p>";
+                                    datiStampati += "<label for='qty'>Quantità da trasferire:</label><br> <input id='qty' class='inputOsai' type='number' value='1' min='1' max='" + dati[0].QTA_GIAC_PRM + "'/>  </p> <p>Quantità totale: <strong>"+dati[0].QTA_GIAC_PRM+"</strong>  </p> </div>";                             
                                 $("#appendData").html(datiStampati);
                             }
                             });
@@ -66,7 +69,7 @@
                     if(i == 3) {
                         sessionStorage.setItem('ubicazione-destinazione', barCode);
                         $("#btnTrasferimento").attr('disabled',false);
-                        $("#magazzinoDest").html("<p style='float: left; width:100%; padding: 0px 15px'> Magazzino destinazione: <strong>" + barCode + " </strong> </p>");
+                        $("#magazzinoDest").html("<p> Magazzino destinazione: <strong>" + barCode + " </strong> </p>");
                     }
                 }
             });
@@ -78,7 +81,7 @@
                             dataType: 'json',
                             success: function(data, status) {
                                 console.log(data);
-                                $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'> Trasferimento avvenuto con successo </div>");
+                                $("#magazzinoDest").append("<div class='alert alertOsai alert-success' role='alert'> Trasferimento avvenuto con successo </div>");
                             }
                             });
             }
