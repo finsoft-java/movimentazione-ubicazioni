@@ -42,7 +42,6 @@ function annulla() {
     $("#dettagli").html("");
     $("#messaggio").html("");
     $("#articoloEsaurito").attr("disabled", true); 
-    
     $("#articoloEsaurito").css("display", "none"); 
     $("#annullaEsaurimento").css("display", "none");
     barCode = null;

@@ -5,7 +5,7 @@
         <meta name="google" content="notranslate">
         <meta name="viewport" content="width=device-width, user-scalable=no,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
 
-        <title>Movimentazione Ubicazioni</title>
+        <title>Trasferimento articoli</title>
         <link rel="stylesheet" href="assets/css/bootstrap.min.css">
         <link rel="stylesheet" href="assets/css/style.css?v=6">
         <link rel="stylesheet" href="assets/css/all.css">
@@ -16,12 +16,12 @@
         <div class="interrogaUbiOsai red">
             <div><a class="nav-link" style="text-transform: uppercase;" href="./index.html">Torna al Menu</a></div>
         </div>
-        <h3 class="titleOsai">Interrogazione Ubicazione</h3>
         <div class="qrcode">
             <input type="password" class="form-control focus" id="qrcode" placeholder="QRCODE" aria-describedby="basic-addon2">
         </div>
-        <div class="listaOsai">
-
+        <div>
+            <button type="button" id="btnTrasferimento" class="btn" disabled="true"> Invia
+            </button>
         </div>
         <script src="assets/js/jquery-3.6.0.min.js"></script>
         <script src="assets/js/popper.min.js"></script>
@@ -34,7 +34,8 @@
                     $("#qrcode").get(0).focus();
                 }, 1000);
             });
-            /**
+
+             
             let i = 0;
             document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 if (event.keyCode === 13) {
@@ -46,38 +47,26 @@
                     }
                     if(i == 2) {
                         sessionStorage.setItem('articolo', barCode);
+                        //chiamata ws get interrogazione quantity 
                     }
                     if(i == 3) {
                         sessionStorage.setItem('ubicazione-destinazione', barCode);
-                        $("#qrcode").attr('disabled',true);
+                        $("#btnTrasferimento").attr('disabled',false);
+                        $.post({
+                            url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + sessionStorage.getItem('ubicazione') + "&codArticolo=" + sessionStorage.getItem('articolo') + "&codUbicazioneDest=" + sessionStorage.getItem('ubicazione-destinazione'),
+                            dataType: 'json',
+                            success: function(data, status) {
+                                console.log(data);
+                            }
+                            });
                     }
                 }
             });
-            */
-            document.getElementById("qrcode").addEventListener("keyup", function(event) {
-                if (event.keyCode === 13) {
-                    $.get({
-                        url: "./ws/Interrogazione.php?codUbicazione=" + $("#qrcode").val(),
-                        dataType: 'json',
-                        //headers: {
-                         //   'Authorization': 'Bearer ' + sessionStorage.getItem('token')
-                        //},
-                        success: function(data, status) {
-                            let dati = data["data"];
-                            let datiStampati = "<p style='color:red'>MAGAZZINO: <strong style='text-transform:uppercase'>"+dati[0].ID_MAGAZZINO+"</strong></p>";
-                            for(let i = 0; i < Object.keys(dati).length;i++){
-                                
-                                datiStampati += "<p>Articolo: <strong>"+dati[i].ID_ARTICOLO+"</strong> | Quantita: <strong>"+dati[i].QTA_GIAC_PRM+" pz. </strong></p>";
-                                datiStampati += "<p>Descrizione: <strong>"+dati[i].DESCRIZIONE+"</strong> </p>";
-                                datiStampati += "<hr/>";
-                            }
-                            $(".listaOsai").html(datiStampati);
-                        }
-                    });
-                    //hide_errors();
+            
+            document.getElementById("btnTrasferimento").addEventListener("keyup", function(event) {
                     $("#qrcode").attr("disabled", true);
-                }
             });
+            
         </script>
     </body>
 </html>
