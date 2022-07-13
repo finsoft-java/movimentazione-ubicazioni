@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="google" content="notranslate">
+        <meta name="viewport" content="width=device-width, user-scalable=no,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+
+        <title>Trasferimento articoli</title>
+        <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+        <link rel="stylesheet" href="assets/css/style.css?v=6">
+        <link rel="stylesheet" href="assets/css/all.css">
+        <link rel="stylesheet" href="assets/css/fontawesome.css">
+        <link rel="stylesheet" href="assets/css/v4-font-face.css">
+    </head>
+    <body>
+        <div class="interrogaUbiOsai red">
+            <div><a class="nav-link" style="text-transform: uppercase;" href="./index.html">Torna al Menu</a></div>
+        </div>
+        <div class="qrcode">
+            <input type="password" class="form-control focus" id="qrcode" placeholder="QRCODE" aria-describedby="basic-addon2">
+        </div>
+        <div>
+            <button type="button" id="btnTrasferimento" class="btn" disabled="true"> Invia
+            </button>
+        </div>
+        <script src="assets/js/jquery-3.6.0.min.js"></script>
+        <script src="assets/js/popper.min.js"></script>
+        <script src="assets/js/bootstrap.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                $(".focus").focus();
+                setInterval(function() {
+                    console.log("Focusing esaurimento");
+                    $("#qrcode").get(0).focus();
+                }, 1000);
+            });
+
+             
+            let i = 0;
+            document.getElementById("qrcode").addEventListener("keyup", function(event) {
+                if (event.keyCode === 13) {
+                    event.preventDefault();
+                    i++;
+                    barCode = $("#qrcode").val();
+                    if(i == 1) {
+                        sessionStorage.setItem('ubicazione', barCode);
+                    }
+                    if(i == 2) {
+                        sessionStorage.setItem('articolo', barCode);
+                        //chiamata ws get interrogazione quantity 
+                    }
+                    if(i == 3) {
+                        sessionStorage.setItem('ubicazione-destinazione', barCode);
+                        $("#btnTrasferimento").attr('disabled',false);
+                        $.post({
+                            url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + sessionStorage.getItem('ubicazione') + "&codArticolo=" + sessionStorage.getItem('articolo') + "&codUbicazioneDest=" + sessionStorage.getItem('ubicazione-destinazione'),
+                            dataType: 'json',
+                            success: function(data, status) {
+                                console.log(data);
+                            }
+                            });
+                    }
+                }
+            });
+            
+            document.getElementById("btnTrasferimento").addEventListener("keyup", function(event) {
+                    $("#qrcode").attr("disabled", true);
+            });
+            
+        </script>
+    </body>
+</html>
