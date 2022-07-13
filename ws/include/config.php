@@ -27,10 +27,11 @@ define('POS_ARTICOLO', '0');
 
 
 /* costanti per il documento di trasferimento */
-$CAU_TESTATA = 'XXX';
-$CAU_RIGA = 'CCC';
 $ID_AZIENDA = '001';
 $UTENTE = 'ADMIN_001';
+$DATA_ORIGIN = 'FOO';
+$CAU_TESTATA = 'XXX';
+$CAU_RIGA = 'CCC';
 
 
 ?>

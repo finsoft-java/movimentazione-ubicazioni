@@ -29,7 +29,7 @@ class CaricamentiMassaManager {
     }
 
     function trasferisciArticolo($codUbicazioneSrc, $codUbicazioneDest, $articolo, $qty) {
-        global $panthera, $CAU_TESTATA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE, $ubicazioniManager;
+        global $panthera, $ubicazioniManager;
 
         if ($panthera->mock) {
             return;
@@ -54,7 +54,7 @@ class CaricamentiMassaManager {
     }
 
     function creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa) {
-        global $panthera, $CAU_RIGA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
+        global $panthera, $DATA_ORIGIN, $CAU_RIGA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
 
         $sql = "INSERT INTO THIP.CM_DOC_TRA_TES (
           DATA_ORIGIN,            -- 1
@@ -119,12 +119,12 @@ class CaricamentiMassaManager {
           R_FORNITORE,            -- 60
           R_FORNITORE_ARR)
         VALUES (
-          '',                     -- 1
-          '',
-          '',
-          '',
-          '',
-          '',
+          '$DATA_ORIGIN',                     -- 1
+          '$RUN_ID',
+          '$id',
+          1,
+          'I',
+          '0',
           '$ID_AZIENDA',
           '$CAU_TESTATA',
           '$YEAR',
@@ -186,7 +186,7 @@ class CaricamentiMassaManager {
     }
 
     function creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo=null, $qty=null) {
-      global $panthera;
+      global $panthera, $DATA_ORIGIN, $CAU_TESTATA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
 
       if (isempty($articolo) || isempty($qty)) {
         $qty = 'S.QTY';
@@ -256,12 +256,12 @@ class CaricamentiMassaManager {
         R_FORNITORE,
         R_FORNITORE_ARR)
       SELECT
-        '',             -- 1
-        '',
-        '',
-        '',
-        '',
-        '',
+        '$DATA_ORIGIN',                     -- 1
+        '$RUN_ID',
+        '$id',
+        ROW_NUMBER() OVER(ORDER BY S.ID_ARTICOLO),
+        'I',
+        '0',
         '$ID_AZIENDA',
         '$YEAR',
         null,
