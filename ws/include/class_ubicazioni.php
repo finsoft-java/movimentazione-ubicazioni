@@ -109,7 +109,7 @@ class UbicazioniManager {
                   ORDER BY U.ID_MAGAZZINO";
           $data = $panthera->select_column($sql);
       }
-      $count = len($data);
+      $count = count($data);
       return [$data, $count];
     }
 }
