@@ -24,7 +24,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 dataType: 'json',
                 success: function(data, status) {
                     let dati = data["data"];
-                    if(dati[0] == null) {                    
+                    if(dati[0] == null || dati.length === 0) {                    
                         $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
                         $("#error_message div").css("display","block");
                         $("#qrcode").val('');
@@ -41,7 +41,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                             success: function(data, status) { 
                                 let dati = data["data"];
                                 arrUbicazioniDest = dati;
-                                if(dati[0] == null) {                    
+                                if(dati[0] == null || dati.length === 0) {                    
                                     $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
                                     $("#error_message div").css("display","block");
                                     $("#qrcode").val('');
