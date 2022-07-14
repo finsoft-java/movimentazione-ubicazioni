@@ -1,13 +1,9 @@
-function setFocus() {
+$(document).ready(function(){
+    $(".focus").focus();
     let interval = setInterval(function() {
         console.log("Focusing esaurimento");
         $("#qrcode").get(0).focus();
     }, 1000);
-}
-
-$(document).ready(function(){
-    $(".focus").focus();
-    setFocus()
 });
 
 let i = 0;
