@@ -4,8 +4,8 @@ $(document).ready(function(){
     $(".focus").focus();
     setInterval(function() {
         if(timerOn) {
-        console.log("Focusing esaurimento");
-        $("#qrcode").get(0).focus();
+            console.log("Focusing esaurimento");
+            $("#qrcode").get(0).focus();
         }
     }, 1000);
 });
@@ -48,7 +48,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                                     return false;
                                 }
                                 let datiStampati = "";
-                                datiStampati += "<select onclick='"+ (() => this.timerOn = false) +"' class=\"form-control\">";    
+                                datiStampati += "<select onclick='timerOn = false' onfocusout='timerOn = true' class=\"form-control\">";    
                                 datiStampati += "<option value='-1'> Seleziona un magazzino </option>";                            
                                 for(let i=0; i<dati.length; i++) {
                                     datiStampati += "<option value='"+dati[i]+"'>" + dati[i] + "</option>";                    

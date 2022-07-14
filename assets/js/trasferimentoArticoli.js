@@ -1,10 +1,16 @@
+let timerOn = true;
+
 $(document).ready(function(){
     $(".focus").focus();
     setInterval(function() {
-        console.log("Focusing esaurimento");
-        $("#qrcode").get(0).focus();
+        if(timerOn) {
+           console.log("Focusing esaurimento");
+            $("#qrcode").get(0).focus();
+        }
+        else console.log('a')
     }, 1000);
-});             
+});   
+
 let i = 0;
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     if (event.keyCode === 13) {
@@ -33,7 +39,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
                         datiStampati += "<p class='pOsai'> Articolo: <strong>"+dati[0].ID_ARTICOLO+"</strong>";
                         datiStampati += "<p class='pOsai'> Descrizione: <strong>"+dati[0].DESCRIZIONE+"</strong> </p>";
-                        datiStampati += "<p class='pOsai'> Quantità da trasferire: <input id='qty' class='inputOsai' type='number' value='1' min='1' max='" + dati[0].QTA_GIAC_PRM + "'/> </p>";
+                        datiStampati += "<p class='pOsai'> Quantità da trasferire: <input onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' type='number' value='1' min='1' max='" + dati[0].QTA_GIAC_PRM + "'/> </p>";
                         datiStampati += "<p class='pOsai' style='margin:0px;'> Quantita Totale: <strong>"+dati[0].QTA_GIAC_PRM+"</strong> </p>";                         
                     $("#appendData").html(datiStampati);
                 }
