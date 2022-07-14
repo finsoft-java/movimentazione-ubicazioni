@@ -28,5 +28,6 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 $(".listaOsai").html(datiStampati);
             }
         });
+        $("#qrcode").val("");
     }
 });

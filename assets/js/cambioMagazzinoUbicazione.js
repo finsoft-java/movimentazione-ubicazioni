@@ -46,10 +46,13 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         });
                     }
                 });
+                $("#qrcode").val("");
             }
             if(i == 2) {
             sessionStorage.setItem('ubicazione-destinazione', barCode);
             $("#magazzinoDest").html("<p class='pOsai'> Magazzino destinazione: <strong>" + barCode + " </strong> </p>");
+            $("select").val(barCode);
+            $("#qrcode").val("");
         }
     }
 });

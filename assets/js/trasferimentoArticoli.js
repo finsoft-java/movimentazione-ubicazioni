@@ -13,6 +13,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
         barCode = $("#qrcode").val();
         if(i == 1) {
             sessionStorage.setItem('ubicazione', barCode);
+            $("#qrcode").val("");
         }
         if(i == 2) {
             sessionStorage.setItem('articolo', barCode);                       
@@ -38,11 +39,13 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     $("#appendData").html(datiStampati);
                 }
             });
+            $("#qrcode").val("");
         }
         if(i == 3) {
             sessionStorage.setItem('ubicazione-destinazione', barCode);
             $("#btnTrasferimento").attr('disabled',false);
             $("#magazzinoDest").html("<p class='pOsai'> Magazzino destinazione: <strong>" + barCode + " </strong> </p>");
+            $("#qrcode").val("");
         }
     }
 });
