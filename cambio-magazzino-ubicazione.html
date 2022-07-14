@@ -5,7 +5,7 @@
         <meta name="google" content="notranslate">
         <meta name="viewport" content="width=device-width, user-scalable=no,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
 
-        <title>Movimentazione Ubicazioni</title>
+        <title> Cambio Magazzino Ubicazione</title>
         <link rel="stylesheet" href="assets/css/bootstrap.min.css">
         <link rel="stylesheet" href="assets/css/style.css?v=6">
         <link rel="stylesheet" href="assets/css/all.css">
@@ -13,23 +13,22 @@
         <link rel="stylesheet" href="assets/css/v4-font-face.css">
     </head>
     <body>
-        <div class="menuOsai red">
-            <div><a class="nav-link" href="./interrogazione-ubicazione.html">Interrogazione Ubicazione</a></div>
+        <div class="interrogaUbiOsai green">
+            <div><a class="nav-link" style="text-transform: uppercase;" href="./index.html">Torna al Menu</a></div>
         </div>
-        <div class="menuOsai green">
-            <div><a class="nav-link" href="./cambio-magazzino-ubicazione.html">Cambio Magazzino Ubicazione</a></div>
+        <h3 class="titleOsai"> Cambio Magazzino Ubicazione</h3>
+
+        <div class="qrcode">
+            <input type="password" class="form-control focus" id="qrcode" placeholder="QRCODE" aria-describedby="basic-addon2">
         </div>
-        <div class="menuOsai blue">
-            <div><a class="nav-link" href="./trasferimento-articoli.html">Trasferimento Articoli</a></div>
+        <div id="appendData"></div>
+        <div id="magazzinoDest"></div>
+        <div class="btnDiv">
+            <button onclick="cambioMagazzinoUbicazione()" type="button" id="btnCambio" class="btn btnOsai" disabled="true"> Invia </button>
         </div>
         <script src="assets/js/jquery-3.6.0.min.js"></script>
         <script src="assets/js/popper.min.js"></script>
         <script src="assets/js/bootstrap.min.js"></script>
-        <script>
-            $(document).ready(function(){
-                $('.menuOsai').css('height',(window.innerHeight/3));
-                sessionStorage.clear();
-            });
-        </script>
+        <script src="assets/js/cambioMagazzinoUbicazione.js"></script>
     </body>
 </html>

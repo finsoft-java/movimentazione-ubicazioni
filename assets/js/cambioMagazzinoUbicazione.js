@@ -4,7 +4,8 @@ $(document).ready(function(){
         console.log("Focusing esaurimento");
         $("#qrcode").get(0).focus();
     }, 1000);
-});             
+});
+
 let i = 0;
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     if (event.keyCode === 13) {
@@ -26,7 +27,6 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
                         datiStampati += "<p class='pOsai'> Articolo: <strong>"+dati[0].ID_ARTICOLO+"</strong>";
                         datiStampati += "<p class='pOsai'> Descrizione: <strong>"+dati[0].DESCRIZIONE+"</strong> </p>";
-
                         datiStampati += "<p class='pOsai'> Quantità da trasferire: <input id='qty' class='inputOsai' type='number' value='1' min='1' max='" + dati[0].QTA_GIAC_PRM + "'/> </p>";
                         datiStampati += "<p class='pOsai' style='margin:0px;'> Quantita Totale: <strong>"+dati[0].QTA_GIAC_PRM+"</strong> </p>";                         
                     $("#appendData").html(datiStampati);
@@ -41,7 +41,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
     }
 });
 
-function trasferimentoArticoli() {
+function cambioMagazzinoUbicazione() {
     $("#qrcode").attr("disabled", true);
     $.post({
         url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + sessionStorage.getItem('ubicazione') + "&codArticolo=" + sessionStorage.getItem('articolo')+ "&qty=" + $("#qty").val() + "&codUbicazioneDest=" + sessionStorage.getItem('ubicazione-destinazione'),
