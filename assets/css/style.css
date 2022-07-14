@@ -7,7 +7,9 @@
     position: relative;
     border-bottom: 4px solid #fff;
   }
-
+  .alert{
+    font-size:15px
+  }
   .inputOsai {
     max-width: 150px;
     float: left;
