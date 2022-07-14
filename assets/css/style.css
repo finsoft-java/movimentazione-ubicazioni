@@ -3,10 +3,12 @@
 html {
 	background-color: #fff;
 }
-
 .menuOsai {
 	position: relative;
-	border-bottom: 4px solid #fff;
+}
+.menuOsai.green{
+	border-bottom: 2px solid white;
+	border-top: 2px solid white;
 }
 .alert {
 	font-size: 15px;
@@ -84,10 +86,6 @@ input:focus {
 	color: #fff;
 	font-weight: bold;
 	text-transform: uppercase;
-}
-
-.menuOsai.red {
-	border-top: 4px solid #fff;
 }
 
 .inputOsai {
