@@ -1,8 +1,12 @@
+let timerOn = true;
+
 $(document).ready(function(){
     $(".focus").focus();
-    let interval = setInterval(function() {
+    setInterval(function() {
+        if(timerOn) {
         console.log("Focusing esaurimento");
         $("#qrcode").get(0).focus();
+        }
     }, 1000);
 });
 
@@ -21,23 +25,24 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     let dati = data["data"];
                     console.log(data);
                     let datiStampati = "";
-                        datiStampati += "<p class='pOsai'> Magazzino: <strong>"+"dati[0].ID_MAGAZZINO"+"</strong></p>";
-                        datiStampati += "<p class='pOsai'> Codice ubicazione: <strong>"+"dati[0].COD_UBICAZIONE"+"</strong></p>";
+                        datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
+                        datiStampati += "<p class='pOsai'> Codice ubicazione: <strong>"+dati[0].ID_UBICAZIONE+"</strong></p>";
+                        timerOn = false;
                         datiStampati += "<select class=\"form-control\"><option>Mag 1</option><option>Mag 2</option><option>Mag 3</option></select>"                     
+                        $("#btnCambio").attr('disabled',false);
                         $("#appendData").html(datiStampati);
                     }
                 });
-                clearInterval(interval);
             }
-        // if(i == 2) {
+            // if(i == 2) {
+            // $("#magazzinoDest").html("<p class='pOsai'> Magazzino destinazione: <strong>" + barCode + " </strong> </p>");
         //     sessionStorage.setItem('ubicazione-destinazione', barCode);
-        //     $("#btnTrasferimento").attr('disabled',false);
-        //     $("#magazzinoDest").html("<p class='pOsai'> Magazzino destinazione: <strong>" + barCode + " </strong> </p>");
         // }
     }
 });
 
 function cambioMagazzinoUbicazione() {
+    timerOn = true;
     $("#qrcode").attr("disabled", true);
     $.post({
         url: "./ws/CambioMagazzinoUbicazione.php?codUbicazione=" + sessionStorage.getItem('ubicazione') + "&codUbicazioneDest=" + sessionStorage.getItem('ubicazione-destinazione'),
