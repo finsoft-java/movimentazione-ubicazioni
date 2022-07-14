@@ -6,22 +6,36 @@
   }
   .menuOsai {
     position: relative;
-    border-bottom: 4px solid #000;
+    border-bottom: 4px solid #fff;
   }
 
   .inputOsai {
     max-width: 150px;
     float: left;
   }
-
-  .btnTrasferimento {
-
+  #appendData{
+    float: left;
+    width: 100%;
+    margin: 0px 0px 30px 0px;
+  }
+  #appendData {
+    font-size:15px;
+  }
+  #magazzinoDest{
+    float: left;
+    width: 100%;
+    margin: 0px 0px 30px 0px;
+    font-size:15px;
+  }
+  #btnTrasferimento {
+    display:block;
+    margin: 0px auto;
   }
 
   .interrogaUbiOsai{
     position: relative;
     padding:10px 0px;
-    border-bottom: 4px solid #000;
+    border-bottom: 4px solid #fff;
   }
   .titleOsai{
     font-size: 16px;
@@ -37,7 +51,7 @@
   .interrogaUbiOsai a{
     width: 100%;
     text-align: center;
-    color:#000;
+    color:#fff;
     font-weight: bold;
   }
   input:focus{
@@ -55,10 +69,14 @@
   .menuOsai a{
     position: absolute;
     top: 50%;
-    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%); /* WebKit */
+    -moz-transform: translateY(-50%);/* Mozilla */
+    -o-transform: translateY(-50%); /* Opera */
+    -ms-transform: translateY(-50%); /* Internet Explorer */
+    transform: translateY(-50%); /* CSS3 */
     width: 100%;
     text-align: center;
-    color:#000;
+    color:#fff;
     font-weight: bold;
     text-transform: uppercase;
 }
@@ -377,13 +395,17 @@
 
   .alert {
     display: none;
-    position: absolute;
+    position: fixed;
     left: 50%;
-    transform: translateX(-50%);
+    -webkit-transform: translateX(-50%); /* WebKit */
+    -moz-transform: translateX(-50%);/* Mozilla */
+    -o-transform: translateX(-50%); /* Opera */
+    -ms-transform: translateX(-50%); /* Internet Explorer */
+    transform: translateX(-50%); /* CSS3 */
     z-index: 1;
     opacity: 0.8;
     width: 90%;
-    bottom: 70px;
+    bottom: 0px;
   }
   .alert > p{
     margin: 0px;
