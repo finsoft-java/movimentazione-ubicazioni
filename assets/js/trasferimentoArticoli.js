@@ -21,6 +21,12 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 dataType: 'json',
                 success: function(data, status) {
                     let dati = data["data"];
+                    if(dati == null) {                    
+                        $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
+                        $("#error_message div").css("display","block");
+                        $("#qrcode").val('');
+                        return false;
+                    }
                     console.log(data);
                     let datiStampati = "";
                         datiStampati += "<p style='float: left; width:100%; padding: 0px 15px'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
