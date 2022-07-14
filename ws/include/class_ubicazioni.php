@@ -95,4 +95,25 @@ class UbicazioniManager {
         return $panthera->select_single($sql);
       }
     }
+
+    /**
+     * Restituisce la lista di tutti i magazzini su cui l'ubicazione è definita con TRASFERIBILE='N'
+     */
+    function getMagazziniAlternativi($codUbicazione) {
+      global $panthera, $ID_AZIENDA;
+
+      if ($panthera->mock) {
+          $data = [ 'M01', 'M02', 'M03' ];
+      } else {
+          $sql = "SELECT U.ID_MAGAZZINO
+                  FROM THIP.UBICAZIONI_LL U
+                  JOIN THIPPERS.YUBICAZIONI_LL YU
+                    ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
+                  WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND YU.TRASFERIBILE='N' AND U.STATO='V'
+                  ORDER BY U.ID_MAGAZZINO";
+          $data = $panthera->select_column($sql);
+      }
+      $count = len($data);
+      return [$data, $count];
+    }
 }
