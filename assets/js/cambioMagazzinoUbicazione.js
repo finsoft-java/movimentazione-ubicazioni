@@ -28,9 +28,20 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
                         datiStampati += "<p class='pOsai'> Codice ubicazione: <strong>"+dati[0].ID_UBICAZIONE+"</strong></p>";
                         timerOn = false;
-                        datiStampati += "<select class=\"form-control\"><option>Mag 1</option><option>Mag 2</option><option>Mag 3</option></select>"                     
-                        $("#btnCambio").attr('disabled',false);
                         $("#appendData").html(datiStampati);
+                        $.get({
+                            url: "./ws/GetMagazziniAlternativi.php?codUbicazione="+ sessionStorage.getItem('ubicazione'),
+                            dataType: 'json',
+                            success: function(data, status) { 
+                                let dati = data["data"];
+                                alert("aaaaaa");
+                                let datiStampati = "";
+                                console.log("gshhfgsdyh",data);
+                                datiStampati += "<select class=\"form-control\"><option>Mag 1</option><option>Mag 2</option><option>Mag 3</option></select>"                     
+                                $("#btnCambio").attr('disabled',false);
+                                $("#appendData").append(datiStampati);
+                            }
+                        });
                     }
                 });
             }
