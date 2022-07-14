@@ -13,10 +13,7 @@ class UbicazioniManager {
       if ($panthera->mock) {
           $data = [ [ 'ID_ARTICOLO' => 'AAAA', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'QTA_GIAC_PRM' => 10, 'TRASFERIBILE' => 'Y' ]]; 
           $count = 1;
-          $data = []; 
-          $count = 0;
       } else {
-          /*
           $sql0 = "SELECT COUNT(*) AS cnt ";
           $sql1 = "SELECT U.ID_UBICAZIONE, U.ID_MAGAZZINO, S.ID_ARTICOLO, A.DESCRIZIONE, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
           
@@ -32,7 +29,6 @@ class UbicazioniManager {
           $sql3 = " ORDER BY S.ID_ARTICOLO";
           $count = $panthera->select_single_value($sql0 . $sql2);
           $data = $panthera->select_list($sql1 . $sql2 . $sql3);
-          */
       }
       
       return [$data, $count];
