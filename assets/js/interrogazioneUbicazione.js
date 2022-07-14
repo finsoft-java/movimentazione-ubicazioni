@@ -12,6 +12,12 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             dataType: 'json',
             success: function(data, status) {
                 let dati = data["data"];
+                if(dati[0] == null) {                    
+                    $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
+                    $("#error_message div").css("display","block");
+                    $("#qrcode").val('');
+                    return false;
+                }
                 let datiStampati = "<p>MAGAZZINO: <strong style='text-transform:uppercase'>"+dati[0].ID_MAGAZZINO+"</strong></p>";
                 for(let i = 0; i < Object.keys(dati).length;i++){
                     
@@ -22,6 +28,5 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 $(".listaOsai").html(datiStampati);
             }
         });
-        $("#qrcode").attr("disabled", true);
     }
 });
