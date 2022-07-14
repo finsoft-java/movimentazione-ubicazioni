@@ -10,10 +10,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 //require_logged_user_JWT();
 
-$codUbicazione = isset($_GET['codUbicazione']) ? $panthera->escape_string($_GET['codUbicazione']) : null;
-$codArticolo = isset($_GET['codArticolo']) ? $panthera->escape_string($_GET['codArticolo']) : null;
-$qty = isset($_GET['qty']) ? $panthera->escape_string($_GET['qty']) : null;
-$codUbicazioneDest = isset($_GET['codUbicazioneDest']) ? $panthera->escape_string($_GET['codUbicazioneDest']) : null;
+$codUbicazione = isset($_REQUEST['codUbicazione']) ? $panthera->escape_string($_REQUEST['codUbicazione']) : null;
+$codArticolo = isset($_REQUEST['codArticolo']) ? $panthera->escape_string($_REQUEST['codArticolo']) : null;
+$qty = isset($_REQUEST['qty']) ? $panthera->escape_string($_REQUEST['qty']) : null;
+$codUbicazioneDest = isset($_REQUEST['codUbicazioneDest']) ? $panthera->escape_string($_REQUEST['codUbicazioneDest']) : null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($codUbicazione)) {

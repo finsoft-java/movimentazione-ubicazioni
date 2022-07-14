@@ -10,8 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 //require_logged_user_JWT();
 
-$codUbicazione = isset($_GET['codUbicazione']) ? $panthera->escape_string($_GET['codUbicazione']) : null;
-$codMagazzinoDest = isset($_GET['codMagazzinoDest']) ? $panthera->escape_string($_GET['codMagazzinoDest']) : null;
+$codUbicazione = isset($_REQUEST['codUbicazione']) ? $panthera->escape_string($_REQUEST['codUbicazione']) : null;
+$codMagazzinoDest = isset($_REQUEST['codMagazzinoDest']) ? $panthera->escape_string($_REQUEST['codMagazzinoDest']) : null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($codUbicazione)) {
