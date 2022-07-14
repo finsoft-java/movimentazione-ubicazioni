@@ -11,6 +11,7 @@ $(document).ready(function(){
 });
 
 let i = 0;
+let arrUbicazioniDest = [];
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     if (event.keyCode === 13) {
         event.preventDefault();
@@ -23,6 +24,12 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 dataType: 'json',
                 success: function(data, status) {
                     let dati = data["data"];
+                    if(dati[0] == null) {                    
+                        $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
+                        $("#error_message div").css("display","block");
+                        $("#qrcode").val('');
+                        return false;
+                    }
                     let datiStampati = "";
                         datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
                         datiStampati += "<p class='pOsai'> Codice ubicazione: <strong>"+dati[0].ID_UBICAZIONE+"</strong></p>";
@@ -33,8 +40,16 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                             dataType: 'json',
                             success: function(data, status) { 
                                 let dati = data["data"];
+                                arrUbicazioniDest = dati;
+                                if(dati[0] == null) {                    
+                                    $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
+                                    $("#error_message div").css("display","block");
+                                    $("#qrcode").val('');
+                                    return false;
+                                }
                                 let datiStampati = "";
-                                datiStampati += "<select placeholder='Seleziona un magazzino' onclick='"+ (() => this.timerOn = false) +"' class=\"form-control\">";            
+                                datiStampati += "<select onclick='"+ (() => this.timerOn = false) +"' class=\"form-control\">";    
+                                datiStampati += "<option value='-1'> Seleziona un magazzino </option>";                            
                                 for(let i=0; i<dati.length; i++) {
                                     datiStampati += "<option value='"+dati[i]+"'>" + dati[i] + "</option>";                    
                                  } 
@@ -49,7 +64,14 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 $("#qrcode").val("");
             }
             if(i == 2) {
+            console.log(arrUbicazioniDest);
             sessionStorage.setItem('ubicazione-destinazione', barCode);
+            if(!arrUbicazioniDest.includes(barCode)) {                    
+                $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione non valida</div>");
+                $("#error_message div").css("display","block");
+                $("#qrcode").val('');
+                return false;
+            }
             $("#magazzinoDest").html("<p class='pOsai'> Magazzino destinazione: <strong>" + barCode + " </strong> </p>");
             $("select").val(barCode);
             $("#qrcode").val("");
@@ -62,10 +84,9 @@ function cambioMagazzinoUbicazione() {
     let magazzinoDest = $("");
     $("#qrcode").attr("disabled", true);
     $.post({
-        url: "./ws/CambioMagazzinoUbicazione.php?codUbicazione=" + sessionStorage.getItem('ubicazione') + "&codMagazzinoDest=" + sessionStorage.getItem('ubicazione-destinazione'),
+        url: "./ws/CambioMagazzinoUbicazione.php?codUbicazione=" + sessionStorage.getItem('ubicazione') + "&codMagazzinoDest=" + $("select").val(),
         dataType: 'json',
         success: function(data, status) {
-            console.log("ushdusd",data);
             $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'> Cambio avvenuto con successo al magazzino <strong>"+sessionStorage.getItem('ubicazione-destinazione')+"</strong></div>");
         }
     });
