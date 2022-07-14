@@ -26,11 +26,9 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         datiStampati += "<p style='float: left; width:100%; padding: 0px 15px'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
                         datiStampati += "<p style='float: left; width:100%; padding: 0px 15px'> Articolo: <strong>"+dati[0].ID_ARTICOLO+"</strong>";
                         datiStampati += "<p style='float: left; width:100%; padding: 0px 15px'> Descrizione: <strong>"+dati[0].DESCRIZIONE+"</strong> </p>";
-                        datiStampati += "<div style='float: left; width:100%; padding: 0px 15px'>";
-                            datiStampati += "<p style='float: left'>";
-                                datiStampati += " <input id='qty' class='inputOsai' type='number' value='1' min='1' max='" + dati[0].QTA_GIAC_PRM + "'/> ";
-                            datiStampati += "</p>";
-                        datiStampati += "<p style='float: right'>Quantita: <strong>"+dati[0].QTA_GIAC_PRM+"</strong></p></div>";                                
+
+                        datiStampati += "<p style='float: left; width:100%; padding: 0px 15px'> Quantità da trasferire: <input id='qty' class='inputOsai' style='float:right' type='number' value='1' min='1' max='" + dati[0].QTA_GIAC_PRM + "'/> </p>";
+                        datiStampati += "<p style='float: left; width:100%; padding: 0px 15px;margin:0px;'> Quantita Totale: <strong>"+dati[0].QTA_GIAC_PRM+"</strong> </p>";                         
                     $("#appendData").html(datiStampati);
                 }
             });
