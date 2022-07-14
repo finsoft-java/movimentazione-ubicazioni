@@ -1,9 +1,13 @@
-$(document).ready(function(){
-    $(".focus").focus();
-    setInterval(function() {
+function setFocus() {
+    let interval = setInterval(function() {
         console.log("Focusing esaurimento");
         $("#qrcode").get(0).focus();
     }, 1000);
+}
+
+$(document).ready(function(){
+    $(".focus").focus();
+    setFocus()
 });
 
 let i = 0;
@@ -13,41 +17,37 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
         i++;
         barCode = $("#qrcode").val();
         if(i == 1) {
-            sessionStorage.setItem('ubicazione', barCode);
-        }
-        if(i == 2) {
-            sessionStorage.setItem('articolo', barCode);                       
+            sessionStorage.setItem('ubicazione', barCode);                    
             $.get({
-                url: "./ws/Interrogazione.php?codUbicazione=" + sessionStorage.getItem('ubicazione') + "&codArticolo=" + sessionStorage.getItem('articolo'),
+                url: "./ws/Interrogazione.php?codUbicazione=" + sessionStorage.getItem('ubicazione'),
                 dataType: 'json',
                 success: function(data, status) {
                     let dati = data["data"];
                     console.log(data);
                     let datiStampati = "";
-                        datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
-                        datiStampati += "<p class='pOsai'> Articolo: <strong>"+dati[0].ID_ARTICOLO+"</strong>";
-                        datiStampati += "<p class='pOsai'> Descrizione: <strong>"+dati[0].DESCRIZIONE+"</strong> </p>";
-                        datiStampati += "<p class='pOsai'> Quantità da trasferire: <input id='qty' class='inputOsai' type='number' value='1' min='1' max='" + dati[0].QTA_GIAC_PRM + "'/> </p>";
-                        datiStampati += "<p class='pOsai' style='margin:0px;'> Quantita Totale: <strong>"+dati[0].QTA_GIAC_PRM+"</strong> </p>";                         
-                    $("#appendData").html(datiStampati);
-                }
-            });
-        }
-        if(i == 3) {
-            sessionStorage.setItem('ubicazione-destinazione', barCode);
-            $("#btnTrasferimento").attr('disabled',false);
-            $("#magazzinoDest").html("<p class='pOsai'> Magazzino destinazione: <strong>" + barCode + " </strong> </p>");
-        }
+                        datiStampati += "<p class='pOsai'> Magazzino: <strong>"+"dati[0].ID_MAGAZZINO"+"</strong></p>";
+                        datiStampati += "<p class='pOsai'> Codice ubicazione: <strong>"+"dati[0].COD_UBICAZIONE"+"</strong></p>";
+                        datiStampati += "<select class=\"form-control\"><option>Mag 1</option><option>Mag 2</option><option>Mag 3</option></select>"                     
+                        $("#appendData").html(datiStampati);
+                    }
+                });
+                clearInterval(interval);
+            }
+        // if(i == 2) {
+        //     sessionStorage.setItem('ubicazione-destinazione', barCode);
+        //     $("#btnTrasferimento").attr('disabled',false);
+        //     $("#magazzinoDest").html("<p class='pOsai'> Magazzino destinazione: <strong>" + barCode + " </strong> </p>");
+        // }
     }
 });
 
 function cambioMagazzinoUbicazione() {
     $("#qrcode").attr("disabled", true);
     $.post({
-        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + sessionStorage.getItem('ubicazione') + "&codArticolo=" + sessionStorage.getItem('articolo')+ "&qty=" + $("#qty").val() + "&codUbicazioneDest=" + sessionStorage.getItem('ubicazione-destinazione'),
+        url: "./ws/CambioMagazzinoUbicazione.php?codUbicazione=" + sessionStorage.getItem('ubicazione') + "&codUbicazioneDest=" + sessionStorage.getItem('ubicazione-destinazione'),
         dataType: 'json',
         success: function(data, status) {
-            $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'> Trasferimento avvenuto con successo all\'ubicazione <strong>"+sessionStorage.getItem('ubicazione-destinazione')+"</strong></div>");
+            $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'> Cambio avvenuto con successo al magazzino <strong>"+sessionStorage.getItem('ubicazione-destinazione')+"</strong></div>");
         }
     });
 }
