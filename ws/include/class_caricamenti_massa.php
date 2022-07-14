@@ -3,7 +3,7 @@
 $caricamentiMassaManager = new CaricamentiMassaManager();
 
 $YEAR = date('Y');
-$DATE = date('Y-m-d');
+$DATE = date('Ymd');
 
 class CaricamentiMassaManager {
 
@@ -14,14 +14,20 @@ class CaricamentiMassaManager {
             return;
         }
 
+        /* DEBUG
         $ubi1 = $ubicazioniManager->getUbicazione($codUbicazioneSrc);
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
         $commessa = $ubi1['R_COMMESSA'];
-        $id = $panthera->get_numeratore('MOVUBI');
+        */
+        $codMagazzinoSrc = 'M1';
+        $commessa = "C0MM1";
 
+        $id = $panthera->get_numeratore('MOVUBI');
+  
+        // FIXME DOBBIAMO POPOLARE BATCH_LOAD_HDR ?!?
         // CM_DOC_TRA_TES
         $this->creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa);
-
+ 
         // CM_DOC_TRA_RIG
         $this->creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazione, $codMagazzinoDest, $codUbicazione, $commessa);
 
@@ -56,6 +62,7 @@ class CaricamentiMassaManager {
     function creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa) {
         global $panthera, $DATA_ORIGIN, $CAU_RIGA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
 
+        // FIXME RUN_ID
         $sql = "INSERT INTO THIP.CM_DOC_TRA_TES (
           DATA_ORIGIN,            -- 1
           RUN_ID,
@@ -146,8 +153,8 @@ class CaricamentiMassaManager {
           null,
           null,
           null,
-          null,
-          null,
+          '0',
+          'N',
           null,                         -- 30
           null,
           null,
@@ -166,9 +173,9 @@ class CaricamentiMassaManager {
           '$commessa',
           null,
           null,
-          null,
+          'T',
           'N',
-          null,                           -- 50
+          'N',                           -- 50
           null,
           null,
           null,
@@ -182,7 +189,12 @@ class CaricamentiMassaManager {
           null
         )
         ";
-        $this->execute_update($sql);
+        
+        // echo $sql; die();
+        
+        $panthera->execute_update($sql);
+
+        echo "done";
     }
 
     function creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo=null, $qty=null) {
@@ -326,6 +338,8 @@ class CaricamentiMassaManager {
       if ($articolo) {
         $sql .= " AND S.ID_ARTICOLO='$articolo' ";
       }
+        
+      // echo $sql; die();
       
       $this->execute_update($sql);
     }
