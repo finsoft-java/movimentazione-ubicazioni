@@ -11,11 +11,8 @@ class UbicazioniManager {
       global $panthera, $ID_AZIENDA;
 
       if ($panthera->mock) {
-          /*
-          $data = [ [ 'ID_ARTICOLO' => 'AAAA', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'QTA_GIAC_PRM' => 10, 'TRASFERIBILE' => 'Y' ],
-                    ]; 
+          $data = [ [ 'ID_ARTICOLO' => 'AAAA', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'QTA_GIAC_PRM' => 10, 'TRASFERIBILE' => 'Y' ]]; 
           $count = 1;
-          */
           $data = []; 
           $count = 0;
       } else {
@@ -48,7 +45,6 @@ class UbicazioniManager {
         global $panthera, $ID_AZIENDA;
 
         if ($panthera->mock) {
-            /*
             $data = [ [ 'ID_ARTICOLO' => 'AAAA', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'QTA_GIAC_PRM' => 10, 'TRASFERIBILE' => 'Y' ],
                       [ 'ID_ARTICOLO' => 'BBBB', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'QTA_GIAC_PRM' => 100, 'TRASFERIBILE' => 'Y' ],
                       [ 'ID_ARTICOLO' => 'CCCC', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y' ],
@@ -60,9 +56,6 @@ class UbicazioniManager {
                       [ 'ID_ARTICOLO' => 'IIII', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y' ]
                      ]; 
             $count = 9;
-            */
-            $data = [];
-            $count = 0;
         } else {
             $sql0 = "SELECT COUNT(*) AS cnt ";
             $sql1 = "SELECT U.ID_UBICAZIONE, U.ID_MAGAZZINO, S.ID_ARTICOLO, A.DESCRIZIONE, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
@@ -101,5 +94,26 @@ class UbicazioniManager {
                     AND U.STATO='V'";
         return $panthera->select_single($sql);
       }
+    }
+
+    /**
+     * Restituisce la lista di tutti i magazzini su cui l'ubicazione è definita con TRASFERIBILE='N'
+     */
+    function getMagazziniAlternativi($codUbicazione) {
+      global $panthera, $ID_AZIENDA;
+
+      if ($panthera->mock) {
+          $data = [ 'M01', 'M02', 'M03' ];
+      } else {
+          $sql = "SELECT U.ID_MAGAZZINO
+                  FROM THIP.UBICAZIONI_LL U
+                  JOIN THIPPERS.YUBICAZIONI_LL YU
+                    ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
+                  WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND YU.TRASFERIBILE='N' AND U.STATO='V'
+                  ORDER BY U.ID_MAGAZZINO";
+          $data = $panthera->select_column($sql);
+      }
+      $count = len($data);
+      return [$data, $count];
     }
 }
