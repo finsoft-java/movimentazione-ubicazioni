@@ -3,10 +3,13 @@
 $caricamentiMassaManager = new CaricamentiMassaManager();
 
 $YEAR = date('Y');
-$DATE = date('Ymd');
+$DATE = date('Ymd'); // Questo e' il formato richiesto da SQL Server
 
 class CaricamentiMassaManager {
 
+    /**
+     * FUNZIONE "Cambia magazzino dell'ubicazione"
+     */
     function trasferisciUbicazione($codUbicazione, $codMagazzinoDest) {
         global $panthera, $CAU_TESTATA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE, $ubicazioniManager;
 
@@ -16,6 +19,7 @@ class CaricamentiMassaManager {
 
         /* DEBUG
         $ubi1 = $ubicazioniManager->getUbicazione($codUbicazioneSrc);
+        if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazioneSrc' inesistente");
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
         $commessa = $ubi1['R_COMMESSA'];
         */
@@ -34,6 +38,9 @@ class CaricamentiMassaManager {
         // ora dovrei invocare il webservice che innesca il job CM
     }
 
+    /**
+     * FUNZIONE "Trasferisci articolo da una ubicazione a un'altra"
+     */
     function trasferisciArticolo($codUbicazioneSrc, $codUbicazioneDest, $articolo, $qty) {
         global $panthera, $ubicazioniManager;
 
@@ -42,10 +49,12 @@ class CaricamentiMassaManager {
         }
 
         $ubi1 = $ubicazioniManager->getUbicazione($codUbicazioneSrc);
+        if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazioneSrc' inesistente");
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
         $commessa = $ubi1['R_COMMESSA'];
 
         $ubi2 = $ubicazioniManager->getUbicazione($codUbicazioneDest);
+        if ($ubi2 === null) print_error(400, "Ubicazione '$codUbicazioneDest' inesistente");
         $codMagazzinoDest = $ubi2['ID_MAGAZZINO'];
 
         $id = $panthera->get_numeratore('MOVUBI');
@@ -194,7 +203,7 @@ class CaricamentiMassaManager {
         
         $panthera->execute_update($sql);
 
-        echo "done";
+        echo "done"; // DEBUG
     }
 
     function creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo=null, $qty=null) {
