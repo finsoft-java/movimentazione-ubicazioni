@@ -22,8 +22,14 @@
             <input type="password" class="form-control focus" id="qrcode" placeholder="UBICAZIONE ORIG." aria-describedby="basic-addon2">
         </div>
         <div id="appendData"></div>
+
         <div class="btnDiv">
-            <button onclick="cambioMagazzinoUbicazione()" type="button" id="btnCambio" class="btn btnOsai" disabled> Conferma Magazzino </button>
+            <div style="float: left;width: 50%;">
+                <button onclick="cambioMagazzinoUbicazione()" type="button" id="btnCambio" class="btn btnOsai" disabled>Conferma</button>
+            </div>
+            <div style="float: left;width: 50%;">
+                <button onclick="window.location.reload()" type="button" class="btn btnOsai"> Annulla </button>
+            </div>
         </div>
         <div id="error_message"></div>
         <div id="magazzinoDest"></div>
