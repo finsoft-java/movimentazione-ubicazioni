@@ -57,8 +57,6 @@
                   password: 'finsoft2022'//$("#password").val()
               },
               success: function(data, status) {
-                console.log('data', data);
-                console.log(sessionStorage.getItem('requiredRole'));
                   if (sessionStorage.getItem('requiredRole') && data["value"]["ruolo"] != sessionStorage.getItem('requiredRole')) {
                     $("#error_message p").html(msg);
                     $("#error_message").css("display","block");
@@ -66,11 +64,9 @@
                     $("#password").val("");
                     $("#rfid").removeAttr("disabled");
                   } else {
-                    console.log(sessionStorage);
                     sessionStorage.setItem( "user", (data["value"]["nome"] || '') + ' ' + (data["value"]["cognome"] || ''));
                     sessionStorage.setItem( "token", data["value"]["username"] );
                     sessionStorage.setItem( "role", data["value"]["ruolo"] );
-                    console.log(sessionStorage);
                     location.href = sessionStorage.getItem('redirectPage') || 'index.html';
                   }
               },
