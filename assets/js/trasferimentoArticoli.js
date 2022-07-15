@@ -18,11 +18,26 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
         i++;
         barCode = $("#qrcode").val();
         if(i == 1) {
-            sessionStorage.setItem('ubicazione', barCode);
-            $("#qrcode").val("");
+            if(barCode.trim() != ""){       
+                sessionStorage.setItem('ubicazione', barCode);
+                $("#qrcode").val("");
+            } else {
+                $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
+                $("#error_message div").css("display","block");
+                i=0;
+                return false;
+            }
         }
-        if(i == 2) {
-            sessionStorage.setItem('articolo', barCode);                       
+        if(i == 2) {             
+            if(barCode.trim() != ""){       
+                sessionStorage.setItem('articolo', barCode);
+                $("#qrcode").val("");
+            } else {
+                $("#error_message").html("<div class='alert alert-danger' role='alert'>Articolo inesistente si prega di riprovare.</div>");
+                $("#error_message div").css("display","block");
+                i=1;
+                return false;
+            }
             $.get({
                 url: "./ws/Interrogazione.php?codUbicazione=" + sessionStorage.getItem('ubicazione') + "&codArticolo=" + sessionStorage.getItem('articolo'),
                 dataType: 'json',
@@ -62,6 +77,12 @@ function trasferimentoArticoli() {
         dataType: 'json',
         success: function(data, status) {
             $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'> Trasferimento avvenuto con successo all\'ubicazione <strong>"+sessionStorage.getItem('ubicazione-destinazione')+"</strong></div>");
+            sessionStorage.removeItem('articolo'); 
+            sessionStorage.removeItem('ubicazione');
+            sessionStorage.removeItem('ubicazione-destinazione');
+            setTimeout(function() {
+                location.href="./index.html";
+            }, 5000);
         }
     });
 }

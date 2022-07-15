@@ -26,6 +26,11 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     datiStampati += "<hr/>";
                 }
                 $(".listaOsai").html(datiStampati);
+            },
+            error: function(data, status){
+                $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
+                $("#error_message div").css("display","block");
+                $("#qrcode").val('');
             }
         });
         $("#qrcode").val("");

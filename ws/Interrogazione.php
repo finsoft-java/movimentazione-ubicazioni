@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (empty($codUbicazione)) {
         print_error(400, "Missing argument codUbicazione");
     }
-    if (!empty($codArticolo)){
+    if (!empty($codArticolo) || $codArticolo == null){
         [$data, $count] = $ubicazioniManager->getContenutoUbicazioneArticolo($codUbicazione,$codArticolo);
     } else {
         [$data, $count] = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
