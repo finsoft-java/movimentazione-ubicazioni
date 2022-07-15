@@ -13,6 +13,7 @@ $(document).ready(function(){
 let i = 0;
 let arrUbicazioniDest = [];
 let ubicazione;
+let ubicazioneDest;
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     if (event.keyCode === 13) {
         event.preventDefault();
@@ -51,7 +52,6 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
                         $("#error_message div").css("display","block");
                         $("#qrcode").val('');
-                        sessionStorage.removeItem('ubicazione');
                         ubicazione = null;
                     }
                 });            
@@ -71,7 +71,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
         if(i == 2) {
             
             if(barCode.trim() != ""){
-                sessionStorage.setItem('ubicazione-destinazione', barCode); 
+                ubicazioneDest = barCode; 
             } else {
                 $("#qrcode").attr('placeholder','UBICAZIONE DEST.');
                 $("#error_message").html("<div class='alert alert-danger' role='alert'>Magazzino di destinazione inesistente si prega di riprovare.</div>");
@@ -86,7 +86,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 $("#error_message").html("<div class='alert alert-danger' role='alert'>Magazzino di destinazione non valido</div>");
                 $("#error_message div").css("display","block");
                 $("#qrcode").val('');
-                sessionStorage.removeItem('ubicazione-destinazione');
+                ubicazioneDest= null;
                 i=1;
                 return false;
             }
@@ -97,7 +97,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
 });
 function getMagazziniAlternativi(){
     $.get({
-        url: "./ws/GetMagazziniAlternativi.php?codUbicazione="+ sessionStorage.getItem('ubicazione'),
+        url: "./ws/GetMagazziniAlternativi.php?codUbicazione="+ ubicazione,
         dataType: 'json',
         success: function(data, status) { 
             $("#error_message").html("");
@@ -127,13 +127,7 @@ function getMagazziniAlternativi(){
 function cambioMagazzinoUbicazione() {
 
     timerOn = true;
-    let magazzinoDest = null;
-
-    if(sessionStorage.getItem('ubicazione-destinazione') != null){
-        magazzinoDest = sessionStorage.getItem('ubicazione-destinazione');
-    } else {
-        magazzinoDest = $("#ubicazioneDest").val();
-    }
+    let magazzinoDest = $("#ubicazioneDest").val();
 
     $("#qrcode").attr("disabled", true);
 
@@ -145,14 +139,12 @@ function cambioMagazzinoUbicazione() {
     }
 
     $.post({
-        url: "./ws/CambioMagazzinoUbicazione.php?codUbicazione=" + sessionStorage.getItem('ubicazione') + "&codMagazzinoDest=" + $("select").val(),
+        url: "./ws/CambioMagazzinoUbicazione.php?codUbicazione=" + ubicazione + "&codMagazzinoDest=" + $("select").val(),
         dataType: 'json',
         success: function(data, status) {
             $("#error_message").html("");
             $("#error_message div").css("display","none");
             $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'> Ubicazione spostata correttamente nel magazzino <strong>"+magazzinoDest+"</strong></div>");
-            sessionStorage.removeItem('ubicazione');
-            sessionStorage.removeItem('ubicazione-destinazione');
             setTimeout(function() {
                 location.href="./index.html";
             }, 5000);
