@@ -25,7 +25,7 @@ class UbicazioniManager {
                     ON U.ID_AZIENDA=S.ID_AZIENDA AND U.ID_UBICAZIONE=S.ID_UBICAZIONE AND U.ID_MAGAZZINO=S.ID_MAGAZZINO
                   JOIN THIP.ARTICOLI A
                     ON S.ID_ARTICOLO=A.ID_ARTICOLO
-                  WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' S.ID_ARTICOLO='$codArticolo' AND YU.TRASFERIBILE='Y' AND U.STATO='V' ";
+                  WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND S.ID_ARTICOLO='$codArticolo' AND YU.TRASFERIBILE='Y' AND U.STATO='V' ";
           
           $sql3 = " ORDER BY S.ID_ARTICOLO";
           $count = $panthera->select_single_value($sql0 . $sql2);
