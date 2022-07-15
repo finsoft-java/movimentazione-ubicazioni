@@ -5,6 +5,7 @@ $(document).ready(function(){
         $("#qrcode").get(0).focus();
     }, 1000);
 });
+let ubicazione;
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     if (event.keyCode === 13) {
         $.get({
@@ -15,6 +16,9 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 if(dati[0] == null || dati.length === 0) {                    
                     $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
                     $("#error_message div").css("display","block");
+                    setTimeout(function() {
+                        $("#error_message").html('');
+                    }, 3000);
                     $("#qrcode").val('');
                     return false;
                 }

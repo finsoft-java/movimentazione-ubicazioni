@@ -35,6 +35,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                             $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione "+ubicazione+" inesistente si prega di riprovare.</div>");
                             $("#error_message div").css("display","block");
                             $("#qrcode").val('');
+                            i=0;
                             return false;
                         }
                         $("#qrcode").attr('placeholder','UBICAZIONE DEST.');
