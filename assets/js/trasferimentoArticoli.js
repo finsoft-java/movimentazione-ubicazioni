@@ -7,11 +7,14 @@ $(document).ready(function(){
            console.log("Focusing esaurimento");
             $("#qrcode").get(0).focus();
         }
-        else console.log('a')
     }, 1000);
 });   
 
 let i = 0;
+let ubicazione;
+let articolo;
+let ubicazioneDest;
+
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     if (event.keyCode === 13) {
         event.preventDefault();
@@ -19,8 +22,12 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
         barCode = $("#qrcode").val();
         if(i == 1) {
             if(barCode.trim() != ""){       
-                sessionStorage.setItem('ubicazione', barCode);
-                $("#qrcode").val("");
+                ubicazione =  barCode;
+                $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'>Ubicazione inserita con successo <strong>"+ubicazione+"</strong></div>");
+                setTimeout(function() {
+                    $("#magazzinoDest").html('');
+                }, 3000);
+                $("#qrcode").val("").attr('placeholder','ARTICOLO');
             } else {
                 $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
                 $("#error_message div").css("display","block");
@@ -30,8 +37,12 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
         }
         if(i == 2) {             
             if(barCode.trim() != ""){       
-                sessionStorage.setItem('articolo', barCode);
-                $("#qrcode").val("");
+                articolo = barCode;
+                $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'>Articolo inserito con successo <strong>"+articolo+"</strong></div>");
+                setTimeout(function() {
+                    $("#magazzinoDest").html('');
+                }, 3000);
+                $("#qrcode").val("").attr('placeholder','MAGAZZINO DEST.');
             } else {
                 $("#error_message").html("<div class='alert alert-danger' role='alert'>Articolo inesistente si prega di riprovare.</div>");
                 $("#error_message div").css("display","block");
@@ -49,7 +60,6 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         $("#qrcode").val('');
                         return false;
                     }
-                    console.log(data);
                     let datiStampati = "";
                         datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
                         datiStampati += "<p class='pOsai'> Articolo: <strong>"+dati[0].ID_ARTICOLO+"</strong>";
@@ -62,10 +72,10 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             $("#qrcode").val("");
         }
         if(i == 3) {
-            sessionStorage.setItem('ubicazione-destinazione', barCode);
+            ubicazioneDest = barCode;
+            $("#qrcode").val("").attr('placeholder','UBICAZIONE').attr('disabled',true);
             $("#btnTrasferimento").attr('disabled',false);
             $("#magazzinoDest").html("<p class='pOsai'> Magazzino destinazione: <strong>" + barCode + " </strong> </p>");
-            $("#qrcode").val("");
         }
     }
 });
@@ -73,13 +83,10 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
 function trasferimentoArticoli() {
     $("#qrcode").attr("disabled", true);
     $.post({
-        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + sessionStorage.getItem('ubicazione') + "&codArticolo=" + sessionStorage.getItem('articolo')+ "&qty=" + $("#qty").val() + "&codUbicazioneDest=" + sessionStorage.getItem('ubicazione-destinazione'),
+        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + $("#qty").val() + "&codUbicazioneDest=" +ubicazioneDest,
         dataType: 'json',
         success: function(data, status) {
-            $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'> Trasferimento avvenuto con successo all\'ubicazione <strong>"+sessionStorage.getItem('ubicazione-destinazione')+"</strong></div>");
-            sessionStorage.removeItem('articolo'); 
-            sessionStorage.removeItem('ubicazione');
-            sessionStorage.removeItem('ubicazione-destinazione');
+            $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'> Trasferimento avvenuto con successo all\'ubicazione <strong>"+ubicazioneDest+"</strong></div>");
             setTimeout(function() {
                 location.href="./index.html";
             }, 5000);

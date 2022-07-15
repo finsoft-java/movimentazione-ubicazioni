@@ -11,8 +11,6 @@ $(document).ready(function(){
 setInterval(function() {
     $("#rfid").focus();
 }, 1000);
-
-console.log(document.getElementById("rfid"));
 document.getElementById("rfid").addEventListener("keyup", function(event) {
 // Number 13 is the "Enter" key on the keyboard
     if (event.keyCode === 13) {
