@@ -42,7 +42,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 setTimeout(function() {
                     $("#magazzinoDest").html('');
                 }, 3000);
-                $("#qrcode").val("").attr('placeholder','MAGAZZINO DEST.');
+                $("#qrcode").val("").attr('placeholder','UBICAZIONE DESTINAZIONE');
             } else {
                 $("#error_message").html("<div class='alert alert-danger' role='alert'>Articolo inesistente si prega di riprovare.</div>");
                 $("#error_message div").css("display","block");
@@ -78,7 +78,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             $("#qrcode").val("").attr('placeholder','UBICAZIONE').attr('disabled',true);
             $("#btnTrasferimento").attr('disabled',false);
             setTimeout(function() {
-                $("#magazzinoDest").html("<p class='pOsai'> Magazzino destinazione: <strong>" + barCode + " </strong> </p>");
+                $("#magazzinoDest").html("<p class='pOsai'> Ubicazione destinazione: <strong>" + barCode + " </strong> </p>");
             }, 2000);
            
         }

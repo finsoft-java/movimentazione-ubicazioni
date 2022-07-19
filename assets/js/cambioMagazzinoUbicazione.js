@@ -14,6 +14,7 @@ let i = 0;
 let arrUbicazioniDest = [];
 let ubicazione;
 let ubicazioneDest;
+let idMagazzino;
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     if (event.keyCode === 13) {
         event.preventDefault();
@@ -40,6 +41,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         }
                         $("#qrcode").attr('placeholder','UBICAZIONE DEST.');
                         let datiStampati = "";
+                        idMagazzino = dati[0].ID_MAGAZZINO;
                         datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
                         datiStampati += "<p class='pOsai'> Codice ubicazione: <strong>"+dati[0].ID_UBICAZIONE+"</strong></p>";
                         datiStampati += "<p class='pOsai'> Magazzino destinazione: </p>";
@@ -98,7 +100,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
 });
 function getMagazziniAlternativi(){
     $.get({
-        url: "./ws/GetMagazziniAlternativi.php?codUbicazione="+ ubicazione,
+        url: "./ws/GetMagazziniAlternativi.php?idMagazzino="+ idMagazzino,
         dataType: 'json',
         success: function(data, status) { 
             $("#error_message").html("");

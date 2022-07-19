@@ -96,18 +96,13 @@ class UbicazioniManager {
     /**
      * Restituisce la lista di tutti i magazzini su cui l'ubicazione è definita con TRASFERIBILE='N'
      */
-    function getMagazziniAlternativi($codUbicazione) {
+    function getMagazziniAlternativi($ID_MAGAZZINO) {
       global $panthera, $ID_AZIENDA;
 
       if ($panthera->mock) {
           $data = [ 'M01', 'M02', 'M03' ];
       } else {
-          $sql = "SELECT U.ID_MAGAZZINO
-                  FROM THIP.UBICAZIONI_LL U
-                  JOIN THIPPERS.YUBICAZIONI_LL YU
-                    ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
-                  WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND YU.TRASFERIBILE='N' AND U.STATO='V'
-                  ORDER BY U.ID_MAGAZZINO";
+          $sql = "SELECT DISTINCT * FROM THIP.MAGAZZINI WHERE ID_MAGAZZINO != '$ID_MAGAZZINO' TIPO_MAGAZ IN('0','2','5','7','9') AND ID_AZIENDA= 001";
           $data = $panthera->select_column($sql);
       }
       $count = count($data);
