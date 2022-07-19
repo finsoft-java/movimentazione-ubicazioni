@@ -46,18 +46,20 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             } else {
                 $("#error_message").html("<div class='alert alert-danger' role='alert'>Articolo inesistente si prega di riprovare.</div>");
                 $("#error_message div").css("display","block");
+                $("#qrcode").val("").attr('placeholder','ARTICOLO');
                 i=1;
                 return false;
             }
             $.get({
-                url: "./ws/Interrogazione.php?codUbicazione=" + sessionStorage.getItem('ubicazione') + "&codArticolo=" + sessionStorage.getItem('articolo'),
+                url: "./ws/Interrogazione.php?codUbicazione=" + ubicazione + "&codArticolo=" +articolo,
                 dataType: 'json',
                 success: function(data, status) {
                     let dati = data["data"];
                     if(dati == null || dati.length === 0) {                    
-                        $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
+                        $("#error_message").html("<div class='alert alert-danger' role='alert'>Articolo inesistente si prega di riprovare.</div>");
                         $("#error_message div").css("display","block");
-                        $("#qrcode").val('');
+                        $("#qrcode").val("").attr('placeholder','ARTICOLO');
+                        i=1;
                         return false;
                     }
                     let datiStampati = "";
@@ -75,7 +77,10 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             ubicazioneDest = barCode;
             $("#qrcode").val("").attr('placeholder','UBICAZIONE').attr('disabled',true);
             $("#btnTrasferimento").attr('disabled',false);
-            $("#magazzinoDest").html("<p class='pOsai'> Magazzino destinazione: <strong>" + barCode + " </strong> </p>");
+            setTimeout(function() {
+                $("#magazzinoDest").html("<p class='pOsai'> Magazzino destinazione: <strong>" + barCode + " </strong> </p>");
+            }, 2000);
+           
         }
     }
 });
