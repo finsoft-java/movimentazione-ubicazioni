@@ -40,7 +40,7 @@ class CaricamentiMassaManager {
         $this->aggiorna_scheduled_job($id);
 
         // lancia davvero il CM su Panthera
-        $this->chiama_ws();
+        return $this->chiama_ws_panthera();
     }
 
     /**
@@ -77,7 +77,7 @@ class CaricamentiMassaManager {
         $this->aggiorna_scheduled_job($id);
 
         // lancia davvero il CM su Panthera
-        $this->chiama_ws();
+        return $this->chiama_ws_panthera();
     }
 
     function creaTestataCaricamento($id) {
@@ -427,32 +427,15 @@ class CaricamentiMassaManager {
       $this->execute_update($sql);
     }
 
-    function chiama_ws() {
-
-      // non sappiamo ancora se c'è un unico job da chiamare o se possono essere diversi...
-      // panthera raggiungibile dai tablet? o dobbiamo chiamarla da qui?
-      // @see https://stackoverflow.com/a/9802854/5116356
-
-      $URL = 'http://pantherasrv:10201/panth02/somepath';
+    function chiama_ws_panthera() {
+      global $URL_CM;
 
       $curl = curl_init();
-
-      curl_setopt($curl, CURLOPT_POST, 1);
-
-      curl_setopt($curl, CURLOPT_POSTFIELDS, ['key' => 'CODICE_DEL_JOB']);
-  
-      // Optional Authentication:
-      // probabilmente dobbiamo usare un token
-      curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-      curl_setopt($curl, CURLOPT_USERPWD, "username:password");
-  
-      curl_setopt($curl, CURLOPT_URL, $url);
+      curl_setopt($curl, CURLOPT_URL, $URL_CM);
       curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-  
       $result = curl_exec($curl);
-  
       curl_close($curl);
-  
+
       return $result;
 
     }
