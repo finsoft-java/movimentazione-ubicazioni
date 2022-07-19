@@ -39,7 +39,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                             i=0;
                             return false;
                         }
-                        $("#qrcode").attr('placeholder','UBICAZIONE DEST.');
+                        $("#qrcode").attr('placeholder','MAGAZZINO DEST.');
                         let datiStampati = "";
                         idMagazzino = dati[0].ID_MAGAZZINO;
                         datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
