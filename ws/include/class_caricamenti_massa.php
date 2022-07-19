@@ -17,25 +17,30 @@ class CaricamentiMassaManager {
             return;
         }
 
-        /* DEBUG
         $ubi1 = $ubicazioniManager->getUbicazione($codUbicazioneSrc);
         if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazioneSrc' inesistente");
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
         $commessa = $ubi1['R_COMMESSA'];
-        */
+        /* DEBUG
         $codMagazzinoSrc = 'M1';
         $commessa = "C0MM1";
-
+        */
         $id = $panthera->get_numeratore('MOVUBI');
   
-        // FIXME DOBBIAMO POPOLARE BATCH_LOAD_HDR ?!?
+        // BATCH_LOAD_HDR
+        $this->creaTestataCaricamento($id);
+
         // CM_DOC_TRA_TES
         $this->creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa);
  
         // CM_DOC_TRA_RIG
         $this->creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazione, $codMagazzinoDest, $codUbicazione, $commessa);
 
-        // ora dovrei invocare il webservice che innesca il job CM
+        // BATCH_LOAD_HDR
+        $this->aggiorna_scheduled_job($id);
+
+        // lancia davvero il CM su Panthera
+        $this->chiama_ws();
     }
 
     /**
@@ -58,6 +63,9 @@ class CaricamentiMassaManager {
         $codMagazzinoDest = $ubi2['ID_MAGAZZINO'];
 
         $id = $panthera->get_numeratore('MOVUBI');
+  
+        // BATCH_LOAD_HDR
+        $this->creaTestataCaricamento($id);
 
         // CM_DOC_TRA_TES
         $this->creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa);
@@ -65,7 +73,38 @@ class CaricamentiMassaManager {
         // CM_DOC_TRA_RIG
         $this->creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo, $qty);
 
-        // ora dovrei invocare il webservice che innesca il job CM
+        // BATCH_LOAD_HDR
+        $this->aggiorna_scheduled_job($id);
+
+        // lancia davvero il CM su Panthera
+        $this->chiama_ws();
+    }
+
+    function creaTestataCaricamento($id) {
+      global $panthera, $DATA_ORIGIN;
+
+      $sql = "INSERT IN THERA.BATCH_LOAD_HDR (
+                DATA_ORIGIN,
+                RUN_ID,
+                ENTITY_ID,
+                TASK_ID,
+                DESCRIPTION,
+                CREATION_TS,
+                SIMULATION_TOO
+              ) VALUES (
+                '$DATA_ORIGIN',
+                '$id',
+                'CMDocMagTra',
+                'RUN',
+                'Movimentazione ubicazioni',
+                CURRENT_TIMESTAMP(),
+                'N'
+              )
+              ";
+        
+      // echo $sql; die();
+      
+      $panthera->execute_update($sql);
     }
 
     function creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa) {
@@ -136,11 +175,11 @@ class CaricamentiMassaManager {
           R_FORNITORE_ARR)
         VALUES (
           '$DATA_ORIGIN',                     -- 1
-          '$RUN_ID',
           '$id',
           1,
           'I',
           '0',
+          '2',
           '$ID_AZIENDA',
           '$CAU_TESTATA',
           '$YEAR',
@@ -278,11 +317,11 @@ class CaricamentiMassaManager {
         R_FORNITORE_ARR)
       SELECT
         '$DATA_ORIGIN',                     -- 1
-        '$RUN_ID',
         '$id',
         ROW_NUMBER() OVER(ORDER BY S.ID_ARTICOLO),
         'I',
         '0',
+        '2',
         '$ID_AZIENDA',
         '$YEAR',
         null,
@@ -347,13 +386,49 @@ class CaricamentiMassaManager {
       if ($articolo) {
         $sql .= " AND S.ID_ARTICOLO='$articolo' ";
       }
-        
+
       // echo $sql; die();
-      
+
+      $this->execute_update($sql);
+    }
+
+    function aggiorna_scheduled_job($id) {
+      global $panthera, $DATA_ORIGIN, $ID_AZIENDA, $COD_SCHEDULED_JOB;
+      $parametri = [
+        "PageTo=0",
+        "PageFrom=0",
+        "ImmediateExecution=N",
+        "PrintPreviewEnabled=N",
+        "ExportType=P",
+        "ReportId=CMDocMagTraVal",
+        "OnlyGroupLeader=N",
+        "PrinterId=000",
+        "CopyNumber=",
+        "ExecutePrint=N",
+        "SSDEnabled=N",
+        "RunParameter.EntityIdService=CMDocMagTra",
+        "RunParameter.DataOrigin=$DATA_ORIGIN",
+        "RunParameter.OnlySimulator=N",
+        "RunParameter.PrintValidData=N",
+        "RunParameter.NumRecords=0",
+        "RunParameter.RunId=$id",
+        "RunParameter.PrintError=N",
+        "NumeratorHandler.IdSottoserie=",
+        "NumeratorHandler.IdNumeratore=",
+        "NumeratorHandler.IdSerie=",
+        "NumeratorHandler.IdAzienda=$ID_AZIENDA",
+      ];
+      $separatore = "'||CHAR(18)||'";
+      $params = "'" . $separatore.join($parametri) . "'||CHAR(18)";
+      $sql = "UPDATE THERA.SCHEDULED_JOB SET PARAMETERS=$params WHERE SCHEDULED_JOB_ID='$COD_SCHEDULED_JOB'";
+
+      // echo $sql; die();
+
       $this->execute_update($sql);
     }
 
     function chiama_ws() {
+
       // non sappiamo ancora se c'è un unico job da chiamare o se possono essere diversi...
       // panthera raggiungibile dai tablet? o dobbiamo chiamarla da qui?
       // @see https://stackoverflow.com/a/9802854/5116356
