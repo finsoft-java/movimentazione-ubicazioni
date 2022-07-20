@@ -151,8 +151,12 @@ function cambioMagazzinoUbicazione() {
             setTimeout(function() {
                 location.href="./index.html";
             }, 5000);
-        }, error: function(data, status) {
-            console.log('ERRORE -> getMagazziniAlternativi', data);
+        },
+        error: function(data, status){
+            console.log('ERRORE -> cambioMagazzinoUbicazione', data);
+            $("#error_message").html("<div class='alert alert-danger' role='alert'>Errore interno</div>");
+            $("#error_message div").css("display","block");
+            $("#qrcode").val('');
         }
     });
 }
