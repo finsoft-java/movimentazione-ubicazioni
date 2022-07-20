@@ -240,9 +240,9 @@ class CaricamentiMassaManager {
           null
         )
         ";
-        
+
         // echo $sql; die();
-        
+
         $panthera->execute_update($sql);
     }
 
@@ -388,7 +388,7 @@ class CaricamentiMassaManager {
         $sql .= " AND S.ID_ARTICOLO='$articolo' ";
       }
 
-echo '<<<';
+      // echo $sql; die();
 
       $panthera->execute_update($sql);
 
@@ -420,9 +420,9 @@ echo '<<<';
         "NumeratorHandler.IdSerie=",
         "NumeratorHandler.IdAzienda=$ID_AZIENDA",
       ];
-      $separatore = "'||CHAR(18)||'";
-      $params = "'" . $separatore.join($parametri) . "'||CHAR(18)";
-      $sql = "UPDATE THERA.SCHEDULED_JOB SET PARAMETERS=$params WHERE SCHEDULED_JOB_ID='$COD_SCHEDULED_JOB'";
+      $separatore = "',CHAR(18),'";
+      $par_joined = "CONCAT('" . join($separatore, $parametri) . "',CHAR(18))";
+      $sql = "UPDATE THERA.SCHEDULED_JOB SET JOB_PARAMETERS=$par_joined WHERE SCHEDULED_JOB_ID='$COD_SCHEDULED_JOB'";
 
       // echo $sql; die();
 
