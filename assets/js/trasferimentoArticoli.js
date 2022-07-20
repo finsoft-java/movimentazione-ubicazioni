@@ -78,8 +78,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             $("#btnTrasferimento").attr('disabled',false);
             setTimeout(function() {
                 $("#magazzinoDest").html("<p class='pOsai'> Ubicazione destinazione: <strong>" + barCode + " </strong> </p>");
-            }, 2000);
-           
+            }, 2000);  
         }
     }
 });
