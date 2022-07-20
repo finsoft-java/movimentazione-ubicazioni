@@ -191,11 +191,14 @@ class PantheraManager {
         if (sqlsrv_begin_transaction($this->conn) === false) {
             print_error(500, $this->fmt_errors());
         }
-        $this->execute_update("UPDATE THERA.NUMERATOR SET LAST_NUMBER=LAST_NUMBER+1 WHERE NUMERATOR_ID='$codNumeratore'");
-        $id = $this->select_single_value("SELECT LAST_NUMBER FROM THERA.NUMERATOR WHERE NUMERATOR_ID='$codNumeratore'");
+        $this->execute_update("UPDATE THERA.NUMERATOR
+                            SET LAST_NUMBER=LAST_NUMBER+1,TIMESTAMP=CURRENT_TIMESTAMP
+                            WHERE NUMERATOR_ID='$codNumeratore'");
+        $id = $this->select_single_value("SELECT LAST_NUMBER
+                                        FROM THERA.NUMERATOR
+                                        WHERE NUMERATOR_ID='$codNumeratore'");
         if ($id == null) {
             print_error(500, 'Manca il numeratore MOVUBI nella tabella THERA.NUMERATOR');
-            // PER DEBUG: $id = 2;
         }
         sqlsrv_commit($this->conn);
         return $id;

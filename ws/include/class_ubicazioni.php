@@ -102,7 +102,10 @@ class UbicazioniManager {
       if ($panthera->mock) {
           $data = [ 'M01', 'M02', 'M03' ];
       } else {
-          $sql = "SELECT DISTINCT(ID_MAGAZZINO) FROM THIP.MAGAZZINI WHERE ID_MAGAZZINO != '$ID_MAGAZZINO' AND TIPO_MAGAZ IN('0','2','5','7','9') AND ID_AZIENDA= '001'";
+          $sql = "SELECT DISTINCT(ID_MAGAZZINO)
+                  FROM THIP.MAGAZZINI
+                  WHERE ID_MAGAZZINO != '$ID_MAGAZZINO' AND TIPO_MAGAZ IN('0','2','5','7','9') AND ID_AZIENDA= '$ID_AZIENDA'
+                  ORDER BY 1";
           //echo $sql."<br/>";          
           $data = $panthera->select_column($sql);
       }
