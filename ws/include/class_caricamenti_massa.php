@@ -17,8 +17,8 @@ class CaricamentiMassaManager {
             return;
         }
 
-        $ubi1 = $ubicazioniManager->getUbicazione($codUbicazioneSrc);
-        if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazioneSrc' inesistente");
+        $ubi1 = $ubicazioniManager->getUbicazione($codUbicazione);
+        if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazione' inesistente");
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
         $commessa = $ubi1['R_COMMESSA'];
         /* DEBUG
@@ -26,18 +26,23 @@ class CaricamentiMassaManager {
         $commessa = "C0MM1";
         */
         $id = $panthera->get_numeratore('MOVUBI');
+        echo ">1< ";
   
         // BATCH_LOAD_HDR
         $this->creaTestataCaricamento($id);
+        echo ">2< ";
 
         // CM_DOC_TRA_TES
         $this->creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa);
+        echo ">3< ";
  
         // CM_DOC_TRA_RIG
         $this->creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazione, $codMagazzinoDest, $codUbicazione, $commessa);
+        echo ">4< ";
 
         // BATCH_LOAD_HDR
         $this->aggiorna_scheduled_job($id);
+        echo ">5< ";
 
         // lancia davvero il CM su Panthera
         return $this->chiama_ws_panthera();
@@ -63,18 +68,23 @@ class CaricamentiMassaManager {
         $codMagazzinoDest = $ubi2['ID_MAGAZZINO'];
 
         $id = $panthera->get_numeratore('MOVUBI');
-  
+        echo ">1< ";
+
         // BATCH_LOAD_HDR
         $this->creaTestataCaricamento($id);
+        echo ">2< ";
 
         // CM_DOC_TRA_TES
         $this->creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa);
+        echo ">3< ";
 
         // CM_DOC_TRA_RIG
         $this->creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo, $qty);
+        echo ">4< ";
 
         // BATCH_LOAD_HDR
         $this->aggiorna_scheduled_job($id);
+        echo ">5< ";
 
         // lancia davvero il CM su Panthera
         return $this->chiama_ws_panthera();
@@ -83,7 +93,7 @@ class CaricamentiMassaManager {
     function creaTestataCaricamento($id) {
       global $panthera, $DATA_ORIGIN;
 
-      $sql = "INSERT IN THERA.BATCH_LOAD_HDR (
+      $sql = "INSERT INTO THERA.BATCH_LOAD_HDR (
                 DATA_ORIGIN,
                 RUN_ID,
                 ENTITY_ID,
@@ -97,12 +107,10 @@ class CaricamentiMassaManager {
                 'CMDocMagTra',
                 'RUN',
                 'Movimentazione ubicazioni',
-                CURRENT_TIMESTAMP(),
+                CURRENT_TIMESTAMP,
                 'N'
               )
               ";
-        
-      // echo $sql; die();
       
       $panthera->execute_update($sql);
     }
@@ -237,19 +245,20 @@ class CaricamentiMassaManager {
           null
         )
         ";
-        
-        // echo $sql; die();
-        
-        $panthera->execute_update($sql);
 
-        echo "done"; // DEBUG
+        // echo $sql; die();
+
+        $panthera->execute_update($sql);
     }
 
     function creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo=null, $qty=null) {
       global $panthera, $DATA_ORIGIN, $CAU_TESTATA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
 
-      if (isempty($articolo) || isempty($qty)) {
-        $qty = 'S.QTY';
+      if (empty($articolo) || empty($qty)) {
+        $qty = 'S.QTA_GIAC_PRM';
+        $qtySec = 'S.QTA_GIAC_SEC';
+      } else {
+        $qtySec = "$qty * A.FTT_CONVER_UM";
       }
 
       $sql = "INSERT INTO THIP.CM_DOC_TRA_RIG (
@@ -336,7 +345,7 @@ class CaricamentiMassaManager {
         '$codMagazzinoDest',
         S.ID_ARTICOLO,
         S.ID_VERSIONE,              -- 20
-        S.COD_CONFIGURAZIONE,
+        S.ID_CONFIG,
         null,
         '$commessa',
         null,
@@ -348,7 +357,7 @@ class CaricamentiMassaManager {
         A.R_UM_PRM_MAG,              -- 30
         $qty,
         A.R_UM_SEC_MAG,
-        $qty * A.FTT_CONVER_UM,   -- FIXME errato dipende dall'operatore di conversione
+        $qtySec,   -- FIXME errato dipende dall'operatore di conversione
         A.FTT_CONVER_UM,
         A.OPER_CONVER_UM,
         null,
@@ -378,18 +387,19 @@ class CaricamentiMassaManager {
         null,              -- 60
         null,
         null
-      FROM THIP.SALDI_UBICAZIONE_V01 S
+      FROM THIP.SALDI_UBICAZIONE S
       JOIN THIP.ARTICOLI A ON A.ID_AZIENDA=S.ID_AZIENDA AND A.ID_ARTICOLO=S.ID_ARTICOLO
       WHERE S.ID_AZIENDA='$ID_AZIENDA' AND S.ID_UBICAZIONE='$codUbicazioneSrc'
       ";
 
-      if ($articolo) {
+      if (!empty($articolo)) {
         $sql .= " AND S.ID_ARTICOLO='$articolo' ";
       }
 
       // echo $sql; die();
 
-      $this->execute_update($sql);
+      $panthera->execute_update($sql);
+
     }
 
     function aggiorna_scheduled_job($id) {
@@ -418,13 +428,13 @@ class CaricamentiMassaManager {
         "NumeratorHandler.IdSerie=",
         "NumeratorHandler.IdAzienda=$ID_AZIENDA",
       ];
-      $separatore = "'||CHAR(18)||'";
-      $params = "'" . $separatore.join($parametri) . "'||CHAR(18)";
-      $sql = "UPDATE THERA.SCHEDULED_JOB SET PARAMETERS=$params WHERE SCHEDULED_JOB_ID='$COD_SCHEDULED_JOB'";
+      $separatore = "',CHAR(18),'";
+      $par_joined = "CONCAT('" . join($separatore, $parametri) . "',CHAR(18))";
+      $sql = "UPDATE THERA.SCHEDULED_JOB SET JOB_PARAMETERS=$par_joined WHERE SCHEDULED_JOB_ID='$COD_SCHEDULED_JOB'";
 
       // echo $sql; die();
 
-      $this->execute_update($sql);
+      $panthera->execute_update($sql);
     }
 
     function chiama_ws_panthera() {
