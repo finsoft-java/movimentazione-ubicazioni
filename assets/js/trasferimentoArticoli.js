@@ -23,13 +23,9 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
         if(i == 1) {
             if(barCode.trim() != ""){       
                 ubicazione =  barCode;
-                $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'>Ubicazione inserita con successo <strong>"+ubicazione+"</strong></div>");
-                setTimeout(function() {
-                    $("#magazzinoDest").html('');
-                }, 3000);
                 $("#qrcode").val("").attr('placeholder','ARTICOLO');
             } else {
-                $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
+                $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente o vuota si prega di riprovare.</div>");
                 $("#error_message div").css("display","block");
                 i=0;
                 return false;
@@ -38,10 +34,6 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
         if(i == 2) {             
             if(barCode.trim() != ""){       
                 articolo = barCode;
-                $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'>Articolo inserito con successo <strong>"+articolo+"</strong></div>");
-                setTimeout(function() {
-                    $("#magazzinoDest").html('');
-                }, 3000);
                 $("#qrcode").val("").attr('placeholder','UBICAZIONE DESTINAZIONE');
             } else {
                 $("#error_message").html("<div class='alert alert-danger' role='alert'>Articolo inesistente si prega di riprovare.</div>");
@@ -69,6 +61,13 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         datiStampati += "<p class='pOsai'> Quantità da trasferire: <input onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' type='number' value='1' min='1' max='" + dati[0].QTA_GIAC_PRM + "'/> </p>";
                         datiStampati += "<p class='pOsai' style='margin:0px;'> Quantita Totale: <strong>"+dati[0].QTA_GIAC_PRM+"</strong> </p>";                         
                     $("#appendData").html(datiStampati);
+                },
+                error: function(data, status){
+                    console.log("ERRORE in i == 2 trasferimentoArticoli", data);
+                    $("#error_message").html("<div class='alert alert-danger' role='alert'>Errore interno</div>");
+                    $("#error_message div").css("display","block");
+                    $("#qrcode").val('');
+                    i=1;
                 }
             });
             $("#qrcode").val("");
@@ -95,6 +94,12 @@ function trasferimentoArticoli() {
             setTimeout(function() {
                 location.href="./index.html";
             }, 5000);
+        },
+        error: function(data, status){
+            console.log("ERRORE in trasferimentoArticoli", data);
+            $("#error_message").html("<div class='alert alert-danger' role='alert'>Errore interno.</div>");
+            $("#error_message div").css("display","block");
+            $("#qrcode").val('');
         }
     });
 }

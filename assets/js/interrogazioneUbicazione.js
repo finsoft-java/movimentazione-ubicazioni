@@ -14,7 +14,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             success: function(data, status) {
                 let dati = data["data"];
                 if(dati[0] == null || dati.length === 0) {                    
-                    $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
+                    $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente o vuota si prega di riprovare.</div>");
                     $("#error_message div").css("display","block");
                     setTimeout(function() {
                         $("#error_message").html('');
@@ -32,7 +32,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 $(".listaOsai").html(datiStampati);
             },
             error: function(data, status){
-                $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
+                $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente o vuota si prega di riprovare.</div>");
                 $("#error_message div").css("display","block");
                 $("#qrcode").val('');
             }
