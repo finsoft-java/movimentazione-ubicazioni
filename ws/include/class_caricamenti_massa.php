@@ -63,18 +63,23 @@ class CaricamentiMassaManager {
         $codMagazzinoDest = $ubi2['ID_MAGAZZINO'];
 
         $id = $panthera->get_numeratore('MOVUBI');
-  
+        echo ">1< ";
+
         // BATCH_LOAD_HDR
         $this->creaTestataCaricamento($id);
+        echo ">2< ";
 
         // CM_DOC_TRA_TES
         $this->creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa);
+        echo ">3< ";
 
         // CM_DOC_TRA_RIG
         $this->creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo, $qty);
+        echo ">4< ";
 
         // BATCH_LOAD_HDR
         $this->aggiorna_scheduled_job($id);
+        echo ">5< ";
 
         // lancia davvero il CM su Panthera
         return $this->chiama_ws_panthera();
@@ -83,7 +88,7 @@ class CaricamentiMassaManager {
     function creaTestataCaricamento($id) {
       global $panthera, $DATA_ORIGIN;
 
-      $sql = "INSERT IN THERA.BATCH_LOAD_HDR (
+      $sql = "INSERT INTO THERA.BATCH_LOAD_HDR (
                 DATA_ORIGIN,
                 RUN_ID,
                 ENTITY_ID,
@@ -97,12 +102,10 @@ class CaricamentiMassaManager {
                 'CMDocMagTra',
                 'RUN',
                 'Movimentazione ubicazioni',
-                CURRENT_TIMESTAMP(),
+                CURRENT_TIMESTAMP,
                 'N'
               )
               ";
-        
-      // echo $sql; die();
       
       $panthera->execute_update($sql);
     }
@@ -241,14 +244,12 @@ class CaricamentiMassaManager {
         // echo $sql; die();
         
         $panthera->execute_update($sql);
-
-        echo "done"; // DEBUG
     }
 
     function creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo=null, $qty=null) {
       global $panthera, $DATA_ORIGIN, $CAU_TESTATA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
 
-      if (isempty($articolo) || isempty($qty)) {
+      if (empty($articolo) || empty($qty)) {
         $qty = 'S.QTY';
       }
 
@@ -336,7 +337,7 @@ class CaricamentiMassaManager {
         '$codMagazzinoDest',
         S.ID_ARTICOLO,
         S.ID_VERSIONE,              -- 20
-        S.COD_CONFIGURAZIONE,
+        S.ID_CONFIG,
         null,
         '$commessa',
         null,
@@ -378,18 +379,19 @@ class CaricamentiMassaManager {
         null,              -- 60
         null,
         null
-      FROM THIP.SALDI_UBICAZIONE_V01 S
+      FROM THIP.SALDI_UBICAZIONE S
       JOIN THIP.ARTICOLI A ON A.ID_AZIENDA=S.ID_AZIENDA AND A.ID_ARTICOLO=S.ID_ARTICOLO
       WHERE S.ID_AZIENDA='$ID_AZIENDA' AND S.ID_UBICAZIONE='$codUbicazioneSrc'
       ";
 
-      if ($articolo) {
+      if (!empty($articolo)) {
         $sql .= " AND S.ID_ARTICOLO='$articolo' ";
       }
 
-      // echo $sql; die();
+echo '<<<';
 
-      $this->execute_update($sql);
+      $panthera->execute_update($sql);
+
     }
 
     function aggiorna_scheduled_job($id) {
@@ -424,7 +426,7 @@ class CaricamentiMassaManager {
 
       // echo $sql; die();
 
-      $this->execute_update($sql);
+      $panthera->execute_update($sql);
     }
 
     function chiama_ws_panthera() {
