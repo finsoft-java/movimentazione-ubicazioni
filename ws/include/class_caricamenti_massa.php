@@ -17,8 +17,8 @@ class CaricamentiMassaManager {
             return;
         }
 
-        $ubi1 = $ubicazioniManager->getUbicazione($codUbicazioneSrc);
-        if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazioneSrc' inesistente");
+        $ubi1 = $ubicazioniManager->getUbicazione($codUbicazione);
+        if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazione' inesistente");
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
         $commessa = $ubi1['R_COMMESSA'];
         /* DEBUG
@@ -26,18 +26,23 @@ class CaricamentiMassaManager {
         $commessa = "C0MM1";
         */
         $id = $panthera->get_numeratore('MOVUBI');
+        echo ">1< ";
   
         // BATCH_LOAD_HDR
         $this->creaTestataCaricamento($id);
+        echo ">2< ";
 
         // CM_DOC_TRA_TES
         $this->creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa);
+        echo ">3< ";
  
         // CM_DOC_TRA_RIG
         $this->creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazione, $codMagazzinoDest, $codUbicazione, $commessa);
+        echo ">4< ";
 
         // BATCH_LOAD_HDR
         $this->aggiorna_scheduled_job($id);
+        echo ">5< ";
 
         // lancia davvero il CM su Panthera
         return $this->chiama_ws_panthera();
@@ -250,7 +255,10 @@ class CaricamentiMassaManager {
       global $panthera, $DATA_ORIGIN, $CAU_TESTATA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
 
       if (empty($articolo) || empty($qty)) {
-        $qty = 'S.QTY';
+        $qty = 'S.QTA_GIAC_PRM';
+        $qtySec = 'S.QTA_GIAC_SEC';
+      } else {
+        $qtySec = "$qty * A.FTT_CONVER_UM";
       }
 
       $sql = "INSERT INTO THIP.CM_DOC_TRA_RIG (
@@ -349,7 +357,7 @@ class CaricamentiMassaManager {
         A.R_UM_PRM_MAG,              -- 30
         $qty,
         A.R_UM_SEC_MAG,
-        $qty * A.FTT_CONVER_UM,   -- FIXME errato dipende dall'operatore di conversione
+        $qtySec,   -- FIXME errato dipende dall'operatore di conversione
         A.FTT_CONVER_UM,
         A.OPER_CONVER_UM,
         null,
