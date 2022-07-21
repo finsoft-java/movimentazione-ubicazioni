@@ -40,7 +40,7 @@ class CaricamentiMassaManager {
         $this->creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazione, $codMagazzinoDest, $codUbicazione, $commessa);
         echo ">4< ";
 
-        // BATCH_LOAD_HDR
+        // SCHEDULED_JOB
         $this->aggiorna_scheduled_job($id);
         echo ">5< ";
 
@@ -82,7 +82,7 @@ class CaricamentiMassaManager {
         $this->creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo, $qty);
         echo ">4< ";
 
-        // BATCH_LOAD_HDR
+        // SCHEDULED_JOB
         $this->aggiorna_scheduled_job($id);
         echo ">5< ";
 
@@ -116,7 +116,7 @@ class CaricamentiMassaManager {
     }
 
     function creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa) {
-        global $panthera, $DATA_ORIGIN, $CAU_RIGA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
+        global $panthera, $DATA_ORIGIN, $CAU_TESTATA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
 
         // FIXME RUN_ID
         $sql = "INSERT INTO THIP.CM_DOC_TRA_TES (
@@ -212,11 +212,11 @@ class CaricamentiMassaManager {
           '0',
           'N',
           null,                         -- 30
-          null,
-          null,
-          null,
-          null,
-          null,
+          '-',
+          '-',
+          '-',
+          '-',
+          '-',
           null,
           null,
           null,
@@ -252,13 +252,14 @@ class CaricamentiMassaManager {
     }
 
     function creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo=null, $qty=null) {
-      global $panthera, $DATA_ORIGIN, $CAU_TESTATA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
+      global $panthera, $DATA_ORIGIN, $CAU_RIGA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
 
       if (empty($articolo) || empty($qty)) {
         $qty = 'S.QTA_GIAC_PRM';
         $qtySec = 'S.QTA_GIAC_SEC';
       } else {
         $qtySec = "$qty * A.FTT_CONVER_UM";
+        // FIXME potrebbe essere un * o un / a seconda dell'operatore...
       }
 
       $sql = "INSERT INTO THIP.CM_DOC_TRA_RIG (
@@ -333,7 +334,7 @@ class CaricamentiMassaManager {
         '2',
         '$ID_AZIENDA',
         '$YEAR',
-        null,
+        '$id',
         '$id',             -- 10
         ROW_NUMBER() OVER(ORDER BY S.ID_ARTICOLO),
         1,
@@ -357,17 +358,17 @@ class CaricamentiMassaManager {
         A.R_UM_PRM_MAG,              -- 30
         $qty,
         A.R_UM_SEC_MAG,
-        $qtySec,   -- FIXME errato dipende dall'operatore di conversione
+        $qtySec,
         A.FTT_CONVER_UM,
         A.OPER_CONVER_UM,
         null,
         null,
         null,
-        null,
-        null,              -- 40
-        null,
-        null,
-        null,
+        '-',
+        '-',              -- 40
+        '-',
+        '-',
+        '-',
         null,
         null,
         null,
