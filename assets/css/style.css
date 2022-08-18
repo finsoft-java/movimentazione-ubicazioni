@@ -5,6 +5,7 @@ html {
 }
 .menuOsai {
 	position: relative;
+	cursor: pointer;
 }
 .menuOsai.green{
 	border-bottom: 2px solid white;
@@ -28,11 +29,6 @@ html {
 	width: 100%;
 	margin: 0px 0px 30px 0px;
 	font-size: 15px;
-}
-
-.btnOsai {
-	display: block;
-	margin: 0px auto;
 }
 
 .interrogaUbiOsai {
@@ -73,21 +69,6 @@ input:focus {
 .blue {
 	background-color: #0000ff85;
 }
-.menuOsai a {
-	position: absolute;
-	top: 50%;
-	-webkit-transform: translateY(-50%); /* WebKit */
-	-moz-transform: translateY(-50%); /* Mozilla */
-	-o-transform: translateY(-50%); /* Opera */
-	-ms-transform: translateY(-50%); /* Internet Explorer */
-	transform: translateY(-50%); /* CSS3 */
-	width: 100%;
-	text-align: center;
-	color: #fff;
-	font-weight: bold;
-	text-transform: uppercase;
-}
-
 .inputOsai {
 	max-width: 150px;
 	float: left;
@@ -105,6 +86,17 @@ input:focus {
 	font-size: 15px;
 }
 
+.inputOsai {
+	width: 8rem;
+	float: right;
+}
+
+.btnAll {
+	min-width: 0.8rem!important;
+	font-size: 0.7rem!important;
+	letter-spacing: 0px!important;
+}
+
 .btnOsai {
 	display: block;
 	margin: 0px auto;
@@ -114,10 +106,6 @@ input:focus {
 	float: left;
 	width: 100%;
 	padding: 0px 15px;
-}
-
-.inputOsai {
-	float: right;
 }
 
 .interrogaUbiOsai {
@@ -142,6 +130,11 @@ input:focus {
 	color: #fff;
 	font-weight: bold;
 }
+
+.alertOsai{
+	margin-bottom: 15rem;
+}
+
 input:focus {
 	border-color: red;
 }
@@ -154,7 +147,7 @@ input:focus {
 .blue {
 	background-color: #0000ff85;
 }
-.menuOsai a {
+.menuOsai p {
 	position: absolute;
 	top: 50%;
 	-webkit-transform: translateY(-50%); /* WebKit */
