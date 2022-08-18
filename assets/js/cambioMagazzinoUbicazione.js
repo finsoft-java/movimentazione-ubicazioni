@@ -35,18 +35,15 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
 
         if(i == 1) {
             if(barCode.trim() != ""){                
-                ubicazione = barCode;   
+                ubicazione = barCode;
                 $.get({
                     url: "./ws/Interrogazione.php?codUbicazione=" + ubicazione,
                     dataType: 'json',
                     success: function(data, status) {
                         
-                        $("#error_message").html("");
-                        $("#error_message div").css("display","none");
                         let dati = data["data"];
-                        if(dati[0] == null || dati.length === 0) {                    
-                            $("#error_message").html("<div class='alertOsai alert alert-danger' role='alert'>Ubicazione "+ubicazione+" inesistente si prega di riprovare.</div>");
-                            $("#error_message div").css("display","block");
+                        if(dati[0] == null || dati.length === 0) {
+                            showError("Ubicazione inesistente si prega di riprovare");
                             $("#qrcode").val('');
                             i=0;
                             return false;
@@ -64,8 +61,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     error: function(data, status){
                         $("#qrcode").attr('placeholder','UBICAZIONE ORIG.');
                         console.log('ERRORE -> Interrogazione', data);
-                        $("#error_message").html("<div class='alertOsai alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
-                        $("#error_message div").css("display","block");
+                        showError("Ubicazione inesistente si prega di riprovare");
                         $("#qrcode").val('');
                         ubicazione = null;
                     }
@@ -74,8 +70,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
 
             } else {
 
-                $("#error_message").html("<div class='alertOsai alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
-                $("#error_message div").css("display","block");
+                showError("Ubicazione inesistente si prega di riprovare");
                 $("#qrcode").val('');
                 i=0;
                 return false;
@@ -88,17 +83,15 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 magazzinoDest = barCode; 
             } else {
                 $("#qrcode").attr('placeholder','UBICAZIONE DEST.');
-                $("#error_message").html("<div class='alertOsai alert alert-danger' role='alert'>Magazzino di destinazione inesistente si prega di riprovare.</div>");
-                $("#error_message div").css("display","block");
+                showError("Magazzino di destinazione inesistente si prega di riprovare");
                 $("#qrcode").val('');
                 i=1;
                 return false;
             }
 
             if(!arrUbicazioniDest.includes(barCode)) {         
-                $("#qrcode").attr('placeholder','UBICAZIONE DEST.');                       
-                $("#error_message").html("<div class='alertOsai alert alert-danger' role='alert'>Magazzino di destinazione non valido</div>");
-                $("#error_message div").css("display","block");
+                $("#qrcode").attr('placeholder','UBICAZIONE DEST.');
+                showError("Magazzino di destinazione non valido");
                 $("#qrcode").val('');
                 magazzinoDest= null;
                 i=1;
@@ -114,13 +107,10 @@ function getMagazziniAlternativi(){
         url: "./ws/GetMagazziniAlternativi.php?idMagazzino="+ idMagazzino,
         dataType: 'json',
         success: function(data, status) { 
-            $("#error_message").html("");
-            $("#error_message div").css("display","none");
             let dati = data["data"];
             arrUbicazioniDest = dati;
-            if(dati[0] == null || dati.length === 0) {                    
-                $("#error_message").html("<div class='alertOsai alert alert-danger' role='alert'>Ubicazione inesistente si prega di riprovare.</div>");
-                $("#error_message div").css("display","block");
+            if(dati[0] == null || dati.length === 0) {
+                showError("Ubicazione inesistente si prega di riprovare");
                 $("#qrcode").val('');
                 return false;
             }
@@ -145,8 +135,7 @@ function cambioMagazzinoUbicazione() {
     $("#qrcode").attr("disabled", true);
 
     if(magazzinoDest == -1){
-        $("#error_message").html("<div class='alertOsai alert alert-danger' role='alert'>Magazzino di destinazione inesistente si prega di riprovare.</div>");
-        $("#error_message div").css("display","block");
+        showError("Magazzino di destinazione inesistente si prega di riprovare");
         $("#qrcode").val('');
         return false;
     }
@@ -155,17 +144,12 @@ function cambioMagazzinoUbicazione() {
         url: "./ws/CambioMagazzinoUbicazione.php?codUbicazione=" + ubicazione + "&codMagazzinoDest=" + $("select").val(),
         dataType: 'json',
         success: function(data, status) {
-            $("#error_message").html("");
-            $("#error_message div").css("display","none");
-            $(".btnDiv").append("<div style='display: block' class='alertOsai alert alert-success' role='alert'> Ubicazione spostata correttamente nel magazzino <strong>"+magazzinoDest+"</strong></div>");
-            setTimeout(function() {
-                location.href="./index.html";
-            }, 5000);
+            showSuccessMsg("Ubicazione spostata correttamente nel magazzino " + magazzinoDest);
+            location.href="./index.html";
         },
         error: function(data, status){
             console.log('ERRORE -> cambioMagazzinoUbicazione', data);
-            $("#error_message").html("<div class='alertOsai alert alert-danger' role='alert'>Errore interno</div>");
-            $("#error_message div").css("display","block");
+            showError("Errore interno")
             $("#qrcode").val('');
         }
     });
@@ -181,4 +165,17 @@ function updateInputValue() {
         $("#qrcode").val('');
         $("#btnCambio").attr('disabled',true);
     }
+}
+
+function showError(msg) {
+    // $("#error_message").html("<div class='alert alert-danger' role='alert'>"+msg+"</div>");
+    // $("#error_message div").css("display","block");
+    // setTimeout(function() {
+    //     $("#error_message").html('');
+    // }, 3000);
+    alert(msg);
+}
+
+function showSuccessMsg(msg) {
+    alert(msg);
 }
