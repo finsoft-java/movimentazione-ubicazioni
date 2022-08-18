@@ -167,6 +167,7 @@ function cambioMagazzinoUbicazione() {
             $("#error_message").html("<div class='alertOsai alert alert-danger' role='alert'>Errore interno</div>");
             $("#error_message div").css("display","block");
             $("#qrcode").val('');
+            $("#btnCambio").attr('disabled',true);
         }
     });
 }
