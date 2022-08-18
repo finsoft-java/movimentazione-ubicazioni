@@ -30,8 +30,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 ubicazione =  barCode;
                 $("#qrcode").val("").attr('placeholder','ARTICOLO');
             } else {
-                $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente o vuota si prega di riprovare.</div>");
-                $("#error_message div").css("display","block");
+                showError("Ubicazione inesistente o vuota si prega di riprovare");
                 i=0;
                 return false;
             }
@@ -41,8 +40,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 articolo = barCode;
                 $("#qrcode").val("").attr('placeholder','UBICAZIONE DESTINAZIONE');
             } else {
-                $("#error_message").html("<div class='alert alert-danger' role='alert'>Articolo inesistente si prega di riprovare.</div>");
-                $("#error_message div").css("display","block");
+                showError("Articolo inesistente si prega di riprovare");
                 $("#qrcode").val("").attr('placeholder','ARTICOLO');
                 i=1;
                 return false;
@@ -52,9 +50,8 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 dataType: 'json',
                 success: function(data, status) {
                     let dati = data["data"];
-                    if(dati == null || dati.length === 0) {                    
-                        $("#error_message").html("<div class='alert alert-danger' role='alert'>Articolo inesistente si prega di riprovare.</div>");
-                        $("#error_message div").css("display","block");
+                    if(dati == null || dati.length === 0) {
+                        showError("Articolo inesistente si prega di riprovare");
                         $("#qrcode").val("").attr('placeholder','ARTICOLO');
                         i=1;
                         return false;
@@ -71,8 +68,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 },
                 error: function(data, status){
                     console.log("ERRORE in i == 2 trasferimentoArticoli", data);
-                    $("#error_message").html("<div class='alert alert-danger' role='alert'>Errore interno</div>");
-                    $("#error_message div").css("display","block");
+                    showError("Errore interno");
                     $("#qrcode").val('');
                     i=1;
                 }
@@ -103,8 +99,7 @@ function trasferimentoArticoli() {
         },
         error: function(data, status){
             console.log("ERRORE in trasferimentoArticoli", data);
-            $("#error_message").html("<div class='alert alert-danger' role='alert'>Errore interno.</div>");
-            $("#error_message div").css("display","block");
+            showError("Errore interno");
             $("#qrcode").val('');
         }
     });
@@ -112,4 +107,17 @@ function trasferimentoArticoli() {
 
 function selezionaTutti(maximum) {
     $(".inputOsai").val(maximum);
+}
+
+function showError(msg) {
+    // $("#error_message").html("<div class='alert alert-danger' role='alert'>"+msg+"</div>");
+    // $("#error_message div").css("display","block");
+    // setTimeout(function() {
+    //     $("#error_message").html('');
+    // }, 3000);
+    alert(msg);
+}
+
+function showSuccessMsg(msg) {
+    alert(msg);
 }

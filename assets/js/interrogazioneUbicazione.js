@@ -13,12 +13,8 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             dataType: 'json',
             success: function(data, status) {
                 let dati = data["data"];
-                if(dati[0] == null || dati.length === 0) {                    
-                    $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente o vuota si prega di riprovare.</div>");
-                    $("#error_message div").css("display","block");
-                    setTimeout(function() {
-                        $("#error_message").html('');
-                    }, 3000);
+                if(dati[0] == null || dati.length === 0) {   
+                    showError("Ubicazione inesistente o vuota si prega di riprovare");
                     $("#qrcode").val('');
                     return false;
                 }
@@ -33,11 +29,18 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 $(".listaOsai").html(datiStampati);
             },
             error: function(data, status){
-                $("#error_message").html("<div class='alert alert-danger' role='alert'>Ubicazione inesistente o vuota si prega di riprovare.</div>");
-                $("#error_message div").css("display","block");
+                showError("Ubicazione inesistente o vuota si prega di riprovare");
                 $("#qrcode").val('');
             }
         });
         $("#qrcode").val("");
     }
 });
+function showError(msg) {
+    // $("#error_message").html("<div class='alert alert-danger' role='alert'>"+msg+"</div>");
+    // $("#error_message div").css("display","block");
+    // setTimeout(function() {
+    //     $("#error_message").html('');
+    // }, 3000);
+    alert(msg);
+}
