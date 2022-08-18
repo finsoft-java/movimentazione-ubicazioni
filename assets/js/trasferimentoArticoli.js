@@ -4,13 +4,18 @@ $(document).ready(function(){
     $(".focus").focus();
     setInterval(function() {
         if(timerOn) {
-           console.log("Focusing esaurimento");
+           console.log("Focusing");
             $("#qrcode").get(0).focus();
         }
     }, 1000);
 });   
 
 let i = 0;
+// i e' uno STATO
+// 0 = initial
+// 1 = e' stato sparato il primo barcode (ubicazione)
+// 2 = e' stato sparato il secondo barcode (articolo)
+// 3 = e' stato sparato il secondo barcode (ubicazioneDest)
 let ubicazione;
 let articolo;
 let ubicazioneDest;
