@@ -11,12 +11,12 @@ class UbicazioniManager {
       global $panthera, $ID_AZIENDA;
 
       if ($panthera->mock) {
-          $data = [ [ 'ID_ARTICOLO' => 'AAAA', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'QTA_GIAC_PRM' => 10, 'TRASFERIBILE' => 'Y' ]]; 
+          $data = [ [ 'ID_ARTICOLO' => 'AAAA', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 10, 'TRASFERIBILE' => 'Y' ]]; 
           $count = 1;
           
       } else {
           $sql0 = "SELECT COUNT(*) AS cnt ";
-          $sql1 = "SELECT U.ID_UBICAZIONE, U.ID_MAGAZZINO, S.ID_ARTICOLO, A.DESCRIZIONE, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
+          $sql1 = "SELECT U.ID_UBICAZIONE, U.ID_MAGAZZINO, S.ID_ARTICOLO, A.DESCRIZIONE, A.DISEGNO, A.R_UM_PRM_MAG, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
           
           $sql2 = "FROM THIP.UBICAZIONI_LL U
                   JOIN THIPPERS.YUBICAZIONI_LL YU
