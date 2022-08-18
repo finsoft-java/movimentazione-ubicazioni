@@ -26,23 +26,23 @@ class CaricamentiMassaManager {
         $commessa = "C0MM1";
         */
         $id = $panthera->get_numeratore('MOVUBI');
-        echo ">1< ";
+        //echo ">1< ";
   
         // BATCH_LOAD_HDR
         $this->creaTestataCaricamento($id);
-        echo ">2< ";
+        //echo ">2< ";
 
         // CM_DOC_TRA_TES
         $this->creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa);
-        echo ">3< ";
+        //echo ">3< ";
  
         // CM_DOC_TRA_RIG
         $this->creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazione, $codMagazzinoDest, $codUbicazione, $commessa);
-        echo ">4< ";
+        //echo ">4< ";
 
         // SCHEDULED_JOB
         $this->aggiorna_scheduled_job($id);
-        echo ">5< ";
+        //echo ">5< ";
 
         // lancia davvero il CM su Panthera
         return $this->chiama_ws_panthera();
@@ -68,23 +68,23 @@ class CaricamentiMassaManager {
         $codMagazzinoDest = $ubi2['ID_MAGAZZINO'];
 
         $id = $panthera->get_numeratore('MOVUBI');
-        echo ">1< ";
+        //echo ">1< ";
 
         // BATCH_LOAD_HDR
         $this->creaTestataCaricamento($id);
-        echo ">2< ";
+        //echo ">2< ";
 
         // CM_DOC_TRA_TES
         $this->creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa);
-        echo ">3< ";
+        //echo ">3< ";
 
         // CM_DOC_TRA_RIG
         $this->creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo, $qty);
-        echo ">4< ";
+        //echo ">4< ";
 
         // SCHEDULED_JOB
         $this->aggiorna_scheduled_job($id);
-        echo ">5< ";
+        //echo ">5< ";
 
         // lancia davvero il CM su Panthera
         return $this->chiama_ws_panthera();
@@ -209,7 +209,7 @@ class CaricamentiMassaManager {
           null,
           null,
           null,
-          '0',
+          '2',
           'N',
           null,                         -- 30
           '-',
