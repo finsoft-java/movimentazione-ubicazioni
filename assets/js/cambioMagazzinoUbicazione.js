@@ -14,10 +14,10 @@ let i = 0;
 // i e' uno STATO
 // 0 = initial
 // 1 = e' stato sparato il primo barcode (ubicazione)
-// 2 = e' stato sparato il secondo barcode (ubicazioneDest)
+// 2 = e' stato sparato il secondo barcode (magazzinoDest)
 let arrUbicazioniDest = [];
 let ubicazione;
-let ubicazioneDest;
+let magazzinoDest;
 let idMagazzino;
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     if (event.keyCode === 13) {
@@ -78,7 +78,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
         if(i == 2) {
             
             if(barCode.trim() != ""){
-                ubicazioneDest = barCode; 
+                magazzinoDest = barCode; 
             } else {
                 $("#qrcode").attr('placeholder','UBICAZIONE DEST.');
                 $("#error_message").html("<div class='alert alert-danger' role='alert'>Magazzino di destinazione inesistente si prega di riprovare.</div>");
@@ -93,7 +93,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 $("#error_message").html("<div class='alert alert-danger' role='alert'>Magazzino di destinazione non valido</div>");
                 $("#error_message div").css("display","block");
                 $("#qrcode").val('');
-                ubicazioneDest= null;
+                magazzinoDest= null;
                 i=1;
                 return false;
             }
@@ -118,7 +118,7 @@ function getMagazziniAlternativi(){
                 return false;
             }
             let datiStampati = "";
-            datiStampati += "<select onclick='timerOn = false' id='ubicazioneDest' onfocusout='timerOn = true' class='form-control'>";    
+            datiStampati += "<select onclick='timerOn = false' id='magazzinoDest' onfocusout='timerOn = true' class='form-control'>";    
                 datiStampati += "<option value='-1'> Seleziona un magazzino </option>";                            
             for(let i=0; i<dati.length; i++) {
                 datiStampati += "<option value='"+dati[i]+"'>" + dati[i] + "</option>";                    
@@ -134,7 +134,7 @@ function getMagazziniAlternativi(){
 function cambioMagazzinoUbicazione() {
 
     timerOn = true;
-    let magazzinoDest = $("#ubicazioneDest").val();
+    let magazzinoDest = $("#magazzinoDest").val();
 
     $("#qrcode").attr("disabled", true);
 
