@@ -14,10 +14,7 @@ html {
 .alert {
 	font-size: 15px;
 }
-.inputOsai {
-	max-width: 150px;
-	float: left;
-}
+
 #appendData {
 	float: left;
 	width: 100%;
@@ -69,10 +66,7 @@ input:focus {
 .blue {
 	background-color: #0000ff85;
 }
-.inputOsai {
-	max-width: 150px;
-	float: left;
-}
+
 #appendData {
 	float: left;
 	width: 100%;
@@ -88,13 +82,15 @@ input:focus {
 
 .inputOsai {
 	width: 8rem;
-	float: right;
+	max-width: 150px;
 }
 
 .btnAll {
 	min-width: 0.8rem!important;
 	font-size: 0.7rem!important;
 	letter-spacing: 0px!important;
+	max-height: 1.7rem;
+	float: right;
 }
 
 .btnOsai {
