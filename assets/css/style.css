@@ -21,11 +21,9 @@ html {
 	margin: 0px 0px 15px 0px;
 	font-size: 13px;
 }
-#magazzinoDest {
-	float: left;
-	width: 100%;
-	margin: 0px 0px 30px 0px;
-	font-size: 15px;
+#magazzinoDest {  
+	width: calc(100% - 30px);
+	margin: 15px 20px 25px 15px;
 }
 
 .interrogaUbiOsai {
@@ -72,12 +70,6 @@ input:focus {
 	width: 100%;
 	margin: 0px 0px 15px 0px;
 	font-size: 13px;
-}
-#magazzinoDest {
-	float: left;
-	width: 100%;
-	margin: 0px 0px 30px 0px;
-	font-size: 15px;
 }
 
 .inputOsai {

@@ -54,9 +54,8 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         $("#qrcode").attr('placeholder','MAGAZZINO DEST.');
                         let datiStampati = "";
                         idMagazzino = dati[0].ID_MAGAZZINO;
-                        datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
+                        datiStampati += "<p class='pOsai'> Magazzino origine: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
                         datiStampati += "<p class='pOsai'> Codice ubicazione: <strong>"+dati[0].ID_UBICAZIONE+"</strong></p>";
-                        datiStampati += "<p class='pOsai'> Magazzino destinazione: </p>";
                         timerOn = false;
                         $("#appendData").html(datiStampati);
                        getMagazziniAlternativi();
@@ -126,12 +125,12 @@ function getMagazziniAlternativi(){
             }
             let datiStampati = "";
             datiStampati += "<select onchange='updateInputValue();'' onclick='timerOn = false' id='magazzinoDest' onfocusout='timerOn = true' class='form-control'>";    
-            datiStampati += "<option value='-1'> Seleziona un magazzino </option>";                            
+            datiStampati += "<option value='-1'> Seleziona magazzino destinazione </option>";                            
             for(let i=0; i<dati.length; i++) {
                 datiStampati += "<option value='"+dati[i]+"'>" + dati[i] + "</option>";                    
             } 
             datiStampati+= "</select>";
-            $("#appendData").append(datiStampati);
+            $("#appendSelect").append(datiStampati);
         }, error: function(data, status) {
             console.log('ERRORE -> getMagazziniAlternativi', data);
         }
