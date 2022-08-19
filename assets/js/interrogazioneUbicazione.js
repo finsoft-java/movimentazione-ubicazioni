@@ -19,7 +19,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     $("#qrcode").val('');
                     return false;
                 }
-                let datiStampati = "<p>MAGAZZINO: <strong style='text-transform:uppercase'>"+dati[0].ID_MAGAZZINO+"</strong></p>";
+                let datiStampati = "<p>Magazzino: <strong style='text-transform:uppercase'>"+dati[0].ID_MAGAZZINO+"</strong></p>";
                 for(let i = 0; i < Object.keys(dati).length;i++){
                     
                     datiStampati += "<p>Articolo: <strong>"+dati[i].ID_ARTICOLO+"</strong> | Quantita: <strong>"+dati[i].QTA_GIAC_PRM+" "+ dati[i].R_UM_PRM_MAG +" </strong></p>";
