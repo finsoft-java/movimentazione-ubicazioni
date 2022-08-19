@@ -8,8 +8,9 @@ $(document).ready(function(){
 let ubicazione;
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     if (event.keyCode === 13) {
+        value = $("#qrcode").val();
         $.get({
-            url: "./ws/Interrogazione.php?codUbicazione=" + $("#qrcode").val(),
+            url: "./ws/Interrogazione.php?codUbicazione=" + value,
             dataType: 'json',
             success: function(data, status) {
                 let dati = data["data"];
@@ -26,6 +27,12 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     datiStampati += "<p>Descrizione: <strong>"+dati[i].DESCRIZIONE+"</strong> </p>";
                     datiStampati += "<hr/>";
                 }
+                // DEBUG CODE
+                datiStampati += "<p style='color:green'>";
+                for (var i = 0; i < value.length; ++i) {
+                    datiStampati += "'" + value.charCodeAt(i) + "' ";
+                }
+                datiStampati += "</p>";
                 $(".listaOsai").html(datiStampati);
             },
             error: function(data, status){
