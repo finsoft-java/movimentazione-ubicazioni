@@ -38,6 +38,14 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             error: function(data, status){
                 showError("Ubicazione inesistente o vuota si prega di riprovare");
                 $("#qrcode").val('');
+                
+                // DEBUG CODE
+                datiStampati += "<p style='color:green'>";
+                for (var i = 0; i < value.length; ++i) {
+                    datiStampati += "'" + value.charCodeAt(i) + "' ";
+                }
+                datiStampati += "</p>";
+                $(".listaOsai").html(datiStampati);
             }
         });
         $("#qrcode").val("");
