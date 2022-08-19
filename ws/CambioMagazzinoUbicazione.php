@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $response = $caricamentiMassaManager->trasferisciUbicazione($codUbicazione, $codMagazzinoDest);
     
     header('Content-Type: application/json');
-    echo json_encode(['msg' => $response]);
+    echo $response;
 } else {
     //==========================================================
     print_error(400, "Unsupported method in request: " . $_SERVER['REQUEST_METHOD']);
