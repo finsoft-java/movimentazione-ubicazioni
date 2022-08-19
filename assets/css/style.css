@@ -22,8 +22,8 @@ html {
 	font-size: 14px;
 }
 #magazzinoDest, .inputDiv {  
-	width: calc(100% - 60px);
-	margin: 15px 30px 25px 30px;
+	width: calc(100% - 64px);
+	margin: 15px 32px 25px 32px;
 }
 
 .interrogaUbiOsai {
@@ -41,8 +41,8 @@ html {
 .listaOsai p {
 	text-align: center;
 	font-size: 14px;
-	width: calc(100% - 60px);
-	margin: 0px 30px 15px 30px;
+	width: calc(100% - 64px);
+	margin: 15px 32px 25px 32px;
 }
 .interrogaUbiOsai a {
 	width: 100%;
@@ -53,6 +53,7 @@ html {
 
 .form-control {
 	width: 85%;
+	border: 1px solid #e9e9ed!important;
 }
 input:focus {
 	border-color: red;
@@ -78,8 +79,18 @@ input:focus {
 	max-height: 40px;
 }
 
-.btnAll {
+.btnInputForm {
 	max-height: 40px;
+	min-width: 45px !important;
+}
+
+.btnAll {
+	margin-left: 15px;
+}
+
+.btnPlus {
+	border-top-right-radius: 3px!important;
+	border-bottom-right-radius: 3px!important;
 }
 
 .btnOsai {
@@ -333,6 +344,15 @@ input[type="password"]:placeholder {
 	color: #cccccc;
 }
 
+input[type=number] {
+	-moz-appearance: textfield;
+  }
+
+  input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 /* ANIMATIONS */
 
 /* Simple CSS3 Fade-in-down Animation */
