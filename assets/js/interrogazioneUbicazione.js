@@ -17,6 +17,14 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 if(dati[0] == null || dati.length === 0) {   
                     showError("Ubicazione inesistente o vuota si prega di riprovare");
                     $("#qrcode").val('');
+                    // DEBUG CODE
+                    let datiStampati = "<p style='color:green'>";
+                    for (var i = 0; i < value.length; ++i) {
+                        datiStampati += "'" + value.charCodeAt(i) + "' ";
+                    }
+                    datiStampati += "</p>";
+                    $(".listaOsai").html(datiStampati);
+                    // END DEBUG CODE
                     return false;
                 }
                 let datiStampati = "<p>Magazzino: <strong style='text-transform:uppercase'>"+dati[0].ID_MAGAZZINO+"</strong></p>";
@@ -33,19 +41,21 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     datiStampati += "'" + value.charCodeAt(i) + "' ";
                 }
                 datiStampati += "</p>";
+                // END DEBUG CODE
                 $(".listaOsai").html(datiStampati);
             },
             error: function(data, status){
                 showError("Ubicazione inesistente o vuota si prega di riprovare");
                 $("#qrcode").val('');
-                
+
                 // DEBUG CODE
-                datiStampati += "<p style='color:green'>";
+                let datiStampati = "<p style='color:green'>";
                 for (var i = 0; i < value.length; ++i) {
                     datiStampati += "'" + value.charCodeAt(i) + "' ";
                 }
                 datiStampati += "</p>";
                 $(".listaOsai").html(datiStampati);
+                // END DEBUG CODE
             }
         });
         $("#qrcode").val("");
