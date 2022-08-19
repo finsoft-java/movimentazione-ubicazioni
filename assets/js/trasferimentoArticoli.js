@@ -69,7 +69,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         datiStampati += "<p class='pOsai'> Disegno: <strong>"+dati[0].DISEGNO+"</strong> </p>";
                         datiStampati += "<p class='pOsai'> Descrizione: <strong>"+dati[0].DESCRIZIONE+"</strong> </p>";
                         datiStampati += "<div class='input-group inputDiv'><input type='number' class='form-control inputOsai'  onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='1' max='" + dati[0].QTA_GIAC_PRM + "' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
-                        datiStampati += "<div class='input-group-append'><button class='btn btn-outline-secondary btnAll' type='button' onClick='selezionaTutti("+dati[0].QTA_GIAC_PRM+")'> Tutti </button></div></div>";
+                        datiStampati += "<div class='input-group-append'><button class='btn btnAll' type='button' onClick='selezionaTutti("+dati[0].QTA_GIAC_PRM+")'> Tutti </button></div></div>";
                         datiStampati += "<p class='pOsai'> Quantita Totale: <strong>"+dati[0].QTA_GIAC_PRM+ " "+ dati[0].R_UM_PRM_MAG +"</strong> </p>";                         
                         datiStampati += "<p class='pOsai'> Ubicazione destinazione: <strong>" + ubicazioneDest + " </strong> </p>";
                         $("#appendData").html(datiStampati);
