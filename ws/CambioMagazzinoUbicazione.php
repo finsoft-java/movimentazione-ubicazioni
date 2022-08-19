@@ -21,11 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         print_error(400, "Missing argument codMagazzinoDest");
     }
 
-    // FIXME non ho ancora deciso come sarà la response
-    $response = $caricamentiMassaManager->trasferisciUbicazione($codUbicazione, $codMagazzinoDest);
+    $caricamentiMassaManager->trasferisciUbicazione($codUbicazione, $codMagazzinoDest);
     
     header('Content-Type: application/json');
-    echo $response;
+    echo '{"msg":"OK"}';
 } else {
     //==========================================================
     print_error(400, "Unsupported method in request: " . $_SERVER['REQUEST_METHOD']);

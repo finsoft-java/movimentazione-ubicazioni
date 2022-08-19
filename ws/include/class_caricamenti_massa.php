@@ -21,10 +21,6 @@ class CaricamentiMassaManager {
         if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazione' inesistente");
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
         $commessa = $ubi1['R_COMMESSA'];
-        /* DEBUG
-        $codMagazzinoSrc = 'M1';
-        $commessa = "C0MM1";
-        */
         $id = $panthera->get_numeratore('MOVUBI');
         //echo ">1< ";
   
@@ -45,7 +41,12 @@ class CaricamentiMassaManager {
         //echo ">5< ";
 
         // lancia davvero il CM su Panthera
-        return $this->chiama_ws_panthera();
+        $this->chiama_ws_panthera();
+
+        usleep(500);
+        if (!$this->checkCM($id)) {
+          print_error(500, 'Il caricamento di massa non è andato a buon fine');
+        }
     }
 
     /**
@@ -88,6 +89,11 @@ class CaricamentiMassaManager {
 
         // lancia davvero il CM su Panthera
         return $this->chiama_ws_panthera();
+
+        usleep(500);
+        if (!$this->checkCM($id)) {
+          print_error(500, 'Il caricamento di massa non è andato a buon fine');
+        }
     }
 
     function creaTestataCaricamento($id) {
@@ -335,7 +341,7 @@ class CaricamentiMassaManager {
         '$ID_AZIENDA',
         '$YEAR',
         '$id',
-        '$id',             -- 10
+        ROW_NUMBER() OVER(ORDER BY S.ID_ARTICOLO),             -- 10 IN QUESTO CASO ID_ORIGINALE E' LA RIGA !
         ROW_NUMBER() OVER(ORDER BY S.ID_ARTICOLO),
         1,
         1,
@@ -390,7 +396,7 @@ class CaricamentiMassaManager {
         null
       FROM THIP.SALDI_UBICAZIONE S
       JOIN THIP.ARTICOLI A ON A.ID_AZIENDA=S.ID_AZIENDA AND A.ID_ARTICOLO=S.ID_ARTICOLO
-      WHERE S.ID_AZIENDA='$ID_AZIENDA' AND S.ID_UBICAZIONE='$codUbicazioneSrc'
+      WHERE S.ID_AZIENDA='$ID_AZIENDA' AND S.ID_UBICAZIONE='$codUbicazioneSrc' AND S.QTA_GIAC_PRM > 0
       ";
 
       if (!empty($articolo)) {
@@ -447,7 +453,21 @@ class CaricamentiMassaManager {
       $result = curl_exec($curl);
       curl_close($curl);
 
+      // il $result è assolutamente inutile, se non magari per il JobId
       return $result;
 
+    }
+
+    function checkCM($id) {
+      global $panthera, $DATA_ORIGIN;
+      $sql = "SELECT TOTAL_RECS,TRANSFERRED_RECS,WRONG_RECS
+              FROM THERA.BATCH_LOAD_HDR
+              WHERE DATA_ORIGIN='$DATA_ORIGIN' AND RUN_ID='$id'";
+      $l = $panthera->select_single($sql);
+      if ($l["TOTAL_RECS"] > 0 && $l["TRANSFERRED_RECS"] > 0 && $l["WRONG_RECS"] == 0) {
+        return true;
+      } else {
+        return false;
+      }
     }
 }
