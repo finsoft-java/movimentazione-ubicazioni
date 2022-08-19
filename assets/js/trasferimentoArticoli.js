@@ -20,7 +20,6 @@ let ubicazione;
 let articolo;
 let ubicazioneDest;
 
-//fixme
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     if (event.keyCode === 13) {
         event.preventDefault();
@@ -63,13 +62,15 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         return false;
                     }
                     let datiStampati = ""; 
-                        datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
                         datiStampati += "<p class='pOsai'> Ubicazione di partenza: <strong>"+dati[0].ID_UBICAZIONE+"</strong></p>";
+                        datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
                         datiStampati += "<p class='pOsai'> Articolo: <strong>"+dati[0].ID_ARTICOLO+"</strong></p>";
                         datiStampati += "<p class='pOsai'> Disegno: <strong>"+dati[0].DISEGNO+"</strong> </p>";
                         datiStampati += "<p class='pOsai'> Descrizione: <strong>"+dati[0].DESCRIZIONE+"</strong> </p>";
-                        datiStampati += "<div class='input-group inputDiv'><input type='number' class='form-control inputOsai'  onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='1' max='" + dati[0].QTA_GIAC_PRM + "' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
-                        datiStampati += "<div class='input-group-append'><button class='btn btn-outline-secondary btnAll' type='button' onClick='selezionaTutti("+dati[0].QTA_GIAC_PRM+")'> Tutti </button></div></div>";
+                        datiStampati += "<div class='input-group inputDiv'>  <div class='input-group-prepend'><button class='btn btnInputForm btnMinus' type='button' onClick='minus()'>-</button></div>";
+                        datiStampati += "<input type='number' class='form-control inputOsai' onChange='checkQty(" + dati[0].QTA_GIAC_PRM + ")'  onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='1' max='" + dati[0].QTA_GIAC_PRM + "' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
+                        datiStampati += "<div class='input-group-append'><button class='btn btnInputForm btnPlus' type='button' onClick='plus("+dati[0].QTA_GIAC_PRM+")'>+</button></div>";
+                        datiStampati += "<button class='btn btnInputForm btnAll' type='button' onClick='selezionaTutti("+dati[0].QTA_GIAC_PRM+")'> Tutti </button></div>";
                         datiStampati += "<p class='pOsai'> Quantita Totale: <strong>"+dati[0].QTA_GIAC_PRM+ " "+ dati[0].R_UM_PRM_MAG +"</strong> </p>";                         
                         datiStampati += "<p class='pOsai'> Ubicazione destinazione: <strong>" + ubicazioneDest + " </strong> </p>";
                         $("#appendData").html(datiStampati);
@@ -99,14 +100,11 @@ function trasferimentoArticoli() {
         },
         error: function(data, status){
             console.log("ERRORE in trasferimentoArticoli", data);
-            showError("Errore interno");
+            const err = data.responseJSON.error.value.length > 0 ? data.responseJSON.error.value : "Errore interno";
+            showError(err);
             $("#qrcode").val('');
         }
     });
-}
-
-function selezionaTutti(maximum) {
-    $(".inputOsai").val(maximum);
 }
 
 function showError(msg) {
@@ -120,4 +118,26 @@ function showError(msg) {
 
 function showSuccessMsg(msg) {
     alert(msg);
+}
+
+function plus(maximum) {
+    $("#qty").val(parseInt($("#qty").val())+1);
+}
+
+function minus(minimum = 1) {
+    $("#qty").val($("#qty").val()-1);
+}
+
+function selezionaTutti(maximum) {
+    $("#qty").val(maximum);
+}
+
+function checkQty(maximum, minimum = 1) {
+    console.log("onchange");
+    if($("#qty")>=maximum) {
+        $(".btnPlus").attr("disabled", "true");
+    }
+    if($("#qty")<=minimum) {
+        $(".btnMinus").attr("disabled", "true");
+    }
 }
