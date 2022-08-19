@@ -19,11 +19,11 @@ html {
 	float: left;
 	width: 100%;
 	margin: 0px 0px 15px 0px;
-	font-size: 13px;
+	font-size: 14px;
 }
-#magazzinoDest {  
-	width: calc(100% - 30px);
-	margin: 15px 20px 25px 15px;
+#magazzinoDest, .inputDiv {  
+	width: calc(100% - 60px);
+	margin: 15px 30px 25px 30px;
 }
 
 .interrogaUbiOsai {
@@ -40,7 +40,9 @@ html {
 
 .listaOsai p {
 	text-align: center;
-	font-size: 16px;
+	font-size: 14px;
+	width: calc(100% - 60px);
+	margin: 0px 30px 15px 30px;
 }
 .interrogaUbiOsai a {
 	width: 100%;
@@ -48,9 +50,9 @@ html {
 	color: #fff;
 	font-weight: bold;
 }
+
 .form-control {
 	width: 85%;
-	margin: auto;
 }
 input:focus {
 	border-color: red;
@@ -69,20 +71,15 @@ input:focus {
 	float: left;
 	width: 100%;
 	margin: 0px 0px 15px 0px;
-	font-size: 13px;
+	font-size: 14px;
 }
 
 .inputOsai {
-	width: 8rem;
-	max-width: 150px;
+	max-height: 40px;
 }
 
 .btnAll {
-	min-width: 0.8rem!important;
-	font-size: 0.7rem!important;
-	letter-spacing: 0px!important;
-	max-height: 1.7rem;
-	float: right;
+	max-height: 40px;
 }
 
 .btnOsai {
@@ -93,7 +90,9 @@ input:focus {
 .pOsai {
 	float: left;
 	width: 100%;
-	padding: 0px 15px;
+	font-size: 14px;
+	width: calc(100% - 60px);
+	margin: 0px 30px 15px 30px;
 }
 
 .interrogaUbiOsai {
@@ -108,10 +107,7 @@ input:focus {
 	text-transform: uppercase;
 	font-weight: 800;
 }
-.listaOsai p {
-	text-align: center;
-	font-size: 16px;
-}
+
 .interrogaUbiOsai a {
 	width: 100%;
 	text-align: center;
@@ -276,7 +272,7 @@ input[type="reset"] {
 	text-decoration: none;
 	display: inline-block;
 	text-transform: uppercase;
-	font-size: 13px;
+	font-size: 14px;
 	-webkit-box-shadow: 0 10px 30px 0 rgba(95, 186, 233, 0.4);
 	box-shadow: 0 10px 30px 0 rgba(95, 186, 233, 0.4);
 	-webkit-border-radius: 5px 5px 5px 5px;
@@ -315,7 +311,6 @@ input[type="password"] {
 	text-decoration: none;
 	display: inline-block;
 	font-size: 16px;
-	margin: 5px;
 	width: 85%;
 	border: 2px solid #f6f6f6;
 	-webkit-transition: all 0.5s ease-in-out;
