@@ -24,10 +24,13 @@
         <div id="appendData"></div>
         <div class="btnDiv">
             <div style="float: left;width: 50%;">
-                <button onclick="trasferimentoArticoli()" type="button" id="btnTrasferimento" class="btn btnOsai" disabled="true"> Conferma </button>
+                <button onclick="trasferimentoArticoli(false)" type="button" id="btnTrasferimento" class="btn btnOsai" disabled="true"> Conferma </button>
             </div>
             <div style="float: left;width: 50%;">
                 <button onclick="window.location.reload()" type="button" class="btn btnOsai"> Annulla </button>
+            </div>
+            <div class="btnRipetiDiv">
+                <button onclick="trasferimentoArticoli(true)" type="button" id="btnRipeti" class="btn btnOsai" disabled="true"> Conferma e Ripeti </button>
             </div>
         </div>
         <div id="error_message"></div>

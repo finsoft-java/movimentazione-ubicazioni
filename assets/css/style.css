@@ -98,6 +98,10 @@ input:focus {
 	margin: 0px auto;
 }
 
+#btnTrasferimento {
+	margin-bottom: 30px;
+}
+
 .pOsai {
 	float: left;
 	width: 100%;

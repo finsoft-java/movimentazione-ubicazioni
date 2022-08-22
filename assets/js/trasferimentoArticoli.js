@@ -19,8 +19,10 @@ let i = 0;
 let ubicazione;
 let articolo;
 let ubicazioneDest;
+let maxQty;
 
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
+    console.log("listen to keyup");
     if (event.keyCode === 13) {
         event.preventDefault();
         i++;
@@ -48,12 +50,16 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
        }
         if(i == 3) {
             articolo = barCode;
-            $("#qrcode").val("").attr('placeholder','UBICAZIONE DI PARTENZA').attr('disabled',true);
+            $("#qrcode").val("").attr('placeholder','ARTICOLO').attr('disabled',true);
             $("#btnTrasferimento").attr('disabled',false);
+            $("#btnRipeti").attr('disabled',false);
             $.get({
                 url: "./ws/Interrogazione.php?codUbicazione=" + ubicazione + "&codArticolo=" +articolo,
                 dataType: 'json',
                 success: function(data, status) {
+                    console.log("sono nella GET (success) con");
+                    console.log("articolo ", articolo, " ub part ", ubicazione, "ub dest ",ubicazioneDest);
+
                     let dati = data["data"];
                     if(dati == null || dati.length === 0) {
                         showError("Articolo inesistente si prega di riprovare");
@@ -61,6 +67,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         i=2;
                         return false;
                     }
+                    maxQty = dati[0].QTA_GIAC_PRM;
                     let datiStampati = ""; 
                         datiStampati += "<p class='pOsai'> Ubicazione di partenza: <strong>"+dati[0].ID_UBICAZIONE+"</strong></p>";
                         datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
@@ -68,9 +75,9 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         datiStampati += "<p class='pOsai'> Disegno: <strong>"+dati[0].DISEGNO+"</strong> </p>";
                         datiStampati += "<p class='pOsai'> Descrizione: <strong>"+dati[0].DESCRIZIONE+"</strong> </p>";
                         datiStampati += "<div class='input-group inputDiv'>  <div class='input-group-prepend'><button class='btn btnInputForm btnMinus' type='button' onClick='minus()'>-</button></div>";
-                        datiStampati += "<input type='number' class='form-control inputOsai' onChange='checkQty(" + dati[0].QTA_GIAC_PRM + ")'  onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='1' max='" + dati[0].QTA_GIAC_PRM + "' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
-                        datiStampati += "<div class='input-group-append'><button class='btn btnInputForm btnPlus' type='button' onClick='plus("+dati[0].QTA_GIAC_PRM+")'>+</button></div>";
-                        datiStampati += "<button class='btn btnInputForm btnAll' type='button' onClick='selezionaTutti("+dati[0].QTA_GIAC_PRM+")'> Tutti </button></div>";
+                        datiStampati += "<input type='number' class='form-control inputOsai' onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='1' max='" + dati[0].QTA_GIAC_PRM + "' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
+                        datiStampati += "<div class='input-group-append'><button class='btn btnInputForm btnPlus' type='button' onClick='plus("+maxQty+")'>+</button></div>";
+                        datiStampati += "<button class='btn btnInputForm btnAll' type='button' onClick='selezionaTutti("+maxQty+")'> Tutti </button></div>";
                         datiStampati += "<p class='pOsai'> Quantita Totale: <strong>"+dati[0].QTA_GIAC_PRM+ " "+ dati[0].R_UM_PRM_MAG +"</strong> </p>";                         
                         datiStampati += "<p class='pOsai'> Ubicazione destinazione: <strong>" + ubicazioneDest + " </strong> </p>";
                         $("#appendData").html(datiStampati);
@@ -87,19 +94,41 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
     }
 });
 
-function trasferimentoArticoli() {
-    $("#qrcode").attr("disabled", true);
+// $(document).on('input', 'input[type=number]', checkQty);
+
+function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> conferma e esce
+    if(repeatFlag) {
+        $("#qrcode").attr("disabled",false);
+        $("#qrcode").val("").attr('placeholder','ARTICOLO');
+        $("#appendData").html("");
+        $("#btnTrasferimento").attr('disabled',true);
+        $("#btnRipeti").attr('disabled',true);
+        timerOn = true;
+        i = 2;
+    } else {
+        $("#qrcode").attr("disabled", true);
+    }
+
+    if(parseInt($("#qty").val()) < 1 || parseInt($("#qty").val()) > maxQty) {
+        alert("Inserire una quantità valida!");
+        return;
+    }
+
     $.post({
         url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + $("#qty").val() + "&codUbicazioneDest=" +ubicazioneDest,
         dataType: 'json',
         success: function(data, status) {
+            console.log("sono nella POST (success) con ");
+            console.log("articolo ", articolo, " ub part ", ubicazione, "ub dest ",ubicazioneDest);
+
             $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'> Trasferimento avvenuto con successo all\'ubicazione <strong>"+ubicazioneDest+"</strong></div>");
-            setTimeout(function() {
-                location.href="./index.html";
-            }, 5000);
-        },
-        error: function(data, status){
-            console.log("ERRORE in trasferimentoArticoli", data);
+            // setTimeout(function() {
+                //     location.href="./index.html";
+                // }, 5000);
+            },
+            error: function(data, status){
+                console.log("sono nella POST (error!!)");
+                console.log("ERRORE in trasferimentoArticoli", data);
             const err = data.responseJSON.error.value.length > 0 ? data.responseJSON.error.value : "Errore interno";
             showError(err);
             $("#qrcode").val('');
@@ -120,24 +149,14 @@ function showSuccessMsg(msg) {
     alert(msg);
 }
 
-function plus(maximum) {
-    $("#qty").val(parseInt($("#qty").val())+1);
+function plus(maxQty) {
+    $("#qty").val(parseInt($("#qty").val())+1);    
 }
 
 function minus(minimum = 1) {
     $("#qty").val($("#qty").val()-1);
 }
 
-function selezionaTutti(maximum) {
-    $("#qty").val(maximum);
-}
-
-function checkQty(maximum, minimum = 1) {
-    console.log("onchange");
-    if($("#qty")>=maximum) {
-        $(".btnPlus").attr("disabled", "true");
-    }
-    if($("#qty")<=minimum) {
-        $(".btnMinus").attr("disabled", "true");
-    }
+function selezionaTutti(maxQty) {
+    $("#qty").val(maxQty);
 }
