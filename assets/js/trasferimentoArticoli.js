@@ -19,6 +19,7 @@ let i = 0;
 let ubicazione;
 let articolo;
 let ubicazioneDest;
+let qty;
 let maxQty;
 
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
@@ -97,6 +98,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
 // $(document).on('input', 'input[type=number]', checkQty);
 
 function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> conferma e esce
+    qty = parseInt($("#qty").val());
     if(repeatFlag) {
         $("#qrcode").attr("disabled",false);
         $("#qrcode").val("").attr('placeholder','ARTICOLO');
@@ -115,16 +117,16 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
     }
 
     $.post({
-        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + parseInt($("#qty").val())  + "&codUbicazioneDest=" +ubicazioneDest,
+        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + qty  + "&codUbicazioneDest=" +ubicazioneDest,
         dataType: 'json',
         success: function(data, status) {
             console.log("sono nella POST (success) con ");
             console.log("articolo ", articolo, " ub part ", ubicazione, "ub dest ",ubicazioneDest);
 
             $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'> Trasferimento avvenuto con successo all\'ubicazione <strong>"+ubicazioneDest+"</strong></div>");
-            // setTimeout(function() {
-                //     location.href="./index.html";
-                // }, 5000);
+            setTimeout(function() {
+                    location.href="./index.html";
+                }, 5000);
             },
             error: function(data, status){
                 console.log("sono nella POST (error!!)");
