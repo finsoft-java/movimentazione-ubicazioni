@@ -103,13 +103,13 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
         $("#qrcode").attr("disabled",false);
         $("#qrcode").val("").attr('placeholder','ARTICOLO');
         $("#appendData").html("");
-        $("#btnTrasferimento").attr('disabled',true);
-        $("#btnRipeti").attr('disabled',true);
         timerOn = true;
         i = 2;
     } else {
         $("#qrcode").attr("disabled", true);
     }
+    $("#btnTrasferimento").attr('disabled',true);
+    $("#btnRipeti").attr('disabled',true);
 
     if(parseInt($("#qty").val()) < 1 || parseInt($("#qty").val()) > maxQty) {
         alert("Inserire una quantità valida!");
@@ -124,9 +124,7 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
             console.log("articolo ", articolo, " ub part ", ubicazione, "ub dest ",ubicazioneDest);
 
             $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'> Trasferimento avvenuto con successo all\'ubicazione <strong>"+ubicazioneDest+"</strong></div>");
-            setTimeout(function() {
-                    location.href="./index.html";
-                }, 5000);
+           
             },
             error: function(data, status){
                 console.log("sono nella POST (error!!)");
