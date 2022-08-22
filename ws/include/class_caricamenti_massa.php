@@ -11,7 +11,7 @@ class CaricamentiMassaManager {
      * FUNZIONE "Cambia magazzino dell'ubicazione"
      */
     function trasferisciUbicazione($codUbicazione, $codMagazzinoDest) {
-        global $panthera, $CAU_TESTATA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE, $ubicazioniManager;
+        global $panthera, $CAU_TESTATA, $CAU_RIGA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE, $ubicazioniManager;
 
         if ($panthera->mock) {
             return;
@@ -29,11 +29,11 @@ class CaricamentiMassaManager {
         //echo ">2< ";
 
         // CM_DOC_TRA_TES
-        $this->creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa);
+        $this->creaTestataDocumento($id, $CAU_TESTATA, $codMagazzinoSrc, $codMagazzinoDest, $commessa);
         //echo ">3< ";
  
         // CM_DOC_TRA_RIG
-        $this->creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazione, $codMagazzinoDest, $codUbicazione, $commessa);
+        $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazione, $codMagazzinoDest, $codUbicazione, $commessa);
         //echo ">4< ";
 
         // SCHEDULED_JOB
@@ -53,7 +53,7 @@ class CaricamentiMassaManager {
      * FUNZIONE "Trasferisci articolo da una ubicazione a un'altra"
      */
     function trasferisciArticolo($codUbicazioneSrc, $codUbicazioneDest, $articolo, $qty) {
-        global $panthera, $ubicazioniManager;
+        global $panthera, $ubicazioniManager, $CAU_TESTATA, $CAU_RIGA;
 
         if ($panthera->mock) {
             return;
@@ -76,11 +76,54 @@ class CaricamentiMassaManager {
         //echo ">2< ";
 
         // CM_DOC_TRA_TES
-        $this->creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa);
+        $this->creaTestataDocumento($id, $CAU_TESTATA, $codMagazzinoSrc, $codMagazzinoDest, $commessa);
         //echo ">3< ";
 
         // CM_DOC_TRA_RIG
-        $this->creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo, $qty);
+        $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo, $qty);
+        //echo ">4< ";
+
+        // SCHEDULED_JOB
+        $this->aggiorna_scheduled_job($id);
+        //echo ">5< ";
+
+        // lancia davvero il CM su Panthera
+        return $this->chiama_ws_panthera();
+
+        usleep(500);
+        if (!$this->checkCM($id)) {
+          print_error(500, 'Il caricamento di massa non è andato a buon fine');
+        }
+    }
+
+    /**
+     * FUNZIONE "Svuota ubicazione"
+     */
+    function svuotaUbicazione($codUbicazione) {
+        global $panthera, $ubicazioniManager, $CAU_TESTATA_SVUOTA, $CAU_RIGA_SVUOTA, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA;
+
+        if ($panthera->mock) {
+            return;
+        }
+
+        $ubi1 = $ubicazioniManager->getUbicazione($codUbicazioneSrc);
+        if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazioneSrc' inesistente");
+        $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
+        $commessa = $ubi1['R_COMMESSA'];
+
+        $id = $panthera->get_numeratore('MOVUBI');
+        //echo ">1< ";
+
+        // BATCH_LOAD_HDR
+        $this->creaTestataCaricamento($id);
+        //echo ">2< ";
+
+        // CM_DOC_TRA_TES
+        $this->creaTestataDocumento($id, $CAU_TESTATA_SVUOTA, $codMagazzinoSrc, $COD_MAGAZ_SVUOTA, $commessa);
+        //echo ">3< ";
+
+        // CM_DOC_TRA_RIG
+        $this->creaRigheDocumento($id, $CAU_RIGA_SVUOTA, $codMagazzinoSrc, $codUbicazioneSrc, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA, $commessa);
         //echo ">4< ";
 
         // SCHEDULED_JOB
@@ -121,8 +164,8 @@ class CaricamentiMassaManager {
       $panthera->execute_update($sql);
     }
 
-    function creaTestataDocumento($id, $codMagazzinoSrc, $codMagazzinoDest, $commessa) {
-        global $panthera, $DATA_ORIGIN, $CAU_TESTATA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
+    function creaTestataDocumento($id, $cauTestata, $codMagazzinoSrc, $codMagazzinoDest, $commessa) {
+        global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
 
         // FIXME RUN_ID
         $sql = "INSERT INTO THIP.CM_DOC_TRA_TES (
@@ -195,7 +238,7 @@ class CaricamentiMassaManager {
           '0',
           '2',
           '$ID_AZIENDA',
-          '$CAU_TESTATA',
+          '$cauTestata',
           '$YEAR',
           '$id',                       -- 10
           null,
@@ -257,8 +300,8 @@ class CaricamentiMassaManager {
         $panthera->execute_update($sql);
     }
 
-    function creaRigheDocumento($id, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo=null, $qty=null) {
-      global $panthera, $DATA_ORIGIN, $CAU_RIGA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
+    function creaRigheDocumento($id, $cauRiga, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo=null, $qty=null) {
+      global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
 
       if (empty($articolo) || empty($qty)) {
         $qty = 'S.QTA_GIAC_PRM';
@@ -346,7 +389,7 @@ class CaricamentiMassaManager {
         1,
         1,
         (ROW_NUMBER() OVER(ORDER BY S.ID_ARTICOLO)) * 10,
-        '$CAU_RIGA',
+        '$cauRiga',
         '$DATE',
         '$codMagazzinoSrc',
         '$codMagazzinoDest',
