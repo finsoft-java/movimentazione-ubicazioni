@@ -98,7 +98,7 @@ input:focus {
 	margin: 0px auto;
 }
 
-#btnTrasferimento {
+#btnTrasferimento, #btnAnnulla {
 	margin-bottom: 30px;
 }
 

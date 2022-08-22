@@ -115,7 +115,7 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
     }
 
     $.post({
-        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + $("#qty").val() + "&codUbicazioneDest=" +ubicazioneDest,
+        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + parseInt($("#qty").val())  + "&codUbicazioneDest=" +ubicazioneDest,
         dataType: 'json',
         success: function(data, status) {
             console.log("sono nella POST (success) con ");
