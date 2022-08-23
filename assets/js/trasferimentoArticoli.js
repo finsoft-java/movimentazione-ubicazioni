@@ -89,6 +89,8 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     showError(data);
                     $("#qrcode").val('');
                     i=2;
+                    $("#btnTrasferimento").attr('disabled',true);
+                    $("#btnRipeti").attr('disabled',true);
                 }
             });
             $("#qrcode").val("");
@@ -139,7 +141,7 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
         },
         error: function(data, status){
             console.log("ERRORE in trasferimentoArticoli", data);
-            showError(err);
+            showError(data);
             $("#qrcode").val('');
         }
     });
