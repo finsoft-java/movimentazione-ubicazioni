@@ -27,7 +27,7 @@ class CaricamentiMassaManager {
         // l'algoritmo cambia a seconda che l'ubicazione sia piena o vuota
         $contenuto = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
         if (empty($contenuto) || count($contenuto) == 0) {
-          $this->trasferisciUbicazioneVuota($ubi1, $codMagazzinoDest);
+          $this->trasferisciUbicazioneVuota($codUbicazione, $codMagazzinoDest);
           return;
         }
 
@@ -56,11 +56,11 @@ class CaricamentiMassaManager {
         }
     }
 
-    private function trasferisciUbicazioneVuota($ubicazione, $codMagazzinoDest) {
+    private function trasferisciUbicazioneVuota($codUbicazione, $codMagazzinoDest) {
       global $panthera, $DATE, $ID_AZIENDA, $UTENTE, $ubicazioniManager;
 
       // FUNZIONE private:
-      // assumo di avere gia' controllato che l'ubicazione e' vuota e $codMagazzinoDest e' valido
+      // assumo di avere gia' controllato che l'ubicazione e' valida e vuota e $codMagazzinoDest e' valido
 
       $sql = "UPDATE THIP.YUBICAZIONI_LL
               SET TRASFERIMENTO=CASE WHEN ID_MAGAZZINO='$codMagazzinoDest' THEN 'Y' ELSE 'N' END
