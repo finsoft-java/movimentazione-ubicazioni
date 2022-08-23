@@ -16,11 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (empty($codUbicazione)) {
         print_error(400, "Missing argument codUbicazione");
     }
-    [$data, $count] = $ubicazioniManager->getUbicazione($codUbicazione);
+    $ubicazione = $ubicazioniManager->getUbicazione($codUbicazione);
     
         
     header('Content-Type: application/json');
-    echo json_encode(['data' => $data, 'count' => $count]);
+    echo json_encode(['value' => $ubicazione]);
 } else {
     //==========================================================
     print_error(400, "Unsupported method in request: " . $_SERVER['REQUEST_METHOD']);
