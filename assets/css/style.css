@@ -121,6 +121,10 @@ input:focus {
 	margin-bottom: 30px;
 }
 
+#btnInterroga {
+	margin-bottom: 25px;
+}
+
 .pOsai {
 	float: left;
 	width: 100%;
