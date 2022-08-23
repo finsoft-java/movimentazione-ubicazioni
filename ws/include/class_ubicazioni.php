@@ -120,11 +120,12 @@ class UbicazioniManager {
     }
 
     function check_articolo($codArticolo) {
+      global $panthera, $ID_AZIENDA;
 
       $sql = "SELECT COUNT(*)
               FROM THIP.ARTICOLI A
               WHERE A.ID_AZIENDA='$ID_AZIENDA' AND A.ID_ARTICOLO='$codArticolo' ";
-      $count = $panthera->select_list($sql);
+      $count = $panthera->select_single_value($sql);
       if ($count == 0) {
         print_error(404, "Articolo inesistente");
       }
@@ -139,6 +140,9 @@ class UbicazioniManager {
       if ($panthera->mock) {
         return [ 'ID_ARTICOLO' => 'AAAAA', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'XXX', 'TRASFERIBILE' => 'Y' ];
       } else {
+
+        $this->check_stato_ubicazione($codUbicazione);
+
         $sql = "SELECT *
                 FROM THIP.UBICAZIONI_LL U
                 JOIN THIPPERS.YUBICAZIONI_LL YU
