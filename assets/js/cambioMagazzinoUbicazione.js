@@ -41,9 +41,8 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     url: "./ws/GetUbicazione.php?codUbicazione=" + ubicazione,
                     dataType: 'json',
                     success: function(data, status) {
-                        
-                        let dati = data["data"];
-                        if(dati[0] == null || dati.length === 0) {
+                        let dati = data.value;
+                        if(dati == null) {
                             showError("Ubicazione inesistente si prega di riprovare");
                             $("#qrcode").val('');
                             i=0;
@@ -51,9 +50,9 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         }
                         $("#qrcode").attr('placeholder','MAGAZZINO DEST.');
                         let datiStampati = "";
-                        idMagazzino = dati[0].ID_MAGAZZINO;
-                        datiStampati += "<p class='pOsai'> Magazzino origine: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
-                        datiStampati += "<p class='pOsai'> Codice ubicazione: <strong>"+dati[0].ID_UBICAZIONE+"</strong></p>";
+                        idMagazzino = dati.ID_MAGAZZINO;
+                        datiStampati += "<p class='pOsai'> Magazzino origine: <strong>"+dati.ID_MAGAZZINO+"</strong></p>";
+                        datiStampati += "<p class='pOsai'> Codice ubicazione: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
                         timerOn = false;
                         $("#appendData").html(datiStampati);
                        getMagazziniAlternativi();
@@ -88,7 +87,6 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 i=1;
                 return false;
             }
-
             if(!arrUbicazioniDest.includes(barCode)) {         
                 $("#qrcode").attr('placeholder','UBICAZIONE DEST.');
                 showError("Magazzino di destinazione non valido");
@@ -158,7 +156,6 @@ function cambioMagazzinoUbicazione() {
 }
 
 function updateInputValue() {
-    console.log("sel", $("#magazzinoDest :selected").val() );
     if($("#magazzinoDest :selected").val() != -1){
         $("#qrcode").val($("#magazzinoDest :selected").text());
         $("#btnCambio").attr('disabled',false);
