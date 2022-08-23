@@ -38,7 +38,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             if(barCode.trim() != ""){                
                 ubicazione = barCode;
                 $.get({
-                    url: "./ws/Interrogazione.php?codUbicazione=" + ubicazione,
+                    url: "./ws/GetUbicazione.php?codUbicazione=" + ubicazione,
                     dataType: 'json',
                     success: function(data, status) {
                         
