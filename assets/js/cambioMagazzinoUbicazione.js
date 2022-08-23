@@ -168,13 +168,11 @@ function updateInputValue() {
     }
 }
 
-function showError(msg) {
-    // $("#error_message").html("<div class='alert alert-danger' role='alert'>"+msg+"</div>");
-    // $("#error_message div").css("display","block");
-    // setTimeout(function() {
-    //     $("#error_message").html('');
-    // }, 3000);
-    alert(msg);
+function showError(data) {
+    const err = typeof data === 'string' ? data :
+                data.responseJSON && data.responseJSON.error && data.responseJSON.error.value.length > 0 ? data.responseJSON.error.value :
+                "Errore interno";
+    alert(err);
 }
 
 function showSuccessMsg(msg) {

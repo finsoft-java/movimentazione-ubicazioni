@@ -148,7 +148,10 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
 }
 
 function showError(msg) {
-    alert(msg);
+    const err = typeof data === 'string' ? data :
+    data.responseJSON && data.responseJSON.error && data.responseJSON.error.value.length > 0 ? data.responseJSON.error.value :
+    "Errore interno";
+    alert(err);
 }
 
 function showSuccessMsg(msg) {

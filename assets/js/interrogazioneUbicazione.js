@@ -16,16 +16,8 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             success: function(data, status) {
                 let dati = data["data"];
                 if(dati[0] == null || dati.length === 0) {   
-                    showError("Ubicazione inesistente o vuota si prega di riprovare");
+                    showError("Ubicazione vuota");
                     $("#qrcode").val('');
-                    // DEBUG CODE
-                    let datiStampati = "<p style='color:green'>";
-                    for (var i = 0; i < value.length; ++i) {
-                        datiStampati += "'" + value.charCodeAt(i) + "' ";
-                    }
-                    datiStampati += "</p>";
-                    $(".listaOsai").html(datiStampati);
-                    // END DEBUG CODE
                     return false;
                 }
                 let datiStampati = "<p>Magazzino: <strong style='text-transform:uppercase'>"+dati[0].ID_MAGAZZINO+"</strong></p>";
@@ -36,37 +28,20 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     datiStampati += "<p>Descrizione: <strong>"+dati[i].DESCRIZIONE+"</strong> </p>";
                     datiStampati += "<hr/>";
                 }
-                // DEBUG CODE
-                datiStampati += "<p style='color:green'>";
-                for (var i = 0; i < value.length; ++i) {
-                    datiStampati += "'" + value.charCodeAt(i) + "' ";
-                }
-                datiStampati += "</p>";
-                // END DEBUG CODE
                 $(".listaOsai").html(datiStampati);
             },
             error: function(data, status){
-                showError("Ubicazione inesistente o vuota si prega di riprovare");
+                showError(data);
                 $("#qrcode").val('');
-
-                // DEBUG CODE
-                let datiStampati = "<p style='color:green'>";
-                for (var i = 0; i < value.length; ++i) {
-                    datiStampati += "'" + value.charCodeAt(i) + "' ";
-                }
-                datiStampati += "</p>";
-                $(".listaOsai").html(datiStampati);
-                // END DEBUG CODE
+                $(".listaOsai").html("");
             }
         });
         $("#qrcode").val("");
     }
 });
-function showError(msg) {
-    // $("#error_message").html("<div class='alert alert-danger' role='alert'>"+msg+"</div>");
-    // $("#error_message div").css("display","block");
-    // setTimeout(function() {
-    //     $("#error_message").html('');
-    // }, 3000);
-    alert(msg);
+function showError(data) {
+    const err = typeof data === 'string' ? data :
+                data.responseJSON && data.responseJSON.error && data.responseJSON.error.value.length > 0 ? data.responseJSON.error.value :
+                "Errore interno";
+    alert(err);
 }

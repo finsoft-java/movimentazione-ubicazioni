@@ -15,6 +15,10 @@ class UbicazioniManager {
           $count = 1;
           
       } else {
+
+          $this->check_stato_ubicazione($codUbicazione);
+          $this->check_articolo($codArticolo);
+
           $sql0 = "SELECT COUNT(*) AS cnt ";
           $sql1 = "SELECT U.ID_UBICAZIONE, U.ID_MAGAZZINO, S.ID_ARTICOLO, A.DESCRIZIONE, A.DISEGNO, A.R_UM_PRM_MAG, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
           
@@ -32,6 +36,7 @@ class UbicazioniManager {
           $data = $panthera->select_list($sql1 . $sql2 . $sql3);
       }
       
+      // se l'ubicazione e' vuota non do' errori
       return [$data, $count];
     }
 
@@ -54,6 +59,9 @@ class UbicazioniManager {
                      ]; 
             $count = 9;
         } else {
+
+            $this->check_stato_ubicazione($codUbicazione);
+
             $sql0 = "SELECT COUNT(*) AS cnt ";
             $sql1 = "SELECT U.ID_UBICAZIONE, U.ID_MAGAZZINO, S.ID_ARTICOLO, A.DESCRIZIONE, A.DISEGNO, A.R_UM_PRM_MAG, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
             $sql2 = "FROM THIP.UBICAZIONI_LL U
@@ -69,7 +77,58 @@ class UbicazioniManager {
             $data = $panthera->select_list($sql1 . $sql2 . $sql3);
         }
         
+        // se l'ubicazione e' vuota non do' errori
         return [$data, $count];
+    }
+
+    function check_stato_ubicazione($codUbicazione) {
+      global $panthera, $ID_AZIENDA;
+      $sql = "SELECT COUNT(*)
+              FROM THIP.UBICAZIONI_LL U
+              JOIN THIPPERS.YUBICAZIONI_LL YU
+                ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
+              WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione'
+                ";
+      $count = $panthera->select_single_value($sql);
+      if ($count == 0) {
+        print_error(404, "Ubicazione inesistente");
+      }
+
+      $sql = "SELECT COUNT(*)
+              FROM THIP.UBICAZIONI_LL U
+              JOIN THIPPERS.YUBICAZIONI_LL YU
+                ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
+              WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND YU.TRASFERIBILE='Y'
+                ";
+      $count = $panthera->select_single_value($sql);
+      if ($count == 0) {
+        print_error(500, "Ubicazione esistente ma non associata a un magazzino (flag 'trasferibile' non impostato)");
+      }
+
+      $sql = "SELECT COUNT(*)
+              FROM THIP.UBICAZIONI_LL U
+              JOIN THIPPERS.YUBICAZIONI_LL YU
+                ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
+              WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND YU.TRASFERIBILE='Y' AND U.STATO='V'
+                ";
+      $count = $panthera->select_single_value($sql);
+      if ($count == 0) {
+        print_error(404, "Ubicazione esistente ma in stato non valido");
+      } elseif ($count > 1) {
+        print_error(500, "Ubicazione associata a $count magazzini diversi");
+      }
+    }
+
+    function check_articolo($codArticolo) {
+      global $panthera, $ID_AZIENDA;
+
+      $sql = "SELECT COUNT(*)
+              FROM THIP.ARTICOLI A
+              WHERE A.ID_AZIENDA='$ID_AZIENDA' AND A.ID_ARTICOLO='$codArticolo' ";
+      $count = $panthera->select_single_value($sql);
+      if ($count == 0) {
+        print_error(404, "Articolo inesistente");
+      }
     }
 
     /**
@@ -81,6 +140,9 @@ class UbicazioniManager {
       if ($panthera->mock) {
         return [ 'ID_ARTICOLO' => 'AAAAA', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'XXX', 'TRASFERIBILE' => 'Y' ];
       } else {
+
+        $this->check_stato_ubicazione($codUbicazione);
+
         $sql = "SELECT *
                 FROM THIP.UBICAZIONI_LL U
                 JOIN THIPPERS.YUBICAZIONI_LL YU
