@@ -40,7 +40,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
 });
 function showError(data) {
     const err = typeof data === 'string' ? data :
-                data.responseJSON && data.responseJSON.error && data.responseJSON.error.value && data.responseJSON.error.value.length > 0 ? data.responseJSON.error.value :
+                data.responseJSON && data.responseJSON.error && data.responseJSON.error.value.length > 0 ? data.responseJSON.error.value :
                 "Errore interno";
     alert(err);
 }
