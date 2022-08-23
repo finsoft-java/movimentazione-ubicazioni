@@ -156,26 +156,6 @@ class UbicazioniManager {
     }
 
     /**
-     * Restituisce la lista di tutti i magazzini
-     */
-    function getMagazziniAlternativi($ID_MAGAZZINO) {
-      global $panthera, $ID_AZIENDA;
-
-      if ($panthera->mock) {
-          $data = [ 'M01', 'M02', 'M03' ];
-      } else {
-          $sql = "SELECT DISTINCT(ID_MAGAZZINO)
-                  FROM THIP.MAGAZZINI
-                  WHERE ID_MAGAZZINO != '$ID_MAGAZZINO' AND TIPO_MAGAZ IN('0','2','5','7','9') AND ID_AZIENDA= '$ID_AZIENDA'
-                  ORDER BY 1";
-          //echo $sql."<br/>";          
-          $data = $panthera->select_column($sql);
-      }
-      $count = count($data);
-      return [$data, $count];
-    }
-
-    /**
      * FUNZIONE salva note
      */
     function salvaNote($codUbicazione, $note, $notePosizione) {
@@ -191,10 +171,10 @@ class UbicazioniManager {
       $sql = "UPDATE THIP.UBICAZIONI_LL U
               SET NOTE='$note'
               WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' ";
-      return $panthera->execute_update($sql);
+      $panthera->execute_update($sql);
       $sql = "UPDATE THIP.YUBICAZIONI_LL YU
               SET NOTE_POSIZIONE='$notePosizione'
               WHERE YU.ID_AZIENDA='$ID_AZIENDA' AND YU.ID_UBICAZIONE='$codUbicazione' ";
-      return $panthera->execute_update($sql);
+      $panthera->execute_update($sql);
     }
 }
