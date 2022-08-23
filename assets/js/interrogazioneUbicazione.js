@@ -15,7 +15,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             success: function(data, status) {
                 let dati = data["data"];
                 if(dati[0] == null || dati.length === 0) {   
-                    showError("Ubicazione inesistente o vuota si prega di riprovare");
+                    showError("Ubicazione vuota");
                     $("#qrcode").val('');
                     return false;
                 }
@@ -30,18 +30,16 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 $(".listaOsai").html(datiStampati);
             },
             error: function(data, status){
-                showError("Ubicazione inesistente o vuota si prega di riprovare");
+                showError(data);
                 $("#qrcode").val('');
             }
         });
         $("#qrcode").val("");
     }
 });
-function showError(msg) {
-    // $("#error_message").html("<div class='alert alert-danger' role='alert'>"+msg+"</div>");
-    // $("#error_message div").css("display","block");
-    // setTimeout(function() {
-    //     $("#error_message").html('');
-    // }, 3000);
-    alert(msg);
+function showError(data) {
+    const err = typeof data === 'string' ? data :
+                data.responseJSON && data.responseJSON.error && data.responseJSON.error.value && data.responseJSON.error.value.length > 0 ? data.responseJSON.error.value :
+                "Errore interno";
+    alert(err);
 }
