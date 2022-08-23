@@ -19,12 +19,10 @@ let i = 0;
 let ubicazione;
 let articolo;
 let ubicazioneDest;
-let qty;
 let maxQty;
 
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     this.value = this.value.toUpperCase();
-    console.log("listen to keyup");
     if (event.keyCode === 13) {
         event.preventDefault();
         i++;
@@ -51,7 +49,15 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             }
        }
         if(i == 3) {
-            articolo = barCode;
+            if(barCode.trim() != ""){       
+                articolo = barCode;
+                $("#qrcode").val("").attr('placeholder','ARTICOLO');
+            } else {
+                showError("Articolo inesistente si prega di riprovare");
+                $("#qrcode").val("").attr('placeholder','ARTICOLO');
+                i=2;
+                return false;
+            }
             $("#qrcode").val("").attr('placeholder','ARTICOLO').attr('disabled',true);
             $("#btnTrasferimento").attr('disabled',false);
             $("#btnRipeti").attr('disabled',false);
@@ -100,9 +106,8 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
 
 // $(document).on('input', 'input[type=number]', checkQty);
 
-function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> conferma e esce
-    qty = parseFloat($("#qty").val()).toFixed(3);
-    if(Number.isNaN(qty)) {
+function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> conferma e esce  
+    if(!$("#qty").val().match(/^\d+(,\d+|\.\d+)?$/) && (parseFloat($("#qty").val()) < 1 || parseFloat($("#qty").val()) > maxQty)) { 
         showError("Inserire una quantità valida! (numeri decimali con il punto)");
         i=3;
         $("#btnTrasferimento").attr('disabled',false);
@@ -121,14 +126,8 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
     $("#btnTrasferimento").attr('disabled',true);
     $("#btnRipeti").attr('disabled',true);
 
-    if(parseFloat($("#qty").val()) < 1 || parseFloat($("#qty").val()) > maxQty) {
-        showError("Inserire una quantità valida!");
-        i=3;
-        $("#btnTrasferimento").attr('disabled',false);
-        $("#btnRipeti").attr('disabled',false);
-        return;
-    }
-
+    const qty = parseFloat($("#qty").val()).toFixed(3);
+    
     $.post({
         url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + qty  + "&codUbicazioneDest=" +ubicazioneDest,
         dataType: 'json',
@@ -173,3 +172,7 @@ function minus(minimum = 1) {
 function selezionaTutti(maxQty) {
     $("#qty").val(maxQty);
 }
+
+
+
+
