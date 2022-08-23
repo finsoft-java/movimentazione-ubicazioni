@@ -101,7 +101,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
 function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> conferma e esce
     qty = parseFloat($("#qty").val()).toFixed(3);
     if(Number.isNaN(qty)) {
-        alert("Inserire una quantità valida! (numeri decimali con il punto)");
+        showError("Inserire una quantità valida! (numeri decimali con il punto)");
         i=3;
         $("#btnTrasferimento").attr('disabled',false);
         $("#btnRipeti").attr('disabled',false);
@@ -120,7 +120,7 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
     $("#btnRipeti").attr('disabled',true);
 
     if(parseFloat($("#qty").val()) < 1 || parseFloat($("#qty").val()) > maxQty) {
-        alert("Inserire una quantità valida!");
+        showError("Inserire una quantità valida!");
         i=3;
         $("#btnTrasferimento").attr('disabled',false);
         $("#btnRipeti").attr('disabled',false);
@@ -135,12 +135,11 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
             console.log("articolo ", articolo, " ub part ", ubicazione, "ub dest ",ubicazioneDest);
 
             $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'> Trasferimento avvenuto con successo all\'ubicazione <strong>"+ubicazioneDest+"</strong></div>");
-            alert("Trasferimento avvenuto con successo \n (ubicazione di partenza: " + ubicazione + ", ubicazione di destinazione: " + ubicazioneDest + ", articolo: " + articolo + ", quantità: " + qty + ")");
-            },
-            error: function(data, status){
+            showSuccessMsg("Trasferimento avvenuto con successo \n (ubicazione di partenza: " + ubicazione + ", ubicazione di destinazione: " + ubicazioneDest + ", articolo: " + articolo + ", quantità: " + qty + ")");
+        },
+        error: function(data, status){
                 console.log("sono nella POST (error!!)");
                 console.log("ERRORE in trasferimentoArticoli", data);
-            const err = data.responseJSON.error.value.length > 0 ? data.responseJSON.error.value : "Errore interno";
             showError(err);
             $("#qrcode").val('');
         }
@@ -149,8 +148,8 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
 
 function showError(msg) {
     const err = typeof data === 'string' ? data :
-    data.responseJSON && data.responseJSON.error && data.responseJSON.error.value.length > 0 ? data.responseJSON.error.value :
-    "Errore interno";
+                data.responseJSON && data.responseJSON.error && data.responseJSON.error.value.length > 0 ? data.responseJSON.error.value :
+                "Errore interno";
     alert(err);
 }
 

@@ -68,6 +68,8 @@ class CaricamentiMassaManager {
         if ($ubi2 === null) print_error(400, "Ubicazione '$codUbicazioneDest' inesistente");
         $codMagazzinoDest = $ubi2['ID_MAGAZZINO'];
 
+        $ubicazioniManager->check_articolo($articolo);
+
         $id = $panthera->get_numeratore('MOVUBI');
         //echo ">1< ";
 

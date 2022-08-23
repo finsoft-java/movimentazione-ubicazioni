@@ -110,7 +110,7 @@ function getMagazziniAlternativi(){
             let dati = data["data"];
             arrUbicazioniDest = dati;
             if(dati[0] == null || dati.length === 0) {
-                showError("Ubicazione inesistente si prega di riprovare");
+                showError("Errore interno nel reperire i magazzini");
                 $("#qrcode").val('');
                 return false;
             }
@@ -124,6 +124,7 @@ function getMagazziniAlternativi(){
             $("#appendSelect").append(datiStampati);
         }, error: function(data, status) {
             console.log('ERRORE -> getMagazziniAlternativi', data);
+            showError(data);
         }
     });
 }
@@ -149,7 +150,7 @@ function cambioMagazzinoUbicazione() {
         },
         error: function(data, status){
             console.log('ERRORE -> cambioMagazzinoUbicazione', data);
-            showError("Errore interno")
+            showError(data)
             $("#qrcode").val('');
             $("#btnCambio").attr('disabled',true);
         }
