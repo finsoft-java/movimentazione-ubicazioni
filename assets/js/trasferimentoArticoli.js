@@ -114,6 +114,8 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
         $("#btnRipeti").attr('disabled',false);
         return;
     }
+    const qty = parseFloat($("#qty").val()).toFixed(3);
+
     if(repeatFlag) {
         $("#qrcode").attr("disabled",false);
         $("#qrcode").val("").attr('placeholder','ARTICOLO');
@@ -126,8 +128,6 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
     $("#btnTrasferimento").attr('disabled',true);
     $("#btnRipeti").attr('disabled',true);
 
-    const qty = parseFloat($("#qty").val()).toFixed(3);
-    
     $.post({
         url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + qty  + "&codUbicazioneDest=" +ubicazioneDest,
         dataType: 'json',
