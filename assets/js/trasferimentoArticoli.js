@@ -86,7 +86,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 },
                 error: function(data, status){
                     console.log("ERRORE in i == 3 trasferimentoArticoli", data);
-                    showError("Errore interno");
+                    showError(data);
                     $("#qrcode").val('');
                     i=2;
                 }
@@ -138,15 +138,14 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
             showSuccessMsg("Trasferimento avvenuto con successo \n (ubicazione di partenza: " + ubicazione + ", ubicazione di destinazione: " + ubicazioneDest + ", articolo: " + articolo + ", quantità: " + qty + ")");
         },
         error: function(data, status){
-                console.log("sono nella POST (error!!)");
-                console.log("ERRORE in trasferimentoArticoli", data);
+            console.log("ERRORE in trasferimentoArticoli", data);
             showError(err);
             $("#qrcode").val('');
         }
     });
 }
 
-function showError(msg) {
+function showError(data) {
     const err = typeof data === 'string' ? data :
                 data.responseJSON && data.responseJSON.error && data.responseJSON.error.value.length > 0 ? data.responseJSON.error.value :
                 "Errore interno";
