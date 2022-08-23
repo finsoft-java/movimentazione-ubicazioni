@@ -21,6 +21,7 @@ let ubicazione;
 let magazzinoDest;
 let idMagazzino;
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
+    this.value = this.value.toUpperCase();
     if(!$("#qrcode").val()== '' && i==1){
         disableBtn = false;
         $("#btnCambio").attr('disabled',false);

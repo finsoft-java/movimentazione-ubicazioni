@@ -7,6 +7,7 @@ $(document).ready(function(){
 });
 let ubicazione;
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
+    this.value = this.value.toUpperCase();
     if (event.keyCode === 13) {
         value = $("#qrcode").val();
         $.get({

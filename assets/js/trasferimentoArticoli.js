@@ -23,6 +23,7 @@ let qty;
 let maxQty;
 
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
+    this.value = this.value.toUpperCase();
     console.log("listen to keyup");
     if (event.keyCode === 13) {
         event.preventDefault();
@@ -98,7 +99,14 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
 // $(document).on('input', 'input[type=number]', checkQty);
 
 function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> conferma e esce
-    qty = parseInt($("#qty").val());
+    qty = parseFloat($("#qty").val()).toFixed(3);
+    if(Number.isNaN(qty)) {
+        alert("Inserire una quantità valida! (numeri decimali con il punto)");
+        i=3;
+        $("#btnTrasferimento").attr('disabled',false);
+        $("#btnRipeti").attr('disabled',false);
+        return;
+    }
     if(repeatFlag) {
         $("#qrcode").attr("disabled",false);
         $("#qrcode").val("").attr('placeholder','ARTICOLO');
@@ -111,8 +119,11 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
     $("#btnTrasferimento").attr('disabled',true);
     $("#btnRipeti").attr('disabled',true);
 
-    if(parseInt($("#qty").val()) < 1 || parseInt($("#qty").val()) > maxQty) {
+    if(parseFloat($("#qty").val()) < 1 || parseFloat($("#qty").val()) > maxQty) {
         alert("Inserire una quantità valida!");
+        i=3;
+        $("#btnTrasferimento").attr('disabled',false);
+        $("#btnRipeti").attr('disabled',false);
         return;
     }
 
@@ -124,7 +135,7 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
             console.log("articolo ", articolo, " ub part ", ubicazione, "ub dest ",ubicazioneDest);
 
             $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'> Trasferimento avvenuto con successo all\'ubicazione <strong>"+ubicazioneDest+"</strong></div>");
-           
+            alert("Trasferimento avvenuto con successo \n (ubicazione di partenza: " + ubicazione + ", ubicazione di destinazione: " + ubicazioneDest + ", articolo: " + articolo + ", quantità: " + qty + ")");
             },
             error: function(data, status){
                 console.log("sono nella POST (error!!)");
@@ -137,11 +148,6 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
 }
 
 function showError(msg) {
-    // $("#error_message").html("<div class='alert alert-danger' role='alert'>"+msg+"</div>");
-    // $("#error_message div").css("display","block");
-    // setTimeout(function() {
-    //     $("#error_message").html('');
-    // }, 3000);
     alert(msg);
 }
 
@@ -150,11 +156,15 @@ function showSuccessMsg(msg) {
 }
 
 function plus(maxQty) {
-    $("#qty").val(parseInt($("#qty").val())+1);    
+    if($("#qty").val() <= maxQty - 1) {
+        $("#qty").val((parseFloat($("#qty").val())+1).toFixed(3));    
+    }
 }
 
 function minus(minimum = 1) {
-    $("#qty").val($("#qty").val()-1);
+    if($("#qty").val() >= minimum + 1) {
+        $("#qty").val((parseFloat($("#qty").val())-1).toFixed(3));
+    }
 }
 
 function selezionaTutti(maxQty) {

@@ -5,7 +5,18 @@ html {
 }
 
 .menu2 {
-	
+	background-color: white;
+	margin: 10px 10px 0px 10px;
+	color: #0a646b;
+}
+
+.menu2 p{
+	text-align:center; 
+	vertical-align: middle;
+}
+
+.container2{
+	background-color: lightsteelblue;
 }
 
 .menuOsai {
@@ -49,11 +60,14 @@ html {
 	width: calc(100% - 64px);
 	margin: 15px 32px 25px 32px;
 }
-.interrogaUbiOsai a {
+.interrogaUbiOsai p {
 	width: 100%;
 	text-align: center;
 	color: #fff;
 	font-weight: bold;
+	text-transform: uppercase;
+	margin-bottom: 0px;
+	padding: 8px 0px;
 }
 
 .form-control {
