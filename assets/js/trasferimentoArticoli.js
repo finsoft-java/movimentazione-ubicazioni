@@ -106,24 +106,27 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
 
 // $(document).on('input', 'input[type=number]', checkQty);
 
-function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> conferma e esce  
-    if(!$("#qty").val().match(/^\d+(,\d+|\.\d+)?$/) && (parseFloat($("#qty").val()) < 1 || parseFloat($("#qty").val()) > maxQty)) { 
-        showError("Inserire una quantità valida! (numeri decimali con il punto)");
+function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> conferma e esce
+    const qtyInput = $("#qty").val();
+    const qrcode = $("#qrcode");
+
+    if((!qtyInput.match(/^\d+(,\d+|\.\d+)?$/)) || !qtyInput || (parseFloat(qtyInput) < 1 || parseFloat(qtyInput) > maxQty)) { 
+        showError("Inserire una quantità valida tra uno e " + maxQty + " (numeri decimali con il punto)");
         i=3;
         $("#btnTrasferimento").attr('disabled',false);
         $("#btnRipeti").attr('disabled',false);
         return;
     }
-    const qty = parseFloat($("#qty").val()).toFixed(3);
+    const qty = parseFloat(qtyInput).toFixed(3);
 
     if(repeatFlag) {
-        $("#qrcode").attr("disabled",false);
-        $("#qrcode").val("").attr('placeholder','ARTICOLO');
+        qrcode.attr("disabled", false);
+        qrcode.val("").attr('placeholder','ARTICOLO');
         $("#appendData").html("");
         timerOn = true;
         i = 2;
     } else {
-        $("#qrcode").attr("disabled", true);
+        qrcode.attr("disabled", true);
     }
     $("#btnTrasferimento").attr('disabled',true);
     $("#btnRipeti").attr('disabled',true);
@@ -141,7 +144,7 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
         error: function(data, status){
             console.log("ERRORE in trasferimentoArticoli", data);
             showError(data);
-            $("#qrcode").val('');
+            qrcode.val('');
         }
     });
 }
