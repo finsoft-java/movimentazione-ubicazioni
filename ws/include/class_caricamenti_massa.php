@@ -18,11 +18,19 @@ class CaricamentiMassaManager {
         }
 
         $ubi1 = $ubicazioniManager->getUbicazione($codUbicazione);
-        if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazione' inesistente");
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
         $id = $panthera->get_numeratore('MOVUBI');
         //echo ">1< ";
   
+        $magazziniManager->checkMagazzino($codMagazzinoDest);
+
+        // l'algoritmo cambia a seconda che l'ubicazione sia piena o vuota
+        $contenuto = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
+        if (empty($contenuto) || count($contenuto) == 0) {
+          $this->trasferisciUbicazioneVuota($ubi1, $codMagazzinoDest);
+          return;
+        }
+
         // BATCH_LOAD_HDR
         $this->creaTestataCaricamento($id);
         //echo ">2< ";
@@ -46,6 +54,19 @@ class CaricamentiMassaManager {
         if (!$this->checkCM($id)) {
           print_error(500, 'Il caricamento di massa non è andato a buon fine');
         }
+    }
+
+    private function trasferisciUbicazioneVuota($ubicazione, $codMagazzinoDest) {
+      global $panthera, $DATE, $ID_AZIENDA, $UTENTE, $ubicazioniManager;
+
+      // FUNZIONE private:
+      // assumo di avere gia' controllato che l'ubicazione e' vuota e $codMagazzinoDest e' valido
+
+      $sql = "UPDATE THIP.YUBICAZIONI_LL
+              SET TRASFERIMENTO=CASE WHEN ID_MAGAZZINO='$codMagazzinoDest' THEN 'Y' ELSE 'N' END
+              WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_UBICAZIONE='$codUbicazione' ";
+      $panthera->execute_update($sql);
+
     }
 
     /**
@@ -88,7 +109,7 @@ class CaricamentiMassaManager {
         //echo ">5< ";
 
         // lancia davvero il CM su Panthera
-        return $this->chiama_ws_panthera();
+        $this->chiama_ws_panthera();
 
         usleep(500);
         if (!$this->checkCM($id)) {
