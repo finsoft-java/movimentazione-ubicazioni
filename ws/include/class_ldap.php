@@ -8,14 +8,14 @@ class LdapManager {
      * Login dell'utente con ruolo magazziniere (serve per il backend)
      */
     function login($username, $pwd) {
-        return $this->_common_get_user(AD_SERVER, $username . '@' . AD_DOMAIN, $pwd, $username, AD_BASE_DN, [AD_FILTER => 'magazziniere']);
+        return $this->_common_get_user(AD_SERVER, $username . '@' . AD_DOMAIN, $pwd, $username, AD_BASE_DN, ['' => 'utente']);
     }
 
     /**
      * Ricerca dell'utente con ruolo magazziniere oppure utente semplice (serve per il frontend)
      */
     function get_user($username) {
-        return $this->_common_get_user(AD_SERVER, AD_USERNAME, AD_PASSWORD, $username, AD_BASE_DN, [AD_FILTER => 'magazziniere', '' => 'utente']);
+        return $this->_common_get_user(AD_SERVER, AD_USERNAME, AD_PASSWORD, $username, AD_BASE_DN, ['' => 'utente']);
     }
 
     /**
