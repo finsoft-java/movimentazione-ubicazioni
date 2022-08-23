@@ -174,4 +174,27 @@ class UbicazioniManager {
       $count = count($data);
       return [$data, $count];
     }
+
+    /**
+     * FUNZIONE salva note
+     */
+    function salvaNote($codUbicazione, $note, $notePosizione) {
+      global $panthera, $ID_AZIENDA;
+
+      if ($panthera->mock) {
+        return;
+      }
+
+      $this->check_stato_ubicazione($codUbicazione);
+
+      // ma lo setto a tappeto su tutti i magazzini???
+      $sql = "UPDATE THIP.UBICAZIONI_LL U
+              SET NOTE='$note'
+              WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' ";
+      return $panthera->execute_update($sql);
+      $sql = "UPDATE THIP.YUBICAZIONI_LL YU
+              SET NOTE_POSIZIONE='$notePosizione'
+              WHERE YU.ID_AZIENDA='$ID_AZIENDA' AND YU.ID_UBICAZIONE='$codUbicazione' ";
+      return $panthera->execute_update($sql);
+    }
 }
