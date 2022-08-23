@@ -20,7 +20,6 @@ class CaricamentiMassaManager {
         $ubi1 = $ubicazioniManager->getUbicazione($codUbicazione);
         if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazione' inesistente");
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
-        $commessa = $ubi1['R_COMMESSA'];
         $id = $panthera->get_numeratore('MOVUBI');
         //echo ">1< ";
   
@@ -29,11 +28,11 @@ class CaricamentiMassaManager {
         //echo ">2< ";
 
         // CM_DOC_TRA_TES
-        $this->creaTestataDocumento($id, $CAU_TESTATA, $codMagazzinoSrc, $codMagazzinoDest, $commessa);
+        $this->creaTestataDocumento($id, $CAU_TESTATA, $codMagazzinoSrc, $codMagazzinoDest);
         //echo ">3< ";
  
         // CM_DOC_TRA_RIG
-        $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazione, $codMagazzinoDest, $codUbicazione, $commessa);
+        $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazione, $codMagazzinoDest, $codUbicazione);
         //echo ">4< ";
 
         // SCHEDULED_JOB
@@ -62,7 +61,6 @@ class CaricamentiMassaManager {
         $ubi1 = $ubicazioniManager->getUbicazione($codUbicazioneSrc);
         if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazioneSrc' inesistente");
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
-        $commessa = $ubi1['R_COMMESSA'];
 
         $ubi2 = $ubicazioniManager->getUbicazione($codUbicazioneDest);
         if ($ubi2 === null) print_error(400, "Ubicazione '$codUbicazioneDest' inesistente");
@@ -78,11 +76,11 @@ class CaricamentiMassaManager {
         //echo ">2< ";
 
         // CM_DOC_TRA_TES
-        $this->creaTestataDocumento($id, $CAU_TESTATA, $codMagazzinoSrc, $codMagazzinoDest, $commessa);
+        $this->creaTestataDocumento($id, $CAU_TESTATA, $codMagazzinoSrc, $codMagazzinoDest);
         //echo ">3< ";
 
         // CM_DOC_TRA_RIG
-        $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo, $qty);
+        $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty);
         //echo ">4< ";
 
         // SCHEDULED_JOB
@@ -111,7 +109,6 @@ class CaricamentiMassaManager {
         $ubi1 = $ubicazioniManager->getUbicazione($codUbicazioneSrc);
         if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazioneSrc' inesistente");
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
-        $commessa = $ubi1['R_COMMESSA'];
 
         $id = $panthera->get_numeratore('MOVUBI');
         //echo ">1< ";
@@ -121,11 +118,11 @@ class CaricamentiMassaManager {
         //echo ">2< ";
 
         // CM_DOC_TRA_TES
-        $this->creaTestataDocumento($id, $CAU_TESTATA_SVUOTA, $codMagazzinoSrc, $COD_MAGAZ_SVUOTA, $commessa);
+        $this->creaTestataDocumento($id, $CAU_TESTATA_SVUOTA, $codMagazzinoSrc, $COD_MAGAZ_SVUOTA);
         //echo ">3< ";
 
         // CM_DOC_TRA_RIG
-        $this->creaRigheDocumento($id, $CAU_RIGA_SVUOTA, $codMagazzinoSrc, $codUbicazioneSrc, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA, $commessa);
+        $this->creaRigheDocumento($id, $CAU_RIGA_SVUOTA, $codMagazzinoSrc, $codUbicazioneSrc, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA);
         //echo ">4< ";
 
         // SCHEDULED_JOB
@@ -166,7 +163,7 @@ class CaricamentiMassaManager {
       $panthera->execute_update($sql);
     }
 
-    function creaTestataDocumento($id, $cauTestata, $codMagazzinoSrc, $codMagazzinoDest, $commessa) {
+    function creaTestataDocumento($id, $cauTestata, $codMagazzinoSrc, $codMagazzinoDest) {
         global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
 
         // FIXME RUN_ID
@@ -248,7 +245,7 @@ class CaricamentiMassaManager {
           null,
           '$codMagazzinoSrc',
           '$codMagazzinoDest',
-          '$commessa',
+          null,
           null,
           null,
           null,
@@ -277,7 +274,7 @@ class CaricamentiMassaManager {
           '$UTENTE',
           CURRENT_TIMESTAMP,
           CURRENT_TIMESTAMP,
-          '$commessa',
+          null,
           null,
           null,
           'T',
@@ -302,7 +299,7 @@ class CaricamentiMassaManager {
         $panthera->execute_update($sql);
     }
 
-    function creaRigheDocumento($id, $cauRiga, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $commessa, $articolo=null, $qty=null) {
+    function creaRigheDocumento($id, $cauRiga, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo=null, $qty=null) {
       global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
 
       if (empty($articolo) || empty($qty)) {
@@ -399,7 +396,7 @@ class CaricamentiMassaManager {
         S.ID_VERSIONE,              -- 20
         S.ID_CONFIG,
         null,
-        '$commessa',
+        S.ID_COMMESSA,
         null,
         null,
         null,
@@ -430,7 +427,7 @@ class CaricamentiMassaManager {
         CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP,
         null,
-        null,
+        S.ID_COMMESSA,
         null,
         null,
         '$codUbicazioneSrc',
