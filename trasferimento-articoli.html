@@ -35,6 +35,13 @@
         </div>
         <div id="error_message"></div>
         <script src="assets/js/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                if(sessionStorage.getItem( "token") == null){
+                    location.href="./login.html";
+                }
+            });
+        </script>
         <script src="assets/js/popper.min.js"></script>
         <script src="assets/js/bootstrap.min.js"></script>
         <script src="assets/js/trasferimentoArticoli.js?v=2"></script>  

@@ -11,6 +11,7 @@
         <link rel="stylesheet" href="assets/css/all.css">
         <link rel="stylesheet" href="assets/css/fontawesome.css">
         <link rel="stylesheet" href="assets/css/v4-font-face.css">
+        
     </head>
     <body>
         <div class="menuOsai red" onclick="window.location='./interrogazione-ubicazione.html'">
@@ -23,12 +24,16 @@
             <p>Trasferimento Articoli</p>
         </div>
         <script src="assets/js/jquery-3.6.0.min.js"></script>
-        <script src="assets/js/popper.min.js"></script>
-        <script src="assets/js/bootstrap.min.js"></script>
         <script>
             $(document).ready(function(){
+                if(sessionStorage.getItem( "token") == null){
+                    location.href="./login.html";
+                }
                 $('.menuOsai').css('height',(window.innerHeight/3));
             });
         </script>
+        <script src="assets/js/popper.min.js"></script>
+        <script src="assets/js/bootstrap.min.js"></script>
+        
     </body>
 </html>
