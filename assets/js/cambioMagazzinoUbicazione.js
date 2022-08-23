@@ -1,5 +1,4 @@
 let timerOn = true;
-let disableBtn = true;
 
 $(document).ready(function(){
     $(".focus").focus();
@@ -23,7 +22,6 @@ let idMagazzino;
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     this.value = this.value.toUpperCase();
     if(!$("#qrcode").val()== '' && i==1){
-        disableBtn = false;
         $("#btnCambio").attr('disabled',false);
     } else {
         $("#btnCambio").attr('disabled',true);
