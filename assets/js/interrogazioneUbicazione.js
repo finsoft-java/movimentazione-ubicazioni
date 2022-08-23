@@ -35,7 +35,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     datiStampati += "<p>Articolo: <strong>"+dati[i].ID_ARTICOLO+"</strong> | Quantita: <strong>"+dati[i].QTA_GIAC_PRM+" "+ dati[i].R_UM_PRM_MAG +" </strong></p>";
                     datiStampati += "<p>Disegno: <strong>"+dati[i].DISEGNO+"</strong> </p>";
                     datiStampati += "<p>Descrizione: <strong>"+dati[i].DESCRIZIONE+"</strong> </p>";
-                    const idCommessa = dati[i].ID_COMMESSA ? "<p>Descrizione: <strong>"+dati[i].ID_COMMESSA+"</strong> </p>" : "";
+                    const idCommessa = dati[i].ID_COMMESSA ? "<p>Commessa: <strong>"+dati[i].ID_COMMESSA+"</strong> </p>" : "";
                     datiStampati += idCommessa;
                     datiStampati += "<hr/>";
                 }

@@ -46,10 +46,8 @@ function check_and_load_user($username, $pwd) {
         $user->email = 'alessandro.barsanti@it-present.com';
         return $user;
     }
-
-    // POI, proviamo su LDAP
-    //global $ldapManager;
-    //return $ldapManager->login($username, $pwd);
+    global $ldapManager;
+    return $ldapManager->login($username, $pwd);
 }
 
 
