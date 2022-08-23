@@ -100,7 +100,7 @@ class UbicazioniManager {
                 ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
               WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND YU.TRASFERIBILE='Y'
                 ";
-      $count = $panthera->select_list($sql);
+      $count = $panthera->select_single_value($sql);
       if ($count == 0) {
         print_error(500, "Ubicazione esistente ma non associata a un magazzino (flag 'trasferibile' non impostato)");
       }
@@ -111,7 +111,7 @@ class UbicazioniManager {
                 ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
               WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND YU.TRASFERIBILE='Y' AND U.STATO='V'
                 ";
-      $count = $panthera->select_list($sql);
+      $count = $panthera->select_single_value($sql);
       if ($count == 0) {
         print_error(404, "Ubicazione esistente ma in stato non valido");
       } elseif ($count > 1) {

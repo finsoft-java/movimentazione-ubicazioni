@@ -32,6 +32,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             error: function(data, status){
                 showError(data);
                 $("#qrcode").val('');
+                $(".listaOsai").html("");
             }
         });
         $("#qrcode").val("");
