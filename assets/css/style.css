@@ -19,11 +19,11 @@ html {
 }
 
 .column {
-	margin-bottom: 12px;
-	border: 2px #D5D5D5 solid;
-	background-color: gainsboro;
+	margin-bottom: 15px;
+	border: 2px gainsboro solid;
+	background-color: #f0f0f0;
 	text-align: center;
-	border-radius: 13px;
+	border-radius: 30px;
 	--dim: calc( 100vw/2 - 30px);
 	min-width: var(--dim);
 	min-height: var(--dim);
@@ -36,6 +36,7 @@ html {
 	top: 25px;
 	width: 100%;
 	left: 0px;
+	color: #515e64;
 }
 .column p {
 	position: absolute;
