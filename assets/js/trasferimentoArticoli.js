@@ -64,6 +64,9 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             $.get({
                 url: "./ws/Interrogazione.php?codUbicazione=" + ubicazione + "&codArticolo=" +articolo,
                 dataType: 'json',
+                headers: {
+                    'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                },
                 success: function(data, status) {
                     console.log("sono nella GET (success) con");
                     console.log("articolo ", articolo, " ub part ", ubicazione, "ub dest ",ubicazioneDest);
@@ -134,6 +137,9 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
     $.post({
         url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + qty  + "&codUbicazioneDest=" +ubicazioneDest,
         dataType: 'json',
+        headers: {
+            'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+        },
         success: function(data, status) {
             console.log("sono nella POST (success) con ");
             console.log("articolo ", articolo, " ub part ", ubicazione, "ub dest ",ubicazioneDest);

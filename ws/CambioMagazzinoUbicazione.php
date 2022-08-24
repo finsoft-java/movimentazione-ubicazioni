@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-//require_logged_user_JWT();
+require_logged_user_JWT();
 
 $codUbicazione = isset($_REQUEST['codUbicazione']) ? $panthera->escape_string($_REQUEST['codUbicazione']) : null;
 $codMagazzinoDest = isset($_REQUEST['codMagazzinoDest']) ? $panthera->escape_string($_REQUEST['codMagazzinoDest']) : null;
