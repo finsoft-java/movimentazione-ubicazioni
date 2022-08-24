@@ -13,9 +13,13 @@
         <link rel="stylesheet" href="assets/css/v4-font-face.css">
     </head>
     <body>
-        <div class="interrogaUbiOsai blue" onclick="window.location='./index.html'">
+        <nav class="navbar blue" onclick="window.location='./index.html'">
+            <p class="navTitle">Torna al menù</p>
+            <button class="btn btn-outline-light btnLogout" onclick="logout()" type="button"><i class="fa-solid fa-arrow-right-from-bracket logout"> </i> </button>
+        </nav>
+        <!-- <div class="interrogaUbiOsai blue" onclick="window.location='./index.html'">
             <div><p>Torna al Menu</p></div>
-        </div>
+        </div> -->
         <h3 class="titleOsai">Interrogazione Ubicazione</h3>
         <div class="qrcode">
             <input type="text" class="form-control focus" id="qrcode" placeholder="UBICAZIONE (PL-0001)" aria-describedby="basic-addon2">
@@ -30,6 +34,10 @@
                     location.href="./login.html";
                 }
             });
+            function logout() {
+                sessionStorage.removeItem("token");
+                location.href="./login.html";
+            }
         </script>
         <script src="assets/js/popper.min.js"></script>
         <script src="assets/js/bootstrap.min.js"></script>

@@ -18,6 +18,31 @@ html {
 	background-color: var(--blueOsai);
 }
 
+.navbar {
+	box-shadow: 0px 10px 10px lightgrey;
+}
+
+.navbar p {
+	color: #fff;
+	font-weight: bold;
+	text-transform: uppercase;
+	margin-top: 0.5rem;
+	margin-bottom: 0.5rem;
+}
+
+.navTitle {
+	float: left;
+	width: 100%;
+	text-align: center;
+}
+
+.btnLogout{
+	min-width: 20px!important;
+	position: absolute;
+	top: 0.5rem;
+	right: 0.5rem;
+}
+
 .column {
 	margin-bottom: 15px;
 	border: 2px gainsboro solid;
@@ -25,8 +50,10 @@ html {
 	text-align: center;
 	border-radius: 30px;
 	--dim: calc( 100vw/2 - 30px);
-	min-width: var(--dim);
-	min-height: var(--dim);
+	width: var(--dim);
+	height: var(--dim);
+	max-width: 250px;
+	max-height: 250px;
 	position: relative;
 	
 }
@@ -46,6 +73,7 @@ html {
 	width: var(--dim);
 	font-size: 12px;
 	font-weight: 700;
+	max-width: 250px;
 	margin-bottom: 0px;
 }
 
