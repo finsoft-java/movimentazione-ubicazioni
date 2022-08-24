@@ -46,7 +46,7 @@ function check_and_load_user($username, $pwd) {
         $user->email = 'alessandro.barsanti@it-present.com';
         return $user;
     }
-    global $ldapManager;
+    global $ldapManager, $panthera;
     $user = $ldapManager->login($username, $pwd);
     if (!$panthera->check_auth($username, ['GA', 'MGZZ_O'])) {
         print_error(403, "Utente non abilitato in Panthera");
