@@ -38,6 +38,9 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 $.get({
                     url: "./ws/GetUbicazione.php?codUbicazione=" + ubicazione,
                     dataType: 'json',
+                    headers: {
+                        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                    },
                     success: function(data, status) {
                         let dati = data.value;
                         if(dati == null) {
@@ -58,7 +61,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     error: function(data, status){
                         $("#qrcode").attr('placeholder','UBICAZIONE ORIG.');
                         console.log('ERRORE -> Interrogazione', data);
-                        showError("Ubicazione inesistente si prega di riprovare");
+                        showError(data);
                         $("#qrcode").val('');
                         ubicazione = null;
                     }
@@ -67,7 +70,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
 
             } else {
 
-                showError("Ubicazione inesistente si prega di riprovare");
+                showError("Ubicazione mancante");
                 $("#qrcode").val('');
                 i=0;
                 return false;
@@ -102,6 +105,9 @@ function getMagazziniAlternativi(){
     $.get({
         url: "./ws/GetMagazziniAlternativi.php?idMagazzino="+ idMagazzino,
         dataType: 'json',
+        headers: {
+            'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+        },
         success: function(data, status) { 
             let dati = data["data"];
             arrUbicazioniDest = dati;
@@ -140,6 +146,9 @@ function cambioMagazzinoUbicazione() {
     $.post({
         url: "./ws/CambioMagazzinoUbicazione.php?codUbicazione=" + ubicazione + "&codMagazzinoDest=" + $("select").val(),
         dataType: 'json',
+        headers: {
+            'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+        },
         success: function(data, status) {
             showSuccessMsg("Ubicazione spostata correttamente nel magazzino " + magazzinoDest);
             location.href="./index.html";

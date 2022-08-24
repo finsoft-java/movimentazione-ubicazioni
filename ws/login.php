@@ -49,7 +49,7 @@ function check_and_load_user($username, $pwd) {
     if (!$panthera->check_auth($username, ['GA', 'MGZZ_O'])) {
         print_error(403, "Utente non abilitato in Panthera");
     }
-    return $user;
+    return $user;   
 }
 
 

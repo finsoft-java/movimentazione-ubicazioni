@@ -218,7 +218,7 @@ class PantheraManager {
 
         $sql = "SELECT COUNT(*)
                 FROM THERA.USER_GROUP
-                WHERE USER_ID='$userId_$ID_AZIENDA' AND GROUP_ID IN ($groups) ";
+                WHERE USER_ID='${userId}_${ID_AZIENDA}' AND GROUP_ID IN ($groups) ";
         $count = $this->select_single_value($sql);
         return $count > 0;
     }
