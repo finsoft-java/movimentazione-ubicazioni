@@ -17,23 +17,30 @@
             <div><p>OSAI</p></div>
         </div>
         <div class="container">
-        <div class="row">
-            <div class="column menu2" onclick="window.location='./interrogazione-ubicazione.html'"><i class="fa-solid fa-3x fa-clipboard-question"></i><p> Interrogazione Ubicazione</p></div>
-            <div class="column menu2" onclick="window.location='./cambio-magazzino-ubicazione.html'"><i class="fa-solid fa-3x fa-truck-moving"></i><p> Cambio Magazzino Ubicazione</p></div>
-        </div>
-        <div class="row">
-            <div class="column menu2" onclick="window.location='./trasferimento-articoli.html'"><i class="fa-solid fa-3x fa-arrow-right-arrow-left"></i><p> Trasferimento <br> Articoli</p></div>
-            <div class="column menu2"><i class="fa-solid fa-3x fa-trash-can-arrow-up"></i><p> Svuota <br> Ubicazione </p></div>
-        </div>
-        <div class="row">
-            <div class="column menu2"><i class="fa-solid fa-3x fa-cart-flatbed"></i><p> Gestione <br> Carrelli </p></div>
-            <div class="column menu2"><i class="fa-solid fa-3x fa-magnifying-glass-location"></i><p> Gestione note e posizione</p></div>
-        </div>
-        <div class="row">
-            <div class="column menu2"><i class="fa-solid fa-3x fa-arrow-right-from-bracket"></i><p> Logout </p></div>
-        </div>
+            <div class="row">
+                <div class="column menu2" onclick="window.location='./interrogazione-ubicazione.html'"><i class="fa-solid fa-3x fa-clipboard-question"></i><p> Interrogazione Ubicazione</p></div>
+                <div class="column menu2" onclick="window.location='./cambio-magazzino-ubicazione.html'"><i class="fa-solid fa-3x fa-truck-moving"></i><p> Cambio Magazzino Ubicazione</p></div>
+            </div>
+            <div class="row">
+                <div class="column menu2" onclick="window.location='./trasferimento-articoli.html'"><i class="fa-solid fa-3x fa-arrow-right-arrow-left"></i><p> Trasferimento <br> Articoli</p></div>
+                <div class="column menu2"><i class="fa-solid fa-3x fa-trash-can-arrow-up"></i><p> Svuota <br> Ubicazione </p></div>
+            </div>
+            <div class="row">
+                <div class="column menu2"><i class="fa-solid fa-3x fa-cart-flatbed"></i><p> Gestione <br> Carrelli </p></div>
+                <div class="column menu2"><i class="fa-solid fa-3x fa-magnifying-glass-location"></i><p> Gestione note e posizione</p></div>
+            </div>
+            <div class="row">
+                <div class="column menu2"><i class="fa-solid fa-3x fa-arrow-right-from-bracket"></i><p> Logout </p></div>
+            </div>
         </div>
         <script src="assets/js/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                if(sessionStorage.getItem( "token") == null){
+                    location.href="./login.html";
+                }
+            });
+        </script>
         <script src="assets/js/popper.min.js"></script>
         <script src="assets/js/bootstrap.min.js"></script>
     </body>
