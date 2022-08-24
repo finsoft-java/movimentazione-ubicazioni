@@ -203,5 +203,24 @@ class PantheraManager {
         sqlsrv_commit($this->conn);
         return $id;
     }
+
+    /**
+     * Controlla se un utente sta in *almeno uno* dei gruppi indicati
+     */
+    function check_auth($userId, $groups) {
+        global $ID_AZIENDA;
+
+        if (is_string($groups)) {
+            $groups = "'" . $groups . "'";
+        } else {
+            $groups = "'" . implode("','", $groups) . "'";
+        }
+
+        $sql = "SELECT COUNT(*)
+                FROM THERA.USER_GROUP
+                WHERE USER_ID='$userId_$ID_AZIENDA' AND GROUP_ID IN ($groups) ";
+        $count = $this->select_single_value($sql);
+        return $count > 0;
+    }
 }
 ?>
