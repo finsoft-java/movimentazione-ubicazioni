@@ -28,14 +28,13 @@ define('POS_ARTICOLO', '0');
 
 /* costanti per il documento di trasferimento */
 $ID_AZIENDA = '001';
-$UTENTE = 'ADMIN_001';
 $DATA_ORIGIN = 'CM-MOV-UBI';
 $CAU_TESTATA = 'LL4';
 $CAU_RIGA = 'LL2';
 $COD_SCHEDULED_JOB = 'CMDocTrasf';
 $URL_CM = 'http://172.18.0.15/panth01/ws?id=JOBLA&user=CAD&pwd=CADQWER&company=001&key=CMDocTrasf';
 $CAU_TESTATA_SVUOTA = 'SVT';
-$CAU_RIGA_SVUOTA = 'XXX';
+$CAU_RIGA_SVUOTA = 'LL2';
 $COD_MAGAZ_SVUOTA = 'DIN';
 $UBIC_SVUOTA = 'PRO';
 

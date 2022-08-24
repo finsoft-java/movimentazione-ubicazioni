@@ -21,6 +21,9 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
         $.get({
             url: "./ws/Interrogazione.php?codUbicazione=" + value,
             dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+            },
             success: function(data, status) {
                 let dati = data["data"];
                 if(dati[0] == null || dati.length === 0) {   
