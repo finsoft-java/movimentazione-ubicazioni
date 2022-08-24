@@ -45,9 +45,10 @@ function check_and_load_user($username, $pwd) {
         $user->cognome = 'Rossi';
         $user->email = 'alessandro.barsanti@it-present.com';
         return $user;
+    }else{
+        global $ldapManager;
+        return $ldapManager->login($username, $pwd);
     }
-    global $ldapManager;
-    return $ldapManager->login($username, $pwd);
 }
 
 
