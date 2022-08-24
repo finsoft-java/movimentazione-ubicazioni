@@ -11,7 +11,7 @@ class CaricamentiMassaManager {
      * FUNZIONE "Cambia magazzino dell'ubicazione"
      */
     function trasferisciUbicazione($codUbicazione, $codMagazzinoDest) {
-        global $panthera, $CAU_TESTATA, $CAU_RIGA, $YEAR, $DATE, $ID_AZIENDA, $UTENTE, $ubicazioniManager;
+        global $panthera, $CAU_TESTATA, $CAU_RIGA, $YEAR, $DATE, $ID_AZIENDA, $logged_user, $ubicazioniManager;
 
         if ($panthera->mock) {
             return;
@@ -57,7 +57,7 @@ class CaricamentiMassaManager {
     }
 
     private function trasferisciUbicazioneVuota($codUbicazione, $codMagazzinoDest) {
-      global $panthera, $DATE, $ID_AZIENDA, $UTENTE, $ubicazioniManager;
+      global $panthera, $DATE, $ID_AZIENDA, $logged_user , $ubicazioniManager;
 
       // FUNZIONE private:
       // assumo di avere gia' controllato che l'ubicazione e' valida e vuota e $codMagazzinoDest e' valido
@@ -185,7 +185,7 @@ class CaricamentiMassaManager {
     }
 
     function creaTestataDocumento($id, $cauTestata, $codMagazzinoSrc, $codMagazzinoDest) {
-        global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
+        global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $logged_user;
 
         // FIXME RUN_ID
         $sql = "INSERT INTO THIP.CM_DOC_TRA_TES (
@@ -291,8 +291,8 @@ class CaricamentiMassaManager {
           null,
           null,
           'V',                         -- 40
-          '$UTENTE',
-          '$UTENTE',
+          '$logged_user->nome_utente',
+          '$logged_user->nome_utente',
           CURRENT_TIMESTAMP,
           CURRENT_TIMESTAMP,
           null,
@@ -321,7 +321,7 @@ class CaricamentiMassaManager {
     }
 
     function creaRigheDocumento($id, $cauRiga, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo=null, $qty=null) {
-      global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $UTENTE;
+      global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $logged_user;
 
       if (empty($articolo) || empty($qty)) {
         $qty = 'S.QTA_GIAC_PRM';
@@ -443,8 +443,8 @@ class CaricamentiMassaManager {
         null,
         null,
         'V',
-        '$UTENTE',
-        '$UTENTE',              -- 50
+        '$logged_user->nome_utente',
+        '$logged_user->nome_utente',              -- 50
         CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP,
         null,
