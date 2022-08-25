@@ -103,7 +103,7 @@ html {
 	margin: 0px 0px 15px 0px;
 	font-size: 14px;
 }
-#magazzinoDest, .inputDiv {  
+#selectMagazzinoDest, .inputDiv {  
 	width: calc(100% - 64px);
 	margin: 15px 32px 25px 32px;
 }
@@ -178,6 +178,10 @@ input:focus {
 .btnOsai {
 	display: block;
 	margin: 0px auto;
+}
+
+#btnRipeti {
+	width: 86%;
 }
 
 #btnTrasferimento, #btnAnnulla {

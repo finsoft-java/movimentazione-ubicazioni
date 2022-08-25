@@ -21,11 +21,6 @@ let magazzinoDest;
 let idMagazzino;
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     this.value = this.value.toUpperCase();
-    if(!$("#qrcode").val()== '' && i==1){
-        $("#btnCambio").attr('disabled',false);
-    } else {
-        $("#btnCambio").attr('disabled',true);
-    }
 
     if (event.keyCode === 13) {
         event.preventDefault();
@@ -56,7 +51,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         datiStampati += "<p class='pOsai'> Codice ubicazione: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
                         timerOn = false;
                         $("#appendData").html(datiStampati);
-                       getMagazziniAlternativi();
+                        getMagazziniAlternativi();
                     },
                     error: function(data, status){
                         $("#qrcode").attr('placeholder','UBICAZIONE ORIG.');
@@ -97,7 +92,8 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 return false;
             }
             $("#qrcode").attr('placeholder','UBICAZIONE ORIG.').val("").attr('disabled',true);
-            $("select").val(barCode);
+            $("#selectMagazzinoDest").val(barCode);
+            $("#selectMagazzinoDest").trigger("change");
         }
     }
 });
@@ -116,14 +112,12 @@ function getMagazziniAlternativi(){
                 $("#qrcode").val('');
                 return false;
             }
-            let datiStampati = "";
-            datiStampati += "<select onchange='updateInputValue();'' onclick='timerOn = false' id='magazzinoDest' onfocusout='timerOn = true' class='form-control'>";    
-            datiStampati += "<option value='-1'> Seleziona magazzino destinazione </option>";                            
+            let datiStampati = "";                         
             for(let i=0; i<dati.length; i++) {
                 datiStampati += "<option value='"+dati[i]+"'>" + dati[i] + "</option>";                    
             } 
-            datiStampati+= "</select>";
-            $("#appendSelect").append(datiStampati);
+            $("#selectMagazzinoDest").append(datiStampati);
+            $("#selectMagazzinoDest").show();
         }, error: function(data, status) {
             console.log('ERRORE -> getMagazziniAlternativi', data);
             showError(data);
@@ -133,7 +127,7 @@ function getMagazziniAlternativi(){
 function cambioMagazzinoUbicazione() {
 
     timerOn = true;
-    let magazzinoDest = $("#magazzinoDest").val();
+    let magazzinoDest = $("#selectMagazzinoDest").val();
 
     $("#qrcode").attr("disabled", true);
 
@@ -144,7 +138,7 @@ function cambioMagazzinoUbicazione() {
     }
 
     $.post({
-        url: "./ws/CambioMagazzinoUbicazione.php?codUbicazione=" + ubicazione + "&codMagazzinoDest=" + $("select").val(),
+        url: "./ws/CambioMagazzinoUbicazione.php?codUbicazione=" + ubicazione + "&codMagazzinoDest=" + $("#selectMagazzinoDest").val(),
         dataType: 'json',
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
@@ -163,14 +157,19 @@ function cambioMagazzinoUbicazione() {
 }
 
 function updateInputValue() {
-    if($("#magazzinoDest :selected").val() != -1){
-        $("#qrcode").val($("#magazzinoDest :selected").text());
+    if($("#selectMagazzinoDest :selected").val() != -1){
+        $("#qrcode").val($("#selectMagazzinoDest :selected").text());
         $("#btnCambio").attr('disabled',false);
     }
     else {
         $("#qrcode").val('');
         $("#btnCambio").attr('disabled',true);
     }
+}
+
+function annulla() {
+    $("#qrcode").val('');
+    window.location.reload();
 }
 
 function showError(data) {

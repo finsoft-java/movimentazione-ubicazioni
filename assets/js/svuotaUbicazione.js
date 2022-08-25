@@ -17,29 +17,6 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
     this.value = this.value.toUpperCase();
     if (event.keyCode === 13) {
         ubicazione = qrcode.val();
-        
-        // event.preventDefault();
-        // i++;
-        // if(i == 1) {
-        //     if(qrcode.val().trim() != ""){       
-        //         ubicazione =  qrcode.val();
-        //         qrcode.val("").attr('placeholder','MAGAZZINO DESTINAZIONE');
-        //     } else {
-        //         showError("Ubicazione inesistente o vuota si prega di riprovare");
-        //         i=0;
-        //         return false;
-        //     }
-        // }
-        // if(i == 2) {             
-        //     if(qrcode.val().trim() != ""){       
-        //         codMagazzinoDest = qrcode.val();
-        //     } else {
-        //         showError("Magazzino destinazione inesistente si prega di riprovare");
-        //         qrcode.val("").attr('placeholder','MAGAZZINO DESTINAZIONE');
-        //         i=1;
-        //         return false;
-        //     }
-        //     qrcode.val("").attr('placeholder','UBICAZIONE').attr('disabled', true);
             $.get({
                 url: "./ws/Interrogazione.php?codUbicazione=" + ubicazione,
                 dataType: 'json',
@@ -87,7 +64,6 @@ function showError(data) {
 }
 
 function svuotaUbicazione() {
-    // $("#qrcode").val("").attr('placeholder','UBICAZIONE');
     $("#btnSvuota").attr('disabled', true);
 
     $.post({
@@ -105,7 +81,7 @@ function svuotaUbicazione() {
             $("#qrcode").val('');
         }
     });
-    // $("#btnSvuota").attr('disabled', false);
+
     $("#appendData").html('');
     $("#qrcode").attr('disabled', false);
 }
