@@ -14,3 +14,4 @@ include("class_panthera.php");
 include("class_magazzini.php");
 include("class_ubicazioni.php");
 include("class_caricamenti_massa.php");
+include("class_log.php");
