@@ -41,6 +41,7 @@ html {
 	position: absolute;
 	top: 0.5rem;
 	right: 0.5rem;
+	border-radius: 10px!important;
 }
 
 .column {
@@ -55,7 +56,6 @@ html {
 	max-width: 250px;
 	max-height: 250px;
 	position: relative;
-	
 }
 
 .column i {
@@ -75,6 +75,14 @@ html {
 	font-weight: 700;
 	max-width: 250px;
 	margin-bottom: 0px;
+}
+
+.disabledMenuItem i {
+	color: lightgrey!important;
+}
+
+.disabledMenuItem p {
+	color: rgb(180, 180, 180)!important;
 }
 
 .menuOsai {
@@ -181,7 +189,6 @@ input:focus {
 }
 
 .pOsai {
-	float: left;
 	width: 100%;
 	font-size: 14px;
 	width: calc(100% - 60px);

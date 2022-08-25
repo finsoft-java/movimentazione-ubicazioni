@@ -13,7 +13,6 @@
         <link rel="stylesheet" href="assets/css/v4-font-face.css">
     </head>
     <body>
-
         <nav class="navbar blue">
             <p class="navTitle">OSAI</p>
               <button class="btn btn-outline-light btnLogout" onclick="logout()" type="button"><i class="fa-solid fa-arrow-right-from-bracket logout"> </i> </button>
@@ -24,19 +23,19 @@
         </div> -->
         <div class="container">
             <div class="row">
-                <div class="column menu2" onclick="window.location='./interrogazione-ubicazione.html'"><i class="fa-solid fa-3x fa-clipboard-question"></i><p> Interrogazione <br> Ubicazione</p></div>
-                <div class="column menu2" onclick="window.location='./cambio-magazzino-ubicazione.html'"><i class="fa-solid fa-3x fa-truck-moving"></i><p> Cambio Magazzino <br> Ubicazione</p></div>
+                <div class="column" onclick="window.location='./interrogazione-ubicazione.html'"><i class="fa-solid fa-3x fa-clipboard-question"></i><p> Interrogazione <br> Ubicazione</p></div>
+                <div class="column" onclick="window.location='./cambio-magazzino-ubicazione.html'"><i class="fa-solid fa-3x fa-truck-moving"></i><p> Cambio Magazzino <br> Ubicazione</p></div>
             </div>
             <div class="row">
-                <div class="column menu2" onclick="window.location='./trasferimento-articoli.html'"><i class="fa-solid fa-3x fa-arrow-right-arrow-left"></i><p> Trasferimento <br> Articoli</p></div>
-                <div class="column menu2"><i class="fa-solid fa-3x fa-trash-can-arrow-up"></i><p> Svuota <br> Ubicazione </p></div>
+                <div class="column" onclick="window.location='./trasferimento-articoli.html'"><i class="fa-solid fa-3x fa-arrow-right-arrow-left"></i><p> Trasferimento <br> Articoli</p></div>
+                <div class="column" onclick="window.location='./svuota-ubicazione.html'"><i class="fa-solid fa-3x fa-trash-can-arrow-up"></i><p> Svuota <br> Ubicazione </p></div>
             </div>
             <div class="row">
-                <div class="column menu2"><i class="fa-solid fa-3x fa-cart-flatbed"></i><p> Gestione <br> Carrelli </p></div>
-                <div class="column menu2"><i class="fa-solid fa-3x fa-magnifying-glass-location"></i><p> Gestione note <br> e posizione</p></div>
+                <div class="column disabledMenuItem"><i class="fa-solid fa-3x fa-cart-flatbed"></i><p> Gestione <br> Carrelli </p></div>
+                <div class="column disabledMenuItem"><i class="fa-solid fa-3x fa-magnifying-glass-location"></i><p> Gestione note <br> e posizione</p></div>
             </div>
             <!-- <div class="row">
-                <div class="column menu2"><i class="fa-solid fa-3x fa-arrow-right-from-bracket"></i><p> Logout </p></div>
+                <div class="column"><i class="fa-solid fa-3x fa-arrow-right-from-bracket"></i><p> Logout </p></div>
             </div> -->
         </div>
         <script src="assets/js/jquery-3.6.0.min.js"></script>

@@ -15,7 +15,7 @@ let i = 0;
 // 0 = initial
 // 1 = e' stato sparato il primo barcode (ubicazione)
 // 2 = e' stato sparato il secondo barcode (ubicazioneDest)
-// 3 = e' stato sparato il secondo barcode (articolo)
+// 3 = e' stato sparato il terzo barcode (articolo)
 let ubicazione;
 let articolo;
 let ubicazioneDest;
@@ -68,9 +68,6 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     'Authorization': 'Bearer ' + sessionStorage.getItem('token')
                 },
                 success: function(data, status) {
-                    console.log("sono nella GET (success) con");
-                    console.log("articolo ", articolo, " ub part ", ubicazione, "ub dest ",ubicazioneDest);
-
                     let dati = data["data"];
                     if(dati == null || dati.length === 0) {
                         showError("Articolo inesistente si prega di riprovare");
@@ -141,10 +138,6 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
         },
         success: function(data, status) {
-            console.log("sono nella POST (success) con ");
-            console.log("articolo ", articolo, " ub part ", ubicazione, "ub dest ",ubicazioneDest);
-
-            $("#magazzinoDest").append("<div style='display: block' class='alert alert-success' role='alert'> Trasferimento avvenuto con successo all\'ubicazione <strong>"+ubicazioneDest+"</strong></div>");
             showSuccessMsg("Trasferimento avvenuto con successo \n (ubicazione di partenza: " + ubicazione + ", ubicazione di destinazione: " + ubicazioneDest + ", articolo: " + articolo + ", quantità: " + qty + ")");
         },
         error: function(data, status){

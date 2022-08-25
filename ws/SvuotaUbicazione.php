@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         print_error(400, "Missing argument codUbicazione");
     }
 
-    $caricamentiMassaManager->svuotaUbicazione($codUbicazione, $codMagazzinoDest);
+    $caricamentiMassaManager->svuotaUbicazione($codUbicazione);
     
     header('Content-Type: application/json');
     echo '{"msg":"OK"}';
