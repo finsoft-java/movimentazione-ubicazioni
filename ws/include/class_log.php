@@ -5,57 +5,30 @@ $logManager = new LogManager();
 class LogManager {
     
   /**
-   * Inserisce una riga di log
+   * Inserisce una riga di log per l'ubicazione
    */
-  function log($idUbicazione, $severity, $msg) {
-    global $panthera, $ID_AZIENDA;
+  function log($idMagazzino, $idUbicazione, $attributeName, $oldValue, $newValue) {
+    global $panthera, $ID_AZIENDA, $logged_user;
     if ($panthera->mock) {
       return;
     }
 
-    $severity = $panthera->escape_string($severity);
-    $msg = $panthera->escape_string($msg);
+    $attributeName = $panthera->escape_string($attributeName);
+    $oldValue = $panthera->escape_string($oldValue);
+    $newValue = $panthera->escape_string($newValue);
 
-    // TIMESTAMP ha default value
-    $sql = "INSERT INTO THIPPERS.LOG_UBICAZIONI
-            (ID_AZIENDA, ID_UBICAZIONE, SEVERITY, MESSAGE)
-            VALUES('$ID_AZIENDA','$idUbicazione','$severity','$msg')";
+    $id = $panthera->get_numeratore('foo');  //FIXME
+
+    // TIMESTAMP ha default value, vero?? FIXME
+    $sql = "INSERT INTO THERA.LOG_UPDATE
+                (ID, CLASS_HDR_NAME, OBJECT_KEY, USER_ID, ATTRIBUTE_NAME, OLD_VALUE, NEW_VALUE)
+            VALUES('$id',
+                'UbicazioneLL',
+                CONCAT('$ID_AZIENDA',CHR(22),'$idMagazzino',CHR(22),'$idUbicazione'),
+                '${ID_AZIENDA}_$logged_user->nome_utente',
+                '$attributeName',
+                '$oldValue',
+                '$newValue')";
     $panthera->execute_update($sql);
-  }
-
-  /**
-   * Restituisce tutte le righe di log con una certa ricerca full-text
-   */
-  function getLog($search) {
-    global $panthera, $ID_AZIENDA;
-
-    if ($panthera->mock) {
-        $data = [ [ 'ID_UBICAZIONE' => 'ABC-001', 'TIMESTAMP' => null, 'SEVERITY' => 'ERROR', 'MESSAGE' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua' ],
-                  [ 'ID_UBICAZIONE' => 'ABC-001', 'TIMESTAMP' => null, 'SEVERITY' => 'INFO', 'MESSAGE' => 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat' ],
-                  [ 'ID_UBICAZIONE' => 'ABC-001', 'TIMESTAMP' => null, 'SEVERITY' => 'INFO', 'MESSAGE' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua' ],
-                  [ 'ID_UBICAZIONE' => 'ABC-002', 'TIMESTAMP' => null, 'SEVERITY' => 'INFO', 'MESSAGE' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua' ],
-                  [ 'ID_UBICAZIONE' => 'ABC-002', 'TIMESTAMP' => null, 'SEVERITY' => 'ERROR', 'MESSAGE' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua' ],
-                  [ 'ID_UBICAZIONE' => 'ABC-003', 'TIMESTAMP' => null, 'SEVERITY' => 'ERROR', 'MESSAGE' => 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat' ],
-                ]; 
-        $count = 100;
-        
-    } else {
-
-        $this->check_stato_ubicazione($codUbicazione);
-        $this->check_articolo($codArticolo);
-
-        $sql0 = "SELECT COUNT(*) AS cnt ";
-        $sql1 = "SELECT ID_UBICAZIONE, TIMESTAMP, SEVERITY, MESSAGE ";
-        
-        $sql2 = "FROM THIPPERS.LOG_UBICAZIONI
-                WHERE ID_AZIENDA='$ID_AZIENDA' AND (ID_UBICAZIONE LIKE '%$search%' OR SEVERITY LIKE '%$search%' MESSAGE LIKE '%$search%' )";
-        
-        $sql3 = " ORDER BY TIMESTAMP DESC";
-        $count = $panthera->select_single_value($sql0 . $sql2);
-        $data = $panthera->select_list($sql1 . $sql2 . $sql3);
-    }
-    
-    // se l'ubicazione e' vuota non do' errori
-    return [$data, $count];
   }
 }

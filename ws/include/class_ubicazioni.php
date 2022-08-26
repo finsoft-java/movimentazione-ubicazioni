@@ -167,7 +167,7 @@ class UbicazioniManager {
 
       $this->check_stato_ubicazione($codUbicazione);
 
-      // ma lo setto a tappeto su tutti i magazzini???
+      // lo setto a tappeto su tutti i magazzini!
       $sql = "UPDATE THIP.UBICAZIONI_LL U
               SET NOTE='$note'
               WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' ";
@@ -175,6 +175,17 @@ class UbicazioniManager {
       $sql = "UPDATE THIP.YUBICAZIONI_LL YU
               SET NOTE_POSIZIONE='$notePosizione'
               WHERE YU.ID_AZIENDA='$ID_AZIENDA' AND YU.ID_UBICAZIONE='$codUbicazione' ";
+      $panthera->execute_update($sql);
+    }
+
+    function updateDatiComuniUbicazione($idUbicazione) {
+      global $panthera, $ID_AZIENDA, $logged_user;
+
+      // lo setto a tappeto su tutti i magazzini!
+      $sql = "UPDATE THIP.UBICAZIONI_LL
+              SET R_UTENTE_AGG='${ID_AZIENDA}_$logged_user->nome_utente',
+                  R_TIMESTAMP_AGG =CURRENT_TIMESTAMP
+              WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_UBICAZIONE='$codUbicazione' ";
       $panthera->execute_update($sql);
     }
 }
