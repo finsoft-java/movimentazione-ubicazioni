@@ -17,9 +17,9 @@ class LogManager {
     $oldValue = $panthera->escape_string($oldValue);
     $newValue = $panthera->escape_string($newValue);
 
-    $id = $panthera->get_numeratore('foo');  //FIXME
+    $id = $panthera->get_numeratore('LOG_UPDATE');
 
-    // TIMESTAMP ha default value, vero?? FIXME
+    // TIMESTAMP ha default value, vero??
     $sql = "INSERT INTO THERA.LOG_UPDATE
                 (ID, CLASS_HDR_NAME, OBJECT_KEY, USER_ID, ATTRIBUTE_NAME, OLD_VALUE, NEW_VALUE)
             VALUES('$id',
