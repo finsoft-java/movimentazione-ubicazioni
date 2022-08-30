@@ -13,15 +13,20 @@
         <link rel="stylesheet" href="assets/css/v4-font-face.css">
     </head>
     <body>
-        <div class="interrogaUbiOsai green" onclick="window.location='./index.html'">
+        <nav class="navbar blue"  onclick="window.location='./index.html'">
+            <p class="navTitle">Torna al menù</p>
+            <button class="btn btn-outline-light btnLogout" onclick="logout()" type="button"><i class="fa-solid fa-arrow-right-from-bracket logout"> </i> </button>
+
+        </nav>
+        <!-- <div class="interrogaUbiOsai blue" onclick="window.location='./index.html'">
             <p>Torna al Menu</p>
-        </div>
+        </div> -->
         <h3 class="titleOsai"> Cambio Magazzino Ubicazione</h3>
 
         <div class="qrcode">
             <input type="text" class="form-control focus" id="qrcode" placeholder="UBICAZIONE ORIG." aria-describedby="basic-addon2">
         </div>
-        <div id="appendSelect"></div>
+        <div id="appendSelect"><select onchange='updateInputValue()' style='display: none;' onclick='timerOn = false' id='selectMagazzinoDest' onfocusout='timerOn = true' class='form-control'><option value='-1'> Seleziona magazzino destinazione </option></select></div>
         <div id="appendData"></div>
 
         <div class="btnDiv">
@@ -29,7 +34,7 @@
                 <button onclick="cambioMagazzinoUbicazione()" type="button" id="btnCambio" class="btn btnOsai" disabled="diableBtn">Conferma</button>
             </div>
             <div style="float: left;width: 50%;">
-                <button onclick="window.location.reload()" type="button" class="btn btnOsai"> Annulla </button>
+                <button onclick="annulla()" type="button" class="btn btnOsai"> Annulla </button>
             </div>
         </div>
         <div id="error_message"></div>
@@ -41,6 +46,10 @@
                     location.href="./login.html";
                 }
             });
+            function logout() {
+                sessionStorage.removeItem("token");
+                location.href="./login.html";
+            }
         </script>
         <script src="assets/js/popper.min.js"></script>
         <script src="assets/js/bootstrap.min.js"></script>

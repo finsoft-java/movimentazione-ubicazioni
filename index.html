@@ -5,23 +5,38 @@
         <meta name="google" content="notranslate">
         <meta name="viewport" content="width=device-width, user-scalable=no,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
 
-        <title>Movimentazione Ubicazioni</title>
+        <title>Homepage </title>
         <link rel="stylesheet" href="assets/css/bootstrap.min.css">
         <link rel="stylesheet" href="assets/css/style.css?v=6">
         <link rel="stylesheet" href="assets/css/all.css">
         <link rel="stylesheet" href="assets/css/fontawesome.css">
         <link rel="stylesheet" href="assets/css/v4-font-face.css">
-        
     </head>
     <body>
-        <div class="menuOsai red" onclick="window.location='./interrogazione-ubicazione.html'">
-            <p>Interrogazione Ubicazione</p>
-        </div>
-        <div class="menuOsai green" onclick="window.location='./cambio-magazzino-ubicazione.html'">
-            <p>Cambio Magazzino Ubicazione</p> 
-        </div>
-        <div class="menuOsai blue" onclick="window.location='./trasferimento-articoli.html'">
-            <p>Trasferimento Articoli</p>
+        <nav class="navbar blue">
+            <p class="navTitle">OSAI</p>
+              <button class="btn btn-outline-light btnLogout" onclick="logout()" type="button"><i class="fa-solid fa-arrow-right-from-bracket logout"> </i> </button>
+          </nav>
+
+        <!-- <div class="interrogaUbiOsai blue">
+            <div><p>OSAI </p> </div><div><i class="fa-solid fa-arrow-right-from-bracket logout"></i></div>
+        </div> -->
+        <div class="container">
+            <div class="row">
+                <div class="column" onclick="window.location='./interrogazione-ubicazione.html'"><i class="fa-solid fa-3x fa-clipboard-question"></i><p> Interrogazione <br> Ubicazione</p></div>
+                <div class="column" onclick="window.location='./cambio-magazzino-ubicazione.html'"><i class="fa-solid fa-3x fa-truck-moving"></i><p> Cambio Magazzino <br> Ubicazione</p></div>
+            </div>
+            <div class="row">
+                <div class="column" onclick="window.location='./trasferimento-articoli.html'"><i class="fa-solid fa-3x fa-arrow-right-arrow-left"></i><p> Trasferimento <br> Articoli</p></div>
+                <div class="column" onclick="window.location='./svuota-ubicazione.html'"><i class="fa-solid fa-3x fa-trash-can-arrow-up"></i><p> Svuota <br> Ubicazione </p></div>
+            </div>
+            <div class="row">
+                <div class="column disabledMenuItem"><i class="fa-solid fa-3x fa-cart-flatbed"></i><p> Gestione <br> Carrelli </p></div>
+                <div class="column disabledMenuItem"><i class="fa-solid fa-3x fa-magnifying-glass-location"></i><p> Gestione note <br> e posizione</p></div>
+            </div>
+            <!-- <div class="row">
+                <div class="column"><i class="fa-solid fa-3x fa-arrow-right-from-bracket"></i><p> Logout </p></div>
+            </div> -->
         </div>
         <script src="assets/js/jquery-3.6.0.min.js"></script>
         <script>
@@ -29,11 +44,13 @@
                 if(sessionStorage.getItem( "token") == null){
                     location.href="./login.html";
                 }
-                $('.menuOsai').css('height',(window.innerHeight/3));
             });
+            function logout() {
+                sessionStorage.removeItem("token");
+                location.href="./login.html";
+            }
         </script>
         <script src="assets/js/popper.min.js"></script>
         <script src="assets/js/bootstrap.min.js"></script>
-        
     </body>
 </html>

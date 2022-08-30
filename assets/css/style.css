@@ -4,19 +4,85 @@ html {
 	background-color: #fff;
 }
 
-.menu2 {
-	background-color: white;
-	margin: 10px 10px 0px 10px;
-	color: #0a646b;
+.container {
+	margin-top: 25px;
 }
 
-.menu2 p{
-	text-align:center; 
-	vertical-align: middle;
+.row {
+	display: flex;
+	justify-content: space-evenly;
 }
 
-.container2{
-	background-color: lightsteelblue;
+.blue {
+	--blueOsai: #049ddd;
+	background-color: var(--blueOsai);
+}
+
+.navbar {
+	box-shadow: 0px 10px 10px lightgrey;
+}
+
+.navbar p {
+	color: #fff;
+	font-weight: bold;
+	text-transform: uppercase;
+	margin-top: 0.5rem;
+	margin-bottom: 0.5rem;
+}
+
+.navTitle {
+	float: left;
+	width: 100%;
+	text-align: center;
+}
+
+.btnLogout{
+	min-width: 20px!important;
+	position: absolute;
+	top: 0.5rem;
+	right: 0.5rem;
+	border-radius: 10px!important;
+}
+
+.column {
+	margin-bottom: 15px;
+	border: 2px gainsboro solid;
+	background-color: #f0f0f0;
+	text-align: center;
+	border-radius: 30px;
+	--dim: calc( 100vw/2 - 30px);
+	width: var(--dim);
+	height: var(--dim);
+	max-width: 250px;
+	max-height: 250px;
+	position: relative;
+}
+
+.column i {
+	position: absolute;
+	top: 25px;
+	width: 100%;
+	left: 0px;
+	color: #515e64;
+}
+.column p {
+	position: absolute;
+	bottom: 10px;
+	left: 0px;
+	text-align: center;
+	width: var(--dim);
+	font-size: 12px;
+	font-weight: 700;
+	max-width: 250px;
+	margin-bottom: 0px;
+}
+
+.disabledMenuItem i {
+	color: lightgrey!important;
+}
+
+.disabledMenuItem p {
+	color: rgb(180, 180, 180)!important;
 }
 
 .menuOsai {
@@ -37,7 +103,7 @@ html {
 	margin: 0px 0px 15px 0px;
 	font-size: 14px;
 }
-#magazzinoDest, .inputDiv {  
+#selectMagazzinoDest, .inputDiv {  
 	width: calc(100% - 64px);
 	margin: 15px 32px 25px 32px;
 }
@@ -83,9 +149,6 @@ input:focus {
 .green {
 	background-color: #00800085;
 }
-.blue {
-	background-color: #0000ff85;
-}
 
 #appendData {
 	float: left;
@@ -117,6 +180,10 @@ input:focus {
 	margin: 0px auto;
 }
 
+#btnRipeti {
+	width: 86%;
+}
+
 #btnTrasferimento, #btnAnnulla {
 	margin-bottom: 30px;
 }
@@ -126,7 +193,6 @@ input:focus {
 }
 
 .pOsai {
-	float: left;
 	width: 100%;
 	font-size: 14px;
 	width: calc(100% - 60px);
@@ -165,9 +231,6 @@ input:focus {
 }
 .green {
 	background-color: #00800085;
-}
-.blue {
-	background-color: #0000ff85;
 }
 .menuOsai p {
 	position: absolute;
