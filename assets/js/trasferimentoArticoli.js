@@ -86,7 +86,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         datiStampati += "<p class='pOsai'> Disegno: <strong>"+dati[0].DISEGNO+"</strong> </p>";
                         datiStampati += "<p class='pOsai'> Descrizione: <strong>"+dati[0].DESCRIZIONE+"</strong> </p>";
                         datiStampati += "<div class='input-group inputDiv'>  <div class='input-group-prepend'><button class='btn btnInputForm btnMinus' type='button' onClick='minus()'>-</button></div>";
-                        datiStampati += "<input type='number' class='form-control inputOsai' onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='1' max='" + dati[0].QTA_GIAC_PRM + "' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
+                        datiStampati += "<input type='number' class='form-control inputOsai' onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='0.001' max='" + dati[0].QTA_GIAC_PRM + "' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
                         datiStampati += "<div class='input-group-append'><button class='btn btnInputForm btnPlus' type='button' onClick='plus("+maxQty+")'>+</button></div>";
                         datiStampati += "<button class='btn btnInputForm btnAll' type='button' onClick='selezionaTutti("+maxQty+")'> Tutti </button></div>";
                         datiStampati += "<p class='pOsai'> Quantita Totale: <strong>"+dati[0].QTA_GIAC_PRM+ " "+ dati[0].R_UM_PRM_MAG +"</strong> </p>";                         
@@ -113,7 +113,7 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
     const qtyInput = $("#qty").val();
     const qrcode = $("#qrcode");
 
-    if((!qtyInput.match(/^\d+(,\d+|\.\d+)?$/)) || !qtyInput || (parseFloat(qtyInput) < 1 || parseFloat(qtyInput) > maxQty)) { 
+    if((!qtyInput.match(/^\d+(,\d+|\.\d+)?$/)) || !qtyInput || (parseFloat(qtyInput) < 0.001 || parseFloat(qtyInput) > maxQty)) { 
         showError("Inserire una quantità valida tra uno e " + maxQty + " (numeri decimali con il punto)");
         i=3;
         $("#btnTrasferimento").attr('disabled',false);

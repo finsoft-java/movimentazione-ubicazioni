@@ -20,9 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($codMagazzinoDest)) {
         print_error(400, "Missing argument codMagazzinoDest");
     }
-
     $caricamentiMassaManager->trasferisciUbicazione($codUbicazione, $codMagazzinoDest);
-    
     header('Content-Type: application/json');
     echo '{"msg":"OK"}';
 } else {

@@ -1,12 +1,10 @@
 <?php
 
 $magazziniManager = new MagazziniManager();
-
 class MagazziniManager {
 
     function esisteMagazzino($ID_MAGAZZINO) {
         global $panthera, $ID_AZIENDA;
-  
         if ($panthera->mock) {
             return true;
         }
@@ -18,6 +16,8 @@ class MagazziniManager {
     }
 
     function checkMagazzino($ID_MAGAZZINO) {
+        global $panthera, $ID_AZIENDA;
+       
         if (!$this->esisteMagazzino($ID_MAGAZZINO)) {
             print_error(404, "Magazzino $ID_MAGAZZINO non esistente o non valido");
         }

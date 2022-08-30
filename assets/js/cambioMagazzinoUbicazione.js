@@ -102,6 +102,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
     }
 });
 function getMagazziniAlternativi(){
+    let datiStampati = "";
     $.get({
         url: "./ws/GetMagazziniAlternativi.php?idMagazzino="+ idMagazzino,
         dataType: 'json',
@@ -116,14 +117,18 @@ function getMagazziniAlternativi(){
                 $("#qrcode").val('');
                 return false;
             }
-            let datiStampati = "";
+            
             datiStampati += "<select onchange='updateInputValue();'' onclick='timerOn = false' id='magazzinoDest' onfocusout='timerOn = true' class='form-control'>";    
             datiStampati += "<option value='-1'> Seleziona magazzino destinazione </option>";                            
             for(let i=0; i<dati.length; i++) {
                 datiStampati += "<option value='"+dati[i]+"'>" + dati[i] + "</option>";                    
             } 
             datiStampati+= "</select>";
-            $("#appendSelect").append(datiStampati);
+            setTimeout(function() {
+                    console.log("appendSelect");
+                    $("#appendSelect").append(datiStampati);
+            }, 500);
+            
         }, error: function(data, status) {
             console.log('ERRORE -> getMagazziniAlternativi', data);
             showError(data);

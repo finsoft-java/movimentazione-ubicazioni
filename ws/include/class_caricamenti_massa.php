@@ -11,7 +11,7 @@ class CaricamentiMassaManager {
      * FUNZIONE "Cambia magazzino dell'ubicazione"
      */
     function trasferisciUbicazione($codUbicazione, $codMagazzinoDest) {
-        global $panthera, $CAU_TESTATA, $CAU_RIGA, $YEAR, $DATE, $ID_AZIENDA, $logged_user, $ubicazioniManager;
+        global $panthera, $CAU_TESTATA, $CAU_RIGA, $YEAR, $DATE, $ID_AZIENDA, $logged_user, $ubicazioniManager,$magazziniManager;
 
         if ($panthera->mock) {
             return;
@@ -19,11 +19,8 @@ class CaricamentiMassaManager {
 
         $ubi1 = $ubicazioniManager->getUbicazione($codUbicazione);
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
-        $id = $panthera->get_numeratore('MOVUBI');
-        //echo ">1< ";
-  
+        $id = $panthera->get_numeratore('MOVUBI');  
         $magazziniManager->checkMagazzino($codMagazzinoDest);
-
         // l'algoritmo cambia a seconda che l'ubicazione sia piena o vuota
         $contenuto = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
         if (empty($contenuto) || count($contenuto) == 0) {
@@ -50,7 +47,6 @@ class CaricamentiMassaManager {
         // lancia davvero il CM su Panthera
         $this->chiama_ws_panthera();
 
-        usleep(500);
         if (!$this->checkCM($id)) {
           print_error(500, 'Il caricamento di massa non è andato a buon fine');
         }
@@ -110,8 +106,6 @@ class CaricamentiMassaManager {
 
         // lancia davvero il CM su Panthera
         $this->chiama_ws_panthera();
-
-        usleep(500);
         if (!$this->checkCM($id)) {
           print_error(500, 'Il caricamento di massa non è andato a buon fine');
         }
@@ -152,8 +146,6 @@ class CaricamentiMassaManager {
 
         // lancia davvero il CM su Panthera
         return $this->chiama_ws_panthera();
-
-        usleep(500);
         if (!$this->checkCM($id)) {
           print_error(500, 'Il caricamento di massa non è andato a buon fine');
         }
@@ -526,11 +518,17 @@ class CaricamentiMassaManager {
       $sql = "SELECT TOTAL_RECS,TRANSFERRED_RECS,WRONG_RECS
               FROM THERA.BATCH_LOAD_HDR
               WHERE DATA_ORIGIN='$DATA_ORIGIN' AND RUN_ID='$id'";
-      $l = $panthera->select_single($sql);
-      if ($l["TOTAL_RECS"] > 0 && $l["TRANSFERRED_RECS"] > 0 && $l["WRONG_RECS"] == 0) {
-        return true;
-      } else {
-        return false;
+      
+      for($i=0; $i <= 10; $i++) {
+        //echo 'tentativo n.'.$i;
+        $l = $panthera->select_single($sql);
+        if ($l["WRONG_RECS"] > 0) {
+          return false;
+        } else if($l["TOTAL_RECS"] > 0 && $l["TRANSFERRED_RECS"] > 0 && $l["WRONG_RECS"] == 0){
+          return true;
+        }
+        sleep(1);
       }
+      return false;
     }
 }
