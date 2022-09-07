@@ -10,13 +10,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_logged_user_JWT();
 
-$codUbicazione = isset($_REQUEST['codUbicazione']) ? $panthera->escape_string($_REQUEST['codUbicazione']) : null;
+$note = isset($_POST['note']) ? $panthera->escape_string($_POST['note']) : null;
+$note_pos = isset($_POST['note_pos']) ? $panthera->escape_string($_POST['note_pos']) : null;
+$idUbicazione = isset($_POST['idUbicazione']) ? $panthera->escape_string($_POST['idUbicazione']) : null;
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $postdata = file_get_contents("php://input");
-    $json_data = json_decode($postdata);
-
-    $ubicazioniManager->salvaNote($json_data->ID_UBICAZIONE, $json_data->NOTE, $json_data->NOTE_POSIZIONE);
+    
+    $ubicazioniManager->salvaNote($idUbicazione, $note, $note_pos);
     
     header('Content-Type: application/json');
     echo '{"msg":"OK"}';

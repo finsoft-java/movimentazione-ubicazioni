@@ -6,6 +6,21 @@
 .fa {
   font-family: var(--fa-style-family, "Font Awesome 6 Free");
   font-weight: var(--fa-style, 900); }
+label{
+  font-size: 16px;
+    text-align: center;
+    width: 100%;
+    margin-bottom:5px;
+}
+.btn_50{
+  float:left;
+  width:100%;
+}
+.btn_50 button {
+  float: left;
+  width: calc(50% - 15px);
+  margin: 10px 7px;
+}
 
 .fa,
 .fas,

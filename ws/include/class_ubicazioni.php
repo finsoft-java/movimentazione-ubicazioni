@@ -138,11 +138,10 @@ class UbicazioniManager {
       global $panthera, $ID_AZIENDA;
 
       if ($panthera->mock) {
-        return [ 'ID_ARTICOLO' => 'AAAAA', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'XXX', 'TRASFERIBILE' => 'Y' ];
+        return [ 'ID_ARTICOLO' => 'AAAAA', 'ID_MAGAZZINO' => 'E1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'XXX', 'TRASFERIBILE' => 'Y' , 'NOTE' => 'Nota 1', 'NOTE_POSIZIONE' => 'Nota posizione 1'];
       } else {
 
         $this->check_stato_ubicazione($codUbicazione);
-
         $sql = "SELECT *
                 FROM THIP.UBICAZIONI_LL U
                 JOIN THIPPERS.YUBICAZIONI_LL YU
