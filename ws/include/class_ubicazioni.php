@@ -11,7 +11,18 @@ class UbicazioniManager {
       global $panthera, $ID_AZIENDA;
 
       if ($panthera->mock) {
-          $data = [ [ 'ID_ARTICOLO' => '00000564                 ', 'ID_MAGAZZINO' => 'E01','ID_COMMESSA' => 'COMMESSA1', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 10, 'TRASFERIBILE' => 'Y' ]]; 
+          $data = [ [ 'ID_ARTICOLO' => '00000564                 ',
+                      'ID_MAGAZZINO' => 'E01',
+                      'ID_COMMESSA' => 'COMMESSA1',
+                      'ID_UBICAZIONE' => 'EEE',
+                      'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
+                      'DISEGNO' => 'ABC',
+                      'R_UM_PRM_MAG' => 'NR',
+                      'QTA_GIAC_PRM' => 10,
+                      'TRASFERIBILE' => 'Y',
+                      'R_UTENTE_AGG' => '001_finsoft         ',
+                      'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410'
+                   ]]; 
           $count = 1;
           
       } else {
@@ -21,7 +32,7 @@ class UbicazioniManager {
           $this->check_articolo($codArticolo);
 
           $sql0 = "SELECT COUNT(*) AS cnt ";
-          $sql1 = "SELECT U.ID_UBICAZIONE, U.ID_MAGAZZINO, S.ID_ARTICOLO, A.DESCRIZIONE, A.DISEGNO, A.R_UM_PRM_MAG, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
+          $sql1 = "SELECT U.ID_UBICAZIONE, U.ID_MAGAZZINO, U.R_UTENTE_AGG, U.TIMESTAMP_AGG, S.ID_ARTICOLO, A.DESCRIZIONE, A.DISEGNO, A.R_UM_PRM_MAG, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
           
           $sql2 = "FROM THIP.UBICAZIONI_LL U
                   JOIN THIPPERS.YUBICAZIONI_LL YU
@@ -48,15 +59,15 @@ class UbicazioniManager {
         global $panthera, $ID_AZIENDA;
 
         if ($panthera->mock) {
-            $data = [ [ 'ID_ARTICOLO' => '00000000                 ','ID_COMMESSA' => 'COMMESSA1', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 10, 'TRASFERIBILE' => 'Y' ],
-                      [ 'ID_ARTICOLO' => '00000564                 ', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 100, 'TRASFERIBILE' => 'Y' ],
-                      [ 'ID_ARTICOLO' => '00003289                 ', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'LT', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y' ],
-                      [ 'ID_ARTICOLO' => 'DDDD', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 100, 'TRASFERIBILE' => 'Y' ],
-                      [ 'ID_ARTICOLO' => 'EEEE', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y' ],
-                      [ 'ID_ARTICOLO' => 'FFFF', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 100, 'TRASFERIBILE' => 'Y' ],
-                      [ 'ID_ARTICOLO' => 'GGGG', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'MMT', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y' ],
-                      [ 'ID_ARTICOLO' => 'HHHH', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 100, 'TRASFERIBILE' => 'Y' ],
-                      [ 'ID_ARTICOLO' => 'IIII', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y' ]
+            $data = [ [ 'ID_ARTICOLO' => '00000000                 ','ID_COMMESSA' => 'COMMESSA1', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 10, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ],
+                      [ 'ID_ARTICOLO' => '00000564                 ', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 100, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ],
+                      [ 'ID_ARTICOLO' => '00003289                 ', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'LT', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ],
+                      [ 'ID_ARTICOLO' => 'DDDD', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 100, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ],
+                      [ 'ID_ARTICOLO' => 'EEEE', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ],
+                      [ 'ID_ARTICOLO' => 'FFFF', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 100, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ],
+                      [ 'ID_ARTICOLO' => 'GGGG', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'MMT', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ],
+                      [ 'ID_ARTICOLO' => 'HHHH', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 100, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ],
+                      [ 'ID_ARTICOLO' => 'IIII', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ]
                      ]; 
             $count = 9;
         } else {
@@ -64,7 +75,7 @@ class UbicazioniManager {
             $trasferibile = $this->check_stato_ubicazione($codUbicazione);
             $str_trasferibile = $trasferibile ? " AND YU.TRASFERIBILE='Y' " : "";
             $sql0 = "SELECT COUNT(*) AS cnt ";
-            $sql1 = "SELECT U.ID_UBICAZIONE, U.ID_MAGAZZINO, S.ID_ARTICOLO, A.DESCRIZIONE, A.DISEGNO, A.R_UM_PRM_MAG, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
+            $sql1 = "SELECT U.ID_UBICAZIONE, U.ID_MAGAZZINO, U.R_UTENTE_AGG, U.TIMESTAMP_AGG, S.ID_ARTICOLO, A.DESCRIZIONE, A.DISEGNO, A.R_UM_PRM_MAG, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
             $sql2 = "FROM THIP.UBICAZIONI_LL U
                     JOIN THIPPERS.YUBICAZIONI_LL YU
                       ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
@@ -190,15 +201,17 @@ class UbicazioniManager {
               SET NOTE_POSIZIONE='$notePosizione'
               WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_UBICAZIONE='$codUbicazione' ";
       $panthera->execute_update($sql);
+
+      $this->updateDatiComuniUbicazione($codUbicazione);
     }
 
-    function updateDatiComuniUbicazione($idUbicazione) {
+    function updateDatiComuniUbicazione($codUbicazione) {
       global $panthera, $ID_AZIENDA, $logged_user;
 
       // lo setto a tappeto su tutti i magazzini!
       $sql = "UPDATE THIP.UBICAZIONI_LL
               SET R_UTENTE_AGG='${ID_AZIENDA}_$logged_user->nome_utente',
-                  R_TIMESTAMP_AGG =CURRENT_TIMESTAMP
+                  TIMESTAMP_AGG=CURRENT_TIMESTAMP
               WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_UBICAZIONE='$codUbicazione' ";
       $panthera->execute_update($sql);
     }

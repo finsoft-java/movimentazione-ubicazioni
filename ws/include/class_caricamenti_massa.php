@@ -145,10 +145,12 @@ class CaricamentiMassaManager {
         //echo ">5< ";
 
         // lancia davvero il CM su Panthera
-        return $this->chiama_ws_panthera();
+        $this->chiama_ws_panthera();
         if (!$this->checkCM($id)) {
           print_error(500, 'Il caricamento di massa non è andato a buon fine');
         }
+        
+        $ubicazioniManager->updateDatiComuniUbicazione($codUbicazioneSrc);
     }
 
     function creaTestataCaricamento($id) {
