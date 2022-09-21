@@ -16,7 +16,8 @@ class UbicazioniManager {
           
       } else {
 
-          $this->check_stato_ubicazione($codUbicazione);
+          $trasferibile = $this->check_stato_ubicazione($codUbicazione);
+          $str_trasferibile = $trasferibile ? " AND YU.TRASFERIBILE='Y' " : "";
           $this->check_articolo($codArticolo);
 
           $sql0 = "SELECT COUNT(*) AS cnt ";
@@ -29,7 +30,7 @@ class UbicazioniManager {
                     ON U.ID_AZIENDA=S.ID_AZIENDA AND U.ID_UBICAZIONE=S.ID_UBICAZIONE AND U.ID_MAGAZZINO=S.ID_MAGAZZINO
                   JOIN THIP.ARTICOLI A
                     ON S.ID_AZIENDA=A.ID_AZIENDA AND S.ID_ARTICOLO=A.ID_ARTICOLO
-                  WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND S.ID_ARTICOLO='$codArticolo' AND YU.TRASFERIBILE='Y' AND U.STATO='V' AND S.QTA_GIAC_PRM>0 ";
+                  WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND S.ID_ARTICOLO='$codArticolo' $str_trasferibile AND U.STATO='V' AND S.QTA_GIAC_PRM>0 ";
           
           $sql3 = " ORDER BY S.ID_ARTICOLO";
           $count = $panthera->select_single_value($sql0 . $sql2);
