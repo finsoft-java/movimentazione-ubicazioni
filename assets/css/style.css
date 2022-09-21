@@ -139,6 +139,8 @@ html {
 .form-control {
 	width: 85%;
 	border: 1px solid #e9e9ed!important;
+	margin: 0px auto;
+	margin-bottom: 10px;
 }
 input:focus {
 	border-color: red;

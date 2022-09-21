@@ -4,8 +4,8 @@
         <meta charset="utf-8">
         <meta name="google" content="notranslate">
         <meta name="viewport" content="width=device-width, user-scalable=no,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
-
-        <title> Cambio Magazzino Ubicazione</title>
+        <!-- codice test ubicazione = PL-0001 articolo = 00000019 -->
+        <title>Movimentazione Ubicazioni</title>
         <link rel="stylesheet" href="assets/css/bootstrap.min.css">
         <link rel="stylesheet" href="assets/css/style.css?v=7">
         <link rel="stylesheet" href="assets/css/all.css">
@@ -13,32 +13,19 @@
         <link rel="stylesheet" href="assets/css/v4-font-face.css">
     </head>
     <body>
-        <nav class="navbar blue"  onclick="window.location='./index.html'">
+        <nav class="navbar blue" onclick="window.location='./index.html'">
             <p class="navTitle">Torna al menù</p>
             <button class="btn btn-outline-light btnLogout" onclick="logout()" type="button"><i class="fa-solid fa-arrow-right-from-bracket logout"> </i> </button>
-
         </nav>
         <!-- <div class="interrogaUbiOsai blue" onclick="window.location='./index.html'">
-            <p>Torna al Menu</p>
+            <div><p>Torna al Menu</p></div>
         </div> -->
-        <h3 class="titleOsai"> Cambio Magazzino Ubicazione</h3>
-
+        <h3 class="titleOsai">Gestione Note e Posizione</h3>
         <div class="qrcode">
-            <input type="text" class="form-control focus" id="qrcode" placeholder="UBICAZIONE ORIG." aria-describedby="basic-addon2">
+            <input type="text" class="form-control focus" id="qrcode" placeholder="UBICAZIONE (PL-0001)" aria-describedby="basic-addon2">
         </div>
-        <div id="appendSelect"></div>
-        <div id="appendData"></div>
-
-        <div class="btnDiv">
-            <div style="float: left;width: 50%;">
-                <button onclick="cambioMagazzinoUbicazione()" type="button" id="btnCambio" class="btn btnOsai" disabled="diableBtn">Conferma</button>
-            </div>
-            <div style="float: left;width: 50%;">
-                <button onclick="annulla()" type="button" class="btn btnOsai"> Annulla </button>
-            </div>
-        </div>
+        <div class="listaOsai"></div>
         <div id="error_message"></div>
-        <div id="magazzinoDest"></div>
         <script src="assets/js/jquery-3.6.0.min.js"></script>
         <script>
             $(document).ready(function(){
@@ -53,6 +40,6 @@
         </script>
         <script src="assets/js/popper.min.js"></script>
         <script src="assets/js/bootstrap.min.js"></script>
-        <script src="assets/js/cambioMagazzinoUbicazione.js?v=3"></script>        
+        <script src="assets/js/gestioneNote.js?v=1"></script>
     </body>
 </html>

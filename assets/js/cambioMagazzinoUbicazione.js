@@ -92,8 +92,8 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 return false;
             }
             $("#qrcode").attr('placeholder','UBICAZIONE ORIG.').val("").attr('disabled',true);
-            $("#selectMagazzinoDest").val(barCode);
-            $("#selectMagazzinoDest").trigger("change");
+            $("#magazzinoDest").val(barCode);
+            $("#magazzinoDest").trigger("change");
         }
     }
 });
@@ -122,7 +122,7 @@ function getMagazziniAlternativi(){
             datiStampati+= "</select>";
             setTimeout(function() {
                     console.log("appendSelect");
-                    $("#appendSelect").append(datiStampati);
+                    $("#appendSelect").html(datiStampati);
             }, 500);
             
         }, error: function(data, status) {
@@ -134,7 +134,7 @@ function getMagazziniAlternativi(){
 function cambioMagazzinoUbicazione() {
 
     timerOn = true;
-    let magazzinoDest = $("#selectMagazzinoDest").val();
+    let magazzinoDest = $("#magazzinoDest").val();
 
     $("#qrcode").attr("disabled", true);
 
@@ -145,7 +145,7 @@ function cambioMagazzinoUbicazione() {
     }
 
     $.post({
-        url: "./ws/CambioMagazzinoUbicazione.php?codUbicazione=" + ubicazione + "&codMagazzinoDest=" + $("#selectMagazzinoDest").val(),
+        url: "./ws/CambioMagazzinoUbicazione.php?codUbicazione=" + ubicazione + "&codMagazzinoDest=" + $("#magazzinoDest").val(),
         dataType: 'json',
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
@@ -164,8 +164,8 @@ function cambioMagazzinoUbicazione() {
 }
 
 function updateInputValue() {
-    if($("#selectMagazzinoDest :selected").val() != -1){
-        $("#qrcode").val($("#selectMagazzinoDest :selected").text());
+    if($("#magazzinoDest :selected").val() != -1){
+        $("#qrcode").val($("#magazzinoDest :selected").text());
         $("#btnCambio").attr('disabled',false);
     }
     else {
