@@ -182,13 +182,13 @@ class UbicazioniManager {
       $this->check_stato_ubicazione($codUbicazione);
 
       // lo setto a tappeto su tutti i magazzini!
-      $sql = "UPDATE THIP.UBICAZIONI_LL U
+      $sql = "UPDATE THIP.UBICAZIONI_LL
               SET NOTE='$note'
-              WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' ";
+              WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_UBICAZIONE='$codUbicazione' ";
       $panthera->execute_update($sql);
-      $sql = "UPDATE THIP.YUBICAZIONI_LL YU
+      $sql = "UPDATE THIPPERS.YUBICAZIONI_LL
               SET NOTE_POSIZIONE='$notePosizione'
-              WHERE YU.ID_AZIENDA='$ID_AZIENDA' AND YU.ID_UBICAZIONE='$codUbicazione' ";
+              WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_UBICAZIONE='$codUbicazione' ";
       $panthera->execute_update($sql);
     }
 
