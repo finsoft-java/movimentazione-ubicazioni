@@ -184,13 +184,22 @@ class UbicazioniManager {
      * FUNZIONE salva note
      */
     function salvaNote($codUbicazione, $note, $notePosizione) {
-      global $panthera, $ID_AZIENDA;
+      global $panthera, $ID_AZIENDA, $logManager;
 
       if ($panthera->mock) {
         return;
       }
 
-      $this->check_stato_ubicazione($codUbicazione);
+      $trasferibile = $this->check_stato_ubicazione($codUbicazione);
+      $str_trasferibile = $trasferibile ? " AND YU.TRASFERIBILE='Y' " : "";
+
+      // reperisco i vecchi valori a scopo di log
+      $sql = "SELECT U.ID_MAGAZZINO, U.NOTE, YU.NOTE_POSIZIONE
+              FROM THIP.UBICAZIONI_LL U
+              JOIN THIPPERS.YUBICAZIONI_LL YU
+                  ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
+              WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' $str_trasferibile AND U.STATO='V'";
+      $old = $panthera->select_single($sql);
 
       // lo setto a tappeto su tutti i magazzini!
       $sql = "UPDATE THIP.UBICAZIONI_LL
@@ -203,6 +212,8 @@ class UbicazioniManager {
       $panthera->execute_update($sql);
 
       $this->updateDatiComuniUbicazione($codUbicazione);
+      $logManager->log($old['ID_MAGAZZINO'], $codUbicazione, 'Note', $old['NOTE'], $note);
+      $logManager->log($old['ID_MAGAZZINO'], $codUbicazione, 'Note Posizione', $old['NOTE_POSIZIONE'], $notePosizione);
     }
 
     function updateDatiComuniUbicazione($codUbicazione) {
