@@ -11,7 +11,7 @@ class CaricamentiMassaManager {
      * FUNZIONE "Cambia magazzino dell'ubicazione"
      */
     function trasferisciUbicazione($codUbicazione, $codMagazzinoDest) {
-        global $panthera, $CAU_TESTATA, $CAU_RIGA, $YEAR, $DATE, $ID_AZIENDA, $logged_user, $ubicazioniManager,$magazziniManager;
+        global $panthera, $CAU_TESTATA, $CAU_RIGA, $YEAR, $DATE, $ID_AZIENDA, $logged_user, $ubicazioniManager, $magazziniManager;
 
         if ($panthera->mock) {
             return;
@@ -19,6 +19,12 @@ class CaricamentiMassaManager {
 
         $ubi1 = $ubicazioniManager->getUbicazione($codUbicazione);
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
+
+        $trasferibile = $ubicazioniManager->checkUbicazione($codUbicazione);
+        if (!$trasferibile) {
+          print_error(404, "Ubicazione dichiarata non trasferibile: $codUbicazione");
+        }
+
         $id = $panthera->get_numeratore('MOVUBI');  
         $magazziniManager->checkMagazzino($codMagazzinoDest);
         // l'algoritmo cambia a seconda che l'ubicazione sia piena o vuota
