@@ -121,8 +121,8 @@ class CaricamentiMassaManager {
             return;
         }
 
-        $ubi1 = $ubicazioniManager->getUbicazione($codUbicazioneSrc);
-        if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazioneSrc' inesistente");
+        $ubi1 = $ubicazioniManager->getUbicazione($codUbicazione);
+        if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazione' inesistente");
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
 
         $id = $panthera->get_numeratore('MOVUBI');
@@ -137,7 +137,7 @@ class CaricamentiMassaManager {
         //echo ">3< ";
 
         // CM_DOC_TRA_RIG
-        $this->creaRigheDocumento($id, $CAU_RIGA_SVUOTA, $codMagazzinoSrc, $codUbicazioneSrc, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA);
+        $this->creaRigheDocumento($id, $CAU_RIGA_SVUOTA, $codMagazzinoSrc, $codUbicazione, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA);
         //echo ">4< ";
 
         // SCHEDULED_JOB
@@ -150,7 +150,7 @@ class CaricamentiMassaManager {
           print_error(500, 'Il caricamento di massa non è andato a buon fine');
         }
         
-        $ubicazioniManager->updateDatiComuniUbicazione($codUbicazioneSrc);
+        $ubicazioniManager->updateDatiComuniUbicazione($codUbicazione);
     }
 
     function creaTestataCaricamento($id) {

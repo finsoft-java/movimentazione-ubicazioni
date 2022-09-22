@@ -30,12 +30,9 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         $("#qrcode").val('');
                         return false;
                     }
-                    let datiStampati = "<p class='text-center'> Ubicazione: <strong style='text-transform:uppercase'>"+ ubicazione +"</strong></p>";
+                    let datiStampati = "<p class='pOsai'> Ubicazione: <strong style='text-transform:uppercase'>" + ubicazione + "</strong></p>";
                     for(let i = 0; i < Object.keys(dati).length; i++){      
-                        datiStampati += "<p class='pOsai'>Articolo: <strong>"+dati[i].ID_ARTICOLO+"</strong> | Quantita: <strong>"+dati[i].QTA_GIAC_PRM+" "+ dati[i].R_UM_PRM_MAG +" </strong></p>";
-                        datiStampati += "<p class='pOsai'>Disegno: <strong>"+dati[i].DISEGNO+"</strong> </p>";
-                        datiStampati += "<p class='pOsai'>Descrizione: <strong>"+dati[i].DESCRIZIONE+"</strong> </p>";
-                        datiStampati += "<hr/>";
+                        datiStampati += getHtml(dati[i]);
                     }
                     $("#appendData").html(datiStampati);
                     timerOn = false;
@@ -51,6 +48,13 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             qrcode.val('');
        }
 });
+
+function getHtml(x) {
+    return "<p class='pOsai'>Articolo: <strong>" + x.ID_ARTICOLO + "</strong> | Quantita: <strong>" + x.QTA_GIAC_PRM + " " + x.R_UM_PRM_MAG + "</strong></p>"
+        + "<p class='pOsai'>Disegno: <strong>" + x.DISEGNO + "</strong></p>"
+        + "<p class='pOsai'>Descrizione: <strong>" + x.DESCRIZIONE + "</strong></p>"
+        + "<hr/>";
+}
 
 function showSuccessMsg(msg) {
     alert(msg);
