@@ -11,7 +11,7 @@ class CaricamentiMassaManager {
      * FUNZIONE "Cambia magazzino dell'ubicazione"
      */
     function trasferisciUbicazione($codUbicazione, $codMagazzinoDest) {
-        global $panthera, $CAU_TESTATA, $CAU_RIGA, $YEAR, $DATE, $ID_AZIENDA, $logged_user, $ubicazioniManager,$magazziniManager;
+        global $panthera, $CAU_TESTATA, $CAU_RIGA, $YEAR, $DATE, $ID_AZIENDA, $logged_user, $ubicazioniManager, $magazziniManager;
 
         if ($panthera->mock) {
             return;
@@ -19,6 +19,12 @@ class CaricamentiMassaManager {
 
         $ubi1 = $ubicazioniManager->getUbicazione($codUbicazione);
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
+
+        $trasferibile = $ubicazioniManager->checkUbicazione($codUbicazione);
+        if (!$trasferibile) {
+          print_error(404, "Ubicazione dichiarata non trasferibile: $codUbicazione");
+        }
+
         $id = $panthera->get_numeratore('MOVUBI');  
         $magazziniManager->checkMagazzino($codMagazzinoDest);
         // l'algoritmo cambia a seconda che l'ubicazione sia piena o vuota
@@ -121,8 +127,8 @@ class CaricamentiMassaManager {
             return;
         }
 
-        $ubi1 = $ubicazioniManager->getUbicazione($codUbicazioneSrc);
-        if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazioneSrc' inesistente");
+        $ubi1 = $ubicazioniManager->getUbicazione($codUbicazione);
+        if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazione' inesistente");
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
 
         $id = $panthera->get_numeratore('MOVUBI');
@@ -137,7 +143,7 @@ class CaricamentiMassaManager {
         //echo ">3< ";
 
         // CM_DOC_TRA_RIG
-        $this->creaRigheDocumento($id, $CAU_RIGA_SVUOTA, $codMagazzinoSrc, $codUbicazioneSrc, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA);
+        $this->creaRigheDocumento($id, $CAU_RIGA_SVUOTA, $codMagazzinoSrc, $codUbicazione, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA);
         //echo ">4< ";
 
         // SCHEDULED_JOB
@@ -145,10 +151,12 @@ class CaricamentiMassaManager {
         //echo ">5< ";
 
         // lancia davvero il CM su Panthera
-        return $this->chiama_ws_panthera();
+        $this->chiama_ws_panthera();
         if (!$this->checkCM($id)) {
           print_error(500, 'Il caricamento di massa non è andato a buon fine');
         }
+        
+        $ubicazioniManager->updateDatiComuniUbicazione($codUbicazione);
     }
 
     function creaTestataCaricamento($id) {

@@ -44,6 +44,12 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                             i=0;
                             return false;
                         }
+                        if(dati.TRASFERIBILE=='N') {
+                            showError("Ubicazione dichiarata non trasferibile");
+                            $("#qrcode").val('');
+                            i=0;
+                            return false;
+                        }
                         $("#qrcode").attr('placeholder','MAGAZZINO DEST.');
                         let datiStampati = "";
                         idMagazzino = dati.ID_MAGAZZINO;

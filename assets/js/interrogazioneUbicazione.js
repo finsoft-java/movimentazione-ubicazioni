@@ -31,16 +31,10 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     $("#qrcode").val('');
                     return false;
                 }
-                let datiStampati = "<p>Magazzino: <strong style='text-transform:uppercase'>"+dati[0].ID_MAGAZZINO+"</strong></p>";
                 console.log("dati ", dati)
+                let datiStampati = getHtmlTestata(dati[0]);
                 for(let i = 0; i < Object.keys(dati).length;i++){
-                    
-                    datiStampati += "<p>Articolo: <strong>"+dati[i].ID_ARTICOLO+"</strong> | Quantita: <strong>"+dati[i].QTA_GIAC_PRM+" "+ dati[i].R_UM_PRM_MAG +" </strong></p>";
-                    datiStampati += "<p>Disegno: <strong>"+dati[i].DISEGNO+"</strong> </p>";
-                    datiStampati += "<p>Descrizione: <strong>"+dati[i].DESCRIZIONE+"</strong> </p>";
-                    const idCommessa = dati[i].ID_COMMESSA ? "<p>Commessa: <strong>"+dati[i].ID_COMMESSA+"</strong> </p>" : "";
-                    datiStampati += idCommessa;
-                    datiStampati += "<hr/>";
+                    datiStampati += getHtmlArticolo(dati[i]);
                 }
                 $(".listaOsai").html(datiStampati);
                 timerOn = false;
@@ -58,6 +52,19 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
     }
 });
 
+function getHtmlTestata(x) {
+    return "<p>Magazzino: <strong style='text-transform:uppercase'>" + x.ID_MAGAZZINO + "</strong></p>"
+        + "<p>Ult. modifica: " + x.TIMESTAMP_AGG + " " + x.R_UTENTE_AGG + "</p>"
+        + "<hr/>";
+}
+
+function getHtmlArticolo(x) {
+    return "<p>Articolo: <strong>" + x.ID_ARTICOLO + "</strong> | Quantita: <strong>" + x.QTA_GIAC_PRM + " " + x.R_UM_PRM_MAG + "</strong></p>"
+        + "<p>Disegno: <strong>" + x.DISEGNO + "</strong></p>"
+        + "<p>Descrizione: <strong>" + x.DESCRIZIONE + "</strong></p>"
+        + (x.ID_COMMESSA ? "<p>Commessa: <strong>" + x.ID_COMMESSA + "</strong></p>" : "")
+        + "<hr/>";
+}
 
 function showError(data) {
     const err = typeof data === 'string' ? data :

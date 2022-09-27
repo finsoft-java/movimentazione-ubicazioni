@@ -30,17 +30,63 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
         if(i == 1) {
             if(barCode.trim() != ""){       
                 ubicazione =  barCode;
-                $("#qrcode").val("").attr('placeholder','UBICAZIONE DESTINAZIONE');
+                $.get({
+                    url: "./ws/GetUbicazione.php?codUbicazione=" + ubicazione,
+                    dataType: 'json',
+                    headers: {
+                        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                    },
+                    success: function(data, status) {
+                        const dati = data.value;
+                        let datiStampati = ""; 
+                        datiStampati += "<p class='pOsai'> Ubicazione di partenza: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
+                        datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati.ID_MAGAZZINO+"</strong></p>";
+                        $("#appendData").html(datiStampati);
+                        $("#qrcode").val("").attr('placeholder','UBICAZIONE DESTINAZIONE');
+                    },
+                    error: function(data, status){
+                        $("#qrcode").attr('placeholder','UBICAZIONE ORIGINE');
+                        console.log('ERRORE -> Interrogazione', data);
+                        showError(data);
+                        $("#qrcode").val('');
+                        ubicazione = null;
+                        i = 0;
+                        return false;
+                    }
+                });
             } else {
-                showError("Ubicazione inesistente o vuota si prega di riprovare");
+                showError("Digitare qualcosa nel campo ubicazione!");
                 i=0;
                 return false;
             }
         }
         if(i == 2) {             
-            if(barCode.trim() != ""){       
+            if(barCode.trim() != ""){     
                 ubicazioneDest = barCode;
-                $("#qrcode").val("").attr('placeholder','ARTICOLO');
+                $.get({
+                    url: "./ws/GetUbicazione.php?codUbicazione=" + ubicazioneDest,
+                    dataType: 'json',
+                    headers: {
+                        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                    },
+                    success: function(data, status) {
+                        const dati = data.value;
+                        let datiStampati = ""; 
+                        datiStampati += "<p class='pOsai'> Ubicazione di destinazione: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
+                        datiStampati += "<p class='pOsai'> Magazzino destinazione: <strong>"+dati.ID_MAGAZZINO+"</strong></p>";
+                        $("#appendData").append(datiStampati);
+                        $("#qrcode").val("").attr('placeholder','ARTICOLO');
+                    },
+                    error: function(data, status){
+                        $("#qrcode").attr('placeholder','UBICAZIONE DESTINAZIONE');
+                        console.log('ERRORE -> Interrogazione', data);
+                        showError(data);
+                        $("#qrcode").val('');
+                        ubicazioneDest = null;
+                        i = 1;
+                        return false;
+                    }
+                });  
             } else {
                 showError("Ubicazione destinazione inesistente si prega di riprovare");
                 $("#qrcode").val("").attr('placeholder','UBICAZIONE DESTINAZIONE');
@@ -49,15 +95,13 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             }
        }
         if(i == 3) {
-            if(barCode.trim() != ""){       
-                articolo = barCode;
-                $("#qrcode").val("").attr('placeholder','ARTICOLO');
-            } else {
-                showError("Articolo inesistente si prega di riprovare");
+            if(barCode.trim() === ""){       
+                showError("Inserire un articolo!");
                 $("#qrcode").val("").attr('placeholder','ARTICOLO');
                 i=2;
                 return false;
             }
+            articolo = barCode;
             $("#qrcode").val("").attr('placeholder','ARTICOLO').attr('disabled',true);
             $("#btnTrasferimento").attr('disabled',false);
             $("#btnRipeti").attr('disabled',false);
@@ -79,6 +123,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     let datiStampati = ""; 
                         datiStampati += "<p class='pOsai'> Ubicazione di partenza: <strong>"+dati[0].ID_UBICAZIONE+"</strong></p>";
                         datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
+                        datiStampati += "<p class='pOsai'> Ubicazione di destinazione: <strong>" + ubicazioneDest + " </strong> </p>";
                         datiStampati += "<p class='pOsai'> Articolo: <strong>"+dati[0].ID_ARTICOLO+"</strong></p>";
                         datiStampati += "<p class='pOsai'> Disegno: <strong>"+dati[0].DISEGNO+"</strong> </p>";
                         datiStampati += "<p class='pOsai'> Descrizione: <strong>"+dati[0].DESCRIZIONE+"</strong> </p>";
@@ -86,9 +131,8 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         datiStampati += "<input type='number' class='form-control inputOsai' onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='0.001' max='" + dati[0].QTA_GIAC_PRM + "' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
                         datiStampati += "<div class='input-group-append'><button class='btn btnInputForm btnPlus' type='button' onClick='plus("+maxQty+")'>+</button></div>";
                         datiStampati += "<button class='btn btnInputForm btnAll' type='button' onClick='selezionaTutti("+maxQty+")'> Tutti </button></div>";
-                        datiStampati += "<p class='pOsai'> Quantita Totale: <strong>"+dati[0].QTA_GIAC_PRM+ " "+ dati[0].R_UM_PRM_MAG +"</strong> </p>";                         
-                        datiStampati += "<p class='pOsai'> Ubicazione destinazione: <strong>" + ubicazioneDest + " </strong> </p>";
-                        $("#appendData").html(datiStampati);
+                        datiStampati += "<p class='pOsai'> Quantita Totale: <strong>"+dati[0].QTA_GIAC_PRM+ " "+ dati[0].R_UM_PRM_MAG +"</strong> </p>";
+                    $("#appendData").html(datiStampati);
                 },
                 error: function(data, status){
                     console.log("ERRORE in i == 3 trasferimentoArticoli", data);
