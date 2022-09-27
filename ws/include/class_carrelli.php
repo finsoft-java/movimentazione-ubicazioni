@@ -33,13 +33,7 @@ class CarrelliManager {
           
       } else {
 
-          $sql = "SELECT STATO FROM THIPPERS.YCARRELLO WHERE C.ID_AZIENDA='$ID_AZIENDA' AND C.ID_CARRELLO='$codCarrello'";
-          $stato = $panthera->select_single_value($sql);
-          if (empty($stato)) {
-            print_error(404, "Carrello inesistente: $codCarrello");
-          } elseif ($stato != 'V') {
-            print_error(404, "Carrello in stato non valido: $codCarrello");
-          }
+          $this->check_carrello($codCarrello);
 
           $sql = "SELECT C.STATO,C.ID_CARRELLO,C.DESCRIZIONE,C.DESCR_RIDOTTA,UC.R_UBICAZIONE,UC.PROGRESSIVO
                   FROM THIPPERS.YCARRELLO C
@@ -59,7 +53,11 @@ class CarrelliManager {
 
       $sql = "SELECT STATO FROM THIPPERS.YCARRELLO WHERE C.ID_AZIENDA='$ID_AZIENDA' AND C.ID_CARRELLO='$codCarrello'";
       $data = $panthera->select_single_value($sql);
-
+      if (empty($stato)) {
+        print_error(404, "Carrello inesistente: $codCarrello");
+      } elseif ($stato != 'V') {
+        print_error(404, "Carrello in stato non valido: $codCarrello");
+      }
     }
 
     function associa($codCarrello, $codUbicazione) {
@@ -71,7 +69,7 @@ class CarrelliManager {
 
       $this->check_stato_ubicazione($codUbicazione);
 
-      $sql = "INSERT INTO THIPPERS.YUBICAZIONI_CARRELLO(ID_AZIENDA,ID_CARRELLO,ID_UBICAZIONE)
+      $sql = "INSERT INTO THIPPERS.YUBICAZIONI_CARRELLO(ID_AZIENDA,ID_CARRELLO,R_UBICAZIONE)
               VALUES('$ID_AZIENDA','$codCarrello','$codUbicazione') ";
       $panthera->execute_update($sql);
 
@@ -86,7 +84,7 @@ class CarrelliManager {
       }
 
       $sql = "DELETE FROM THIPPERS.YUBICAZIONI_CARRELLO
-              WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_CARRELLO='$codCarrello' AND ID_UBICAZIONE='$codUbicazione' ";
+              WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_CARRELLO='$codCarrello' AND R_UBICAZIONE='$codUbicazione' ";
       $panthera->execute_update($sql);
 
       $ubicazioniManager->updateDatiComuniUbicazione($codUbicazione);
