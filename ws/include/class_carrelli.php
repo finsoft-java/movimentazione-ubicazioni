@@ -8,30 +8,58 @@ class CarrelliManager {
       global $panthera, $ID_AZIENDA;
 
       if ($panthera->mock) {
-          $data = [ [ 'ID_CARRELLO' => 'AAAAAA',
-                      'ID_UBICAZIONE' => 'UUUUUU1'
+          $data = [ [
+                      'PROGRESSIVO' => 1,
+                      'ID_CARRELLO' => 'AAAAAA',
+                      'R_UBICAZIONE' => 'UUUUUU1',
+                      'DESCRIZIONE' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ',
+                      'DESCR_RIDOTTA' => 'Lorem ipsum dolor sit amet'
                     ],
-                    [ 'ID_CARRELLO' => 'AAAAAA',
-                    'ID_UBICAZIONE' => 'UUUUUU2'
+                    [
+                      'PROGRESSIVO' => 2,
+                      'ID_CARRELLO' => 'AAAAAA',
+                      'R_UBICAZIONE' => 'UUUUUU2',
+                      'DESCRIZIONE' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ',
+                      'DESCR_RIDOTTA' => 'Lorem ipsum dolor sit amet'
                     ],
-                    [ 'ID_CARRELLO' => 'AAAAAA',
-                    'ID_UBICAZIONE' => 'UUUUUU3'
+                    [
+                      'PROGRESSIVO' => 3,
+                      'ID_CARRELLO' => 'AAAAAA',
+                      'R_UBICAZIONE' => 'UUUUUU3',
+                      'DESCRIZIONE' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ',
+                      'DESCR_RIDOTTA' => 'Lorem ipsum dolor sit amet'
                     ]
                   ];
           
       } else {
 
-          $sql = "SELECT *
+          $sql = "SELECT STATO FROM THIPPERS.YCARRELLO WHERE C.ID_AZIENDA='$ID_AZIENDA' AND C.ID_CARRELLO='$codCarrello'";
+          $stato = $panthera->select_single_value($sql);
+          if (empty($stato)) {
+            print_error(404, "Carrello inesistente: $codCarrello");
+          } elseif ($stato != 'V') {
+            print_error(404, "Carrello in stato non valido: $codCarrello");
+          }
+
+          $sql = "SELECT C.STATO,C.ID_CARRELLO,C.DESCRIZIONE,C.DESCR_RIDOTTA,UC.R_UBICAZIONE,UC.PROGRESSIVO
                   FROM THIPPERS.YCARRELLO C
-                  JOIN THIPPERS.YUBICAZIONI_CARRELLO UC
+                  LEFT JOIN THIPPERS.YUBICAZIONI_CARRELLO UC
                     ON C.ID_AZIENDA=UC.ID_AZIENDA AND C.ID_CARRELLO=UC.ID_CARRELLO
                   WHERE C.ID_AZIENDA='$ID_AZIENDA' AND C.ID_CARRELLO='$codCarrello'
-                  ORDER BY UC.ID_UBICAZIONE ";
+                  ORDER BY UC.PROGRESSIVO ";
           $data = $panthera->select_list($sql);
       }
       
       // se l'ubicazione e' vuota non do' errori
       return $data;
+    }
+
+    function check_carrello($codCarrello) {
+      global $panthera, $ID_AZIENDA;
+
+      $sql = "SELECT STATO FROM THIPPERS.YCARRELLO WHERE C.ID_AZIENDA='$ID_AZIENDA' AND C.ID_CARRELLO='$codCarrello'";
+      $data = $panthera->select_single_value($sql);
+
     }
 
     function associa($codCarrello, $codUbicazione) {
