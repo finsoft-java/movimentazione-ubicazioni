@@ -33,8 +33,6 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     let datiStampati = "<p class='text-center'> Ubicazione: <strong style='text-transform:uppercase'>"+ ubicazione +"</strong></p>";
                     for(let i = 0; i < Object.keys(dati).length; i++){      
                         datiStampati += "<p class='pOsai'>Articolo: <strong>"+dati[i].ID_ARTICOLO+"</strong> | Quantita: <strong>"+dati[i].QTA_GIAC_PRM+" "+ dati[i].R_UM_PRM_MAG +" </strong></p>";
-                        datiStampati += "<p class='pOsai'>Disegno: <strong>"+dati[i].DISEGNO+"</strong> </p>";
-                        datiStampati += "<p class='pOsai'>Descrizione: <strong>"+dati[i].DESCRIZIONE+"</strong> </p>";
                         datiStampati += "<hr/>";
                     }
                     $("#appendData").html(datiStampati);

@@ -10,13 +10,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_logged_user_JWT();
 
-$note = isset($_POST['note']) ? $panthera->escape_string($_POST['note']) : null;
-$note_pos = isset($_POST['note_pos']) ? $panthera->escape_string($_POST['note_pos']) : null;
-$idUbicazione = isset($_POST['idUbicazione']) ? $panthera->escape_string($_POST['idUbicazione']) : null;
+$note = isset($_REQUEST['note']) ? $panthera->escape_string($_REQUEST['note']) : null;
+$note_pos = isset($_REQUEST['note_pos']) ? $_REQUEST['note_pos'] : null;
+$idUbicazione = isset($_REQUEST['idUbicazione']) ? $_REQUEST['idUbicazione'] : null;
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
     $ubicazioniManager->salvaNote($idUbicazione, $note, $note_pos);
     
     header('Content-Type: application/json');

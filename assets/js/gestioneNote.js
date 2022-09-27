@@ -33,6 +33,12 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     $("#qrcode").val('');
                     return false;
                 }
+                if(dati.NOTE_POSIZIONE == null){
+                    dati.NOTE_POSIZIONE = "";
+                }
+                if(dati.NOTE == null){
+                    dati.NOTE = "";
+                }
                 let datiStampati = `<label>Note di posizionamento :</label> <textarea id="note_pos" class="form-control">${dati.NOTE_POSIZIONE}</textarea>
                                     <label>Note descrittive : </label> <textarea id="note" class="form-control">${dati.NOTE}</textarea>
                                     <input type="hidden" value="${dati.ID_UBICAZIONE}" id="idUbicazione">
@@ -57,8 +63,9 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
 });
 function salva(){
     $.post({
-        url: "./ws/Note.php?idUbicazione=" + $("#idUbicazione").val() + "&note=" + $("#note").val() + "&note_pos=" + $("#note_pos").val(),
+        url: "./ws/Note.php",
         dataType: 'json',
+        data: "idUbicazione=" + $("#idUbicazione").val().trim() + "&note=" + $("#note").val() + "&note_pos=" + $("#note_pos").val(),
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
         },
