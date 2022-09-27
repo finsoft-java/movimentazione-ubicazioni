@@ -13,5 +13,6 @@ include("class_ldap.php");
 include("class_panthera.php");
 include("class_magazzini.php");
 include("class_ubicazioni.php");
+include("class_carrelli.php");
 include("class_caricamenti_massa.php");
 include("class_log.php");
