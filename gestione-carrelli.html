@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="google" content="notranslate">
+        <meta name="viewport" content="width=device-width, user-scalable=no,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+        <!-- codice test ubicazione = PL-0001 articolo = 00000019 -->
+        <title>Movimentazione Ubicazioni</title>
+        <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+        <link rel="stylesheet" href="assets/css/style.css?v=7">
+        <link rel="stylesheet" href="assets/css/all.css">
+        <link rel="stylesheet" href="assets/css/fontawesome.css">
+        <link rel="stylesheet" href="assets/css/v4-font-face.css">
+    </head>
+    <body>
+        <nav class="navbar blue" onclick="window.location='./index.html'">
+            <p class="navTitle">Torna al menù</p>
+            <button class="btn btn-outline-light btnLogout" onclick="logout()" type="button"><i class="fa-solid fa-arrow-right-from-bracket logout"> </i> </button>
+        </nav>
+        <!-- <div class="interrogaUbiOsai blue" onclick="window.location='./index.html'">
+            <div><p>Torna al Menu</p></div>
+        </div> -->
+        <h3 class="titleOsai">Gestione Carrelli</h3>
+        <div class="qrcode">
+            <input type="text" class="form-control focus" id="qrcode" placeholder="CODICE CARRELLO" aria-describedby="basic-addon2">
+            <input type="text" class="form-control focus" disabled id="qrcode_ubi" style="display:none" placeholder="CODICE UBICAZIONE" aria-describedby="basic-addon2">
+        </div>
+        
+        <div class="listaOsai"></div>
+        <div id="error_message"></div>
+        <div class="bottoniStep1">
+            <button onclick="associa()" type="button" style="display:none;" class="btn btnOsai btnCarrello"> Associazione da carrello </button>
+            <button onclick="disassiocia()" type="button" style="display:none;" class="btn btnOsai btnCarrello"> Disassociazione da carrello </button>
+            <button onclick="trasferisciCarrello()" type="button" style="display:none;" class="btn btnOsai btnCarrello"> Trasf. carrello a nuovo mag. </button>
+        </div>
+        <div class="bottoniStep2" style="display:none;">
+            <div class="btnDiv">
+                <div style="float: left;width: 50%;">
+                    <button type="button" id="btnAssocia" style="display:none" class="btn btnOsai"> Conferma </button>
+                    <button type="button" id="btnDissocia" class="btn btnOsai"  style="display:none"> Conferma </button>
+                </div>
+                <div style="float: left;width: 50%;">
+                    <button onclick="window.location.reload()" type="button" id="btnAnnulla" class="btn btnOsai"> Annulla </button>
+                </div>
+            </div>
+        </div>
+        <script src="assets/js/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                if(sessionStorage.getItem( "token") == null){
+                    location.href="./login.html";
+                }
+            });
+            function logout() {
+                sessionStorage.removeItem("token");
+                location.href="./login.html";
+            }
+        </script>
+        <script src="assets/js/popper.min.js"></script>
+        <script src="assets/js/bootstrap.min.js"></script>
+        <script src="assets/js/gestioneCarrello.js?v=1"></script>
+    </body>
+</html>
