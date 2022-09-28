@@ -13,15 +13,53 @@ $(document).ready(function(){
 let ubicazione;
 
 document.getElementById("qrcode_ubi").addEventListener("keyup", function(event) {
-    console.log('entrooooo');
+    this.value = this.value.toUpperCase();
+    
+    console.log("listening to keyup")
+    if (event.keyCode === 13) {
+        ubicazione = $("#qrcode_ubi").val();
+        $.get({
+            url: "./ws/GetUbicazione.php?codUbicazione=" + ubicazione,
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+            },
+            success: function(data, status) {
+                const dati = data.value;
+                let datiStampati = ""; 
+                datiStampati += "<p class='pOsai'> Ubicazione: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
+                datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati.ID_MAGAZZINO+"</strong></p><hr/>";
+                $("#appendData").append(datiStampati);
+                $("#bottoniStep1").css("display","none");
+                $("#bottoniStep2").css("display","");
+            },
+            error: function(data, status){
+                $("#qrcode").attr('placeholder','UBICAZIONE ORIGINE');
+                console.log('ERRORE -> Interrogazione', data);
+                showError(data);
+                $("#qrcode").val('');
+                ubicazione = null;
+                i = 0;
+                return false;
+            }
+        });
+    }
 });
 
 function associa() {
-
+    $("#qrcode").prop("disabled",true).css("display","none");
+    $("#qrcode_ubi").prop("disabled",false).css("display","block");
+    $(".listaOsai").css("display","none");
+    $("#btnAssocia").css("display","");
+    $("#btnDissocia").css("display","none");
 }
 
 function disassocia() {
-
+    $("#qrcode").prop("disabled",true).css("display","none");
+    $("#qrcode_ubi").prop("disabled",false).css("display","block");
+    $(".listaOsai").css("display","none");
+    $("#btnAssocia").css("display","none");
+    $("#btnDissocia").css("display","");
 } 
 
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
