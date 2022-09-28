@@ -20,11 +20,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($codUbicazione)) {
         print_error(400, "Missing argument codUbicazione");
     }
-    $data = $carrelliManager->dissocia($codCarrello, $codUbicazione);
+    $carrelliManager->dissocia($codCarrello, $codUbicazione);
     
         
     header('Content-Type: application/json');
-    echo json_encode(['data' => $data, 'count' => count($data)]);
+    echo '{"msg":"OK"}';
 } else {
     //==========================================================
     print_error(405, "Unsupported method in request: " . $_SERVER['REQUEST_METHOD']);

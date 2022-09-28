@@ -25,20 +25,20 @@
             <input type="text" class="form-control focus" id="qrcode" placeholder="CODICE CARRELLO" aria-describedby="basic-addon2">
             <input type="text" class="form-control focus" disabled id="qrcode_ubi" style="display:none" placeholder="CODICE UBICAZIONE" aria-describedby="basic-addon2">
         </div>
-        
+        <div id="codCarrello"></div>
         <div class="listaOsai"></div>
         <div id="appendData"></div>
         <div id="error_message"></div>
-        <div id="bottoniStep1">
-            <button onclick="associa()" type="button" style="display:none;" class="btn btnOsai btnCarrello"> Associazione da carrello </button>
-            <button onclick="disassocia()" type="button" style="display:none;" class="btn btnOsai btnCarrello"> Disassociazione da carrello </button>
-            <button onclick="trasferisciCarrello()" type="button" style="display:none;" class="btn btnOsai btnCarrello"> Trasf. carrello a nuovo mag. </button>
+        <div id="bottoniStep1" style="margin-bottom:30px;float:left;">
+            <button onclick="associa()" type="button" style="display:none;float:left;margin-left:15px;margin-bottom:15px;" class="btn btnOsai btnCarrello"> Associa</button>
+            <button onclick="disassocia()" type="button" style="display:none;float:right;margin-right:15px;margin-bottom:15px;" class="btn btnOsai btnCarrello"> Dissocia </button>
+            <button onclick="trasferisciCarrello()" type="button" style="display:none;margin:0px auto;" class="btn btnOsai btnCarrello"> Trasferisci</button>
         </div>
-        <div class="bottoniStep2" style="display:none;">
+        <div id="bottoniStep2" style="display:none;">
             <div class="btnDiv">
                 <div style="float: left;width: 50%;">
-                    <button type="button" id="btnAssocia" style="display:none" class="btn btnOsai"> Conferma </button>
-                    <button type="button" id="btnDissocia" class="btn btnOsai"  style="display:none"> Conferma </button>
+                    <button type="button" onclick="confermaAssociazione()" id="btnAssocia" class="btn btnOsai"  disabled style="display:none"> Conferma </button>
+                    <button type="button" onclick="confermaDisassociazione()" id="btnDissocia" class="btn btnOsai" disabled style="display:none"> Conferma </button>
                 </div>
                 <div style="float: left;width: 50%;">
                     <button onclick="window.location.reload()" type="button" id="btnAnnulla" class="btn btnOsai"> Annulla </button>

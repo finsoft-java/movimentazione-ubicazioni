@@ -135,7 +135,18 @@ html {
 	margin-bottom: 0px;
 	padding: 8px 0px;
 }
-
+#codCarrello p{
+	text-align: center;
+    font-size: 14px;
+    width: calc(100% - 64px);
+    margin: 15px 32px 25px 32px;
+}
+#appendData p {
+	text-align: center;
+    font-size: 14px;
+    width: calc(100% - 64px);
+    margin: 15px 32px 10px 32px;
+}
 .form-control {
 	width: 85%;
 	border: 1px solid #e9e9ed!important;
