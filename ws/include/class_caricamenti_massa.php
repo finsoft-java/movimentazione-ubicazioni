@@ -159,6 +159,80 @@ class CaricamentiMassaManager {
         $ubicazioniManager->updateDatiComuniUbicazione($codUbicazione);
     }
 
+    /**
+     * FUNZIONE "Trasferimento carrello"
+     */
+    function trasferisciCarrello($codCarrello, $codMagazzinoDest) {
+        global $panthera, $CAU_TESTATA, $CAU_RIGA, $YEAR, $DATE, $ID_AZIENDA, $logged_user,
+        $ubicazioniManager, $magazziniManager, $carrelliManager;
+
+        if ($panthera->mock) {
+            return;
+        }
+
+        $carrello = $carrelliManager->getContenutoCarrello($codCarrello);
+        if (count($carrello) == 0) {
+          print_error(404, "Nulla da trasferire, carrello vuoto: $codCarrello");
+        }
+        $ubi1 = $ubicazioniManager->getUbicazione($carrello[0]['R_UBICAZIONE']);
+        $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
+
+        $id = $panthera->get_numeratore('MOVUBI');  
+        $magazziniManager->checkMagazzino($codMagazzinoDest);
+
+        // l'algoritmo cambia a seconda che l'ubicazione sia piena o vuota
+        $codUbicazioniVuote = [];
+        $codUbicazioniNonVuote = [];
+        foreach($carrello as $c) {
+          $codUbicazione = $c['R_UBICAZIONE'];
+          $trasferibile = $ubicazioniManager->checkUbicazione($codUbicazione);
+          if (!$trasferibile) {
+            print_error(404, "Ubicazione dichiarata non trasferibile: $codUbicazione");
+          }
+          $ubi1 = $ubicazioniManager->getUbicazione();
+          $contenuto = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
+          if (empty($contenuto) || count($contenuto) == 0) {
+            $codUbicazioniVuote[] = $codUbicazione;
+          } else {
+            $codUbicazioniNonVuote[] = $codUbicazione;
+          }
+        }
+
+        foreach($codUbicazioniVuote as $codUbicazione) {
+          $this->trasferisciUbicazioneVuota($codUbicazione, $codMagazzinoDest);
+        }
+
+        if (count($codUbicazioniNonVuote) == 0) {
+          return;
+        }
+
+        // BATCH_LOAD_HDR
+        $this->creaTestataCaricamento($id);
+        //echo ">2< ";
+
+        // CM_DOC_TRA_TES
+        $this->creaTestataDocumento($id, $CAU_TESTATA, $codMagazzinoSrc, $codMagazzinoDest);
+        //echo ">3< ";
+ 
+        // CM_DOC_TRA_RIG
+        $row = 0;
+        foreach($codUbicazioniVuote as $codUbicazione) {
+          $row = $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazione, $codMagazzinoDest, $codUbicazione, null, null, $row);
+        }
+        //echo ">4< ";
+
+        // SCHEDULED_JOB
+        $this->aggiorna_scheduled_job($id);
+        //echo ">5< ";
+
+        // lancia davvero il CM su Panthera
+        $this->chiama_ws_panthera();
+
+        if (!$this->checkCM($id)) {
+          print_error(500, 'Il caricamento di massa non è andato a buon fine');
+        }
+    }
+
     function creaTestataCaricamento($id) {
       global $panthera, $DATA_ORIGIN;
 
@@ -320,7 +394,8 @@ class CaricamentiMassaManager {
         $panthera->execute_update($sql);
     }
 
-    function creaRigheDocumento($id, $cauRiga, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo=null, $qty=null) {
+    function creaRigheDocumento($id, $cauRiga, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest,
+                                                              $codUbicazioneDest, $articolo=null, $qty=null, $baseRowIndex=0) {
       global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $logged_user;
 
       if (empty($articolo) || empty($qty)) {
@@ -397,18 +472,18 @@ class CaricamentiMassaManager {
       SELECT
         '$DATA_ORIGIN',                     -- 1
         '$id',
-        ROW_NUMBER() OVER(ORDER BY S.ID_ARTICOLO),
+        $baseRow+ROW_NUMBER() OVER(ORDER BY S.ID_ARTICOLO),
         'I',
         '0',
         '2',
         '$ID_AZIENDA',
         '$YEAR',
         '$id',
-        ROW_NUMBER() OVER(ORDER BY S.ID_ARTICOLO),             -- 10 IN QUESTO CASO ID_ORIGINALE E' LA RIGA !
-        ROW_NUMBER() OVER(ORDER BY S.ID_ARTICOLO),
+        $baseRow+ROW_NUMBER() OVER(ORDER BY S.ID_ARTICOLO),             -- 10 IN QUESTO CASO ID_ORIGINALE E' LA RIGA !
+        $baseRow+ROW_NUMBER() OVER(ORDER BY S.ID_ARTICOLO),
         1,
         1,
-        (ROW_NUMBER() OVER(ORDER BY S.ID_ARTICOLO)) * 10,
+        $baseRow+(ROW_NUMBER() OVER(ORDER BY S.ID_ARTICOLO)) * 10,
         '$cauRiga',
         '$DATE',
         '$codMagazzinoSrc',
@@ -470,6 +545,10 @@ class CaricamentiMassaManager {
 
       $panthera->execute_update($sql);
 
+      $sql = "SELECT MAX(ROW_ID)
+              FROM THIP.CM_DOC_TRA_RIG
+              WHERE DATA_ORIGIN='$DATA_ORIGIN'AND RUN_ID='$id'";
+      return $panthera->select_single_value($sql);
     }
 
     function aggiorna_scheduled_job($id) {
@@ -527,15 +606,16 @@ class CaricamentiMassaManager {
               FROM THERA.BATCH_LOAD_HDR
               WHERE DATA_ORIGIN='$DATA_ORIGIN' AND RUN_ID='$id'";
       
-      for($i=0; $i <= 10; $i++) {
-        //echo 'tentativo n.'.$i;
+      $MAX_TENTATIVI = 10;
+      $SLEEP_SECONDI = 1;
+      for ($i = 0; $i <= $MAX_TENTATIVI; $i++) {
         $l = $panthera->select_single($sql);
         if ($l["WRONG_RECS"] > 0) {
           return false;
         } else if($l["TOTAL_RECS"] > 0 && $l["TRANSFERRED_RECS"] > 0 && $l["WRONG_RECS"] == 0){
           return true;
         }
-        sleep(1);
+        sleep($SLEEP_SECONDI);
       }
       return false;
     }
