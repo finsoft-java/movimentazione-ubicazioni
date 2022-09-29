@@ -26,6 +26,7 @@
             <input type="text" class="form-control focus" disabled id="qrcode_ubi" style="display:none" placeholder="CODICE UBICAZIONE" aria-describedby="basic-addon2">
         </div>
         <div id="codCarrello"></div>
+        <div id="appendSelect"></div>
         <div class="listaOsai"></div>
         <div id="appendData"></div>
         <div id="error_message"></div>
@@ -39,9 +40,10 @@
                 <div style="float: left;width: 50%;">
                     <button type="button" onclick="confermaAssociazione()" id="btnAssocia" class="btn btnOsai"  disabled style="display:none"> Conferma </button>
                     <button type="button" onclick="confermaDisassociazione()" id="btnDissocia" class="btn btnOsai" disabled style="display:none"> Conferma </button>
+                    <button type="button" onclick="confermaTrasferimento()" id="btnTrasferisci" class="btn btnOsai" disabled style="display:none"> Conferma </button>
                 </div>
                 <div style="float: left;width: 50%;">
-                    <button onclick="window.location.reload()" type="button" id="btnAnnulla" class="btn btnOsai"> Annulla </button>
+                    <button onclick="location.reload(true)" type="button" id="btnAnnulla" class="btn btnOsai"> Annulla </button>
                 </div>
             </div>
         </div>
