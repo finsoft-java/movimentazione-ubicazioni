@@ -48,11 +48,61 @@ class CarrelliManager {
       return $data;
     }
 
+    /**
+     * Questa funzione controlla che l'ubicazione sia esistente e valida
+     * @return true se l'ubicazione è trasferibile
+     */
+    function check_stato_ubicazione($codUbicazione) {
+      global $panthera, $ID_AZIENDA;
+      $sql = "SELECT COUNT(*)
+              FROM THIP.UBICAZIONI_LL U
+              JOIN THIPPERS.YUBICAZIONI_LL YU
+                ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
+              WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione'
+                ";
+      $count = $panthera->select_single_value($sql);
+      if ($count == 0) {
+        print_error(404, "Ubicazione inesistente: $codUbicazione");
+      }
+
+      $sql = "SELECT COUNT(*)
+              FROM THIP.UBICAZIONI_LL U
+              JOIN THIPPERS.YUBICAZIONI_LL YU
+                ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
+              WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND U.STATO='V'
+                ";
+      $count = $panthera->select_single_value($sql);
+      if ($count == 0) {
+        print_error(404, "Ubicazione esistente ma in stato non valido: $codUbicazione");
+      }
+
+      $sql = "SELECT COUNT(*)
+                FROM THIP.UBICAZIONI_LL U
+                JOIN THIPPERS.YUBICAZIONI_LL YU
+                  ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
+                WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND YU.TRASFERIBILE='Y' AND U.STATO='V'
+                  ";
+      $countY = $panthera->select_single_value($sql);
+      $sql = "SELECT COUNT(*)
+                FROM THIP.UBICAZIONI_LL U
+                JOIN THIPPERS.YUBICAZIONI_LL YU
+                  ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
+                WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND YU.TRASFERIBILE='N' AND U.STATO='V'
+                  ";
+      $countN = $panthera->select_single_value($sql);
+      if ($countY > 1) {
+        print_error(500, "Errore di configurazione! L'ubicazione trasferibile $codUbicazione è associata a $countY magazzini diversi");
+      } elseif ($countY == 0 && $countN > 1) {
+        print_error(500, "Errore di configurazione! L'ubicazione non trasferibile $codUbicazione è associata a $countN magazzini diversi");
+      }
+      return $countY > 0;
+    }
+
     function check_carrello($codCarrello) {
       global $panthera, $ID_AZIENDA;
 
-      $sql = "SELECT STATO FROM THIPPERS.YCARRELLO WHERE C.ID_AZIENDA='$ID_AZIENDA' AND C.ID_CARRELLO='$codCarrello'";
-      $data = $panthera->select_single_value($sql);
+      $sql = "SELECT C.STATO FROM THIPPERS.YCARRELLO C WHERE C.ID_AZIENDA='$ID_AZIENDA' AND C.ID_CARRELLO='$codCarrello'";
+      $stato = $panthera->select_single_value($sql);
       if (empty($stato)) {
         print_error(404, "Carrello inesistente: $codCarrello");
       } elseif ($stato != 'V') {
@@ -61,18 +111,23 @@ class CarrelliManager {
     }
 
     function associa($codCarrello, $codUbicazione) {
-      global $panthera, $ID_AZIENDA, $logManager, $ubicazioniManager;
+      global $panthera, $ID_AZIENDA, $logManager, $ubicazioniManager,$logged_user;
 
       if ($panthera->mock) {
         return;
       }
 
       $this->check_stato_ubicazione($codUbicazione);
-
-      $sql = "INSERT INTO THIPPERS.YUBICAZIONI_CARRELLO(ID_AZIENDA,ID_CARRELLO,R_UBICAZIONE)
-              VALUES('$ID_AZIENDA','$codCarrello','$codUbicazione') ";
+      $sql = "SELECT MAX(PROGRESSIVO) FROM THIPPERS.YUBICAZIONI_CARRELLO WHERE ID_CARRELLO='$codCarrello'";
+      $progressivo = $panthera->select_single_value($sql);
+      if($progressivo == null){
+        $progressivo = 1;
+      } else {
+        $progressivo = $progressivo+1;
+      }
+      $sql = "INSERT INTO THIPPERS.YUBICAZIONI_CARRELLO(ID_AZIENDA, ID_CARRELLO, R_UBICAZIONE, PROGRESSIVO, STATO, R_UTENTE_CRZ, R_UTENTE_AGG) VALUES 
+              ('$ID_AZIENDA','$codCarrello','$codUbicazione', '$progressivo', 'V', '$logged_user->nome_utente','$logged_user->nome_utente') ";
       $panthera->execute_update($sql);
-
       $ubicazioniManager->updateDatiComuniUbicazione($codUbicazione);
     }
 

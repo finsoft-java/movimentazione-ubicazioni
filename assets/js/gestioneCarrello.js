@@ -41,7 +41,7 @@ document.getElementById("qrcode_ubi").addEventListener("keyup", function(event) 
                     datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati.ID_MAGAZZINO+"</strong></p><hr/>";
                     $("#btnAssocia").attr("disabled",false);
                     $("#btnDissocia").attr("disabled",true);
-                } else if(operazioneCarrello == 'dissocia'){
+                } else if(operazioneCarrello == 'disassocia'){
                     datiStampati += "<p class='pOsai'> Ubicazione: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
                     datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati.ID_MAGAZZINO+"</strong></p><hr/>";
                     $("#btnAssocia").attr("disabled",true);
@@ -62,6 +62,7 @@ document.getElementById("qrcode_ubi").addEventListener("keyup", function(event) 
                     $("#magazzinoDest").trigger("change");
                     //compare select con tutti i magazzini                    
                 }
+                $("#appendData").append(datiStampati);
 
             },
             error: function(data, status){
@@ -240,15 +241,7 @@ function confermaTrasferimento() {
         },
         success: function(data, status) {
             showSuccessMsg("Trasferimento carrello " + codCarrello + " avvenuto con successo al magazzino "+magazzinoDest);
-            $("#appendData").html("");
-            ubicazioni = [];
-            magazzinoDest = "";
-            $("#magazzinoDest").val(-1);
-            $("#btnAssocia").attr("disabled",true);
-            $("#btnDissocia").attr("disabled",true); 
-            $("#btnTrasferisci").attr("disabled",true);
-            $("#qrcode_ubi").val("");
-            $("#qrcode").val("");
+            location.reload(true);
         },
         error: function(data, status){            
             console.log("ERRORE in confermaAssociazione", data, status);

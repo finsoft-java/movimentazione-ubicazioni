@@ -124,7 +124,7 @@ html {
 	text-align: center;
 	font-size: 14px;
 	width: calc(100% - 64px);
-	margin: 15px 32px 25px 32px;
+	margin: 15px 32px 10px 32px;
 }
 .interrogaUbiOsai p {
 	width: 100%;
@@ -139,7 +139,7 @@ html {
 	text-align: center;
     font-size: 14px;
     width: calc(100% - 64px);
-    margin: 15px 32px 25px 32px;
+    margin: 15px 32px 10px 32px;
 }
 #appendData p {
 	text-align: center;
