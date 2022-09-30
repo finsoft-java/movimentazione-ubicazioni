@@ -221,7 +221,7 @@ class UbicazioniManager {
 
       // lo setto a tappeto su tutti i magazzini!
       $sql = "UPDATE THIP.UBICAZIONI_LL
-              SET R_UTENTE_AGG='${ID_AZIENDA}_$logged_user->nome_utente',
+              SET R_UTENTE_AGG='{$logged_user->nome_utente}_$ID_AZIENDA',
                   TIMESTAMP_AGG=CURRENT_TIMESTAMP
               WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_UBICAZIONE='$codUbicazione' ";
       $panthera->execute_update($sql);
