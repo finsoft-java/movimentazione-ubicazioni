@@ -144,4 +144,24 @@ class CarrelliManager {
 
       $ubicazioniManager->updateDatiComuniUbicazione($codUbicazione);
     }
+
+    function getMagazzinoCarrello($codCarrello) {
+      global $panthera, $ID_AZIENDA, $ubicazioniManager;
+
+      // faccio una query per tirarmi fuori la prima ubicazione del carrello 
+      $sql = "SELECT TOP 1 UC.R_UBICAZIONE
+              FROM THIPPERS.YCARRELLO C
+              JOIN THIPPERS.YUBICAZIONI_CARRELLO UC
+                ON C.ID_AZIENDA=UC.ID_AZIENDA AND C.ID_CARRELLO=UC.ID_CARRELLO
+              WHERE C.ID_AZIENDA='$ID_AZIENDA' AND C.ID_CARRELLO='$codCarrello'
+              ORDER BY UC.PROGRESSIVO ";
+      $primaUbicazione = $panthera->select_single($sql);
+
+      if ($primaUbicazione == null) {
+        // carrello vuoto: quindi il magazzino non è definito
+        return null;
+      }
+
+      return $ubicazioniManager->getUbicazione($primaUbicazione)['ID_MAGAZZINO'];
+    }
 }
