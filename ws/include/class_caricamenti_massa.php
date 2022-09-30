@@ -369,8 +369,8 @@ echo'p1';
           null,
           null,
           'V',                         -- 40
-          '$logged_user->nome_utente',
-          '$logged_user->nome_utente',
+          '{$logged_user->nome_utente}_$ID_AZIENDA',
+          '{$logged_user->nome_utente}_$ID_AZIENDA',
           CURRENT_TIMESTAMP,
           CURRENT_TIMESTAMP,
           null,
@@ -522,8 +522,8 @@ echo'p1';
         null,
         null,
         'V',
-        '$logged_user->nome_utente',
-        '$logged_user->nome_utente',              -- 50
+        '{$logged_user->nome_utente}_$ID_AZIENDA',
+        '{$logged_user->nome_utente}_$ID_AZIENDA',              -- 50
         CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP,
         null,
@@ -556,7 +556,7 @@ echo'p1';
     }
 
     function aggiorna_scheduled_job($id) {
-      global $panthera, $DATA_ORIGIN, $ID_AZIENDA, $COD_SCHEDULED_JOB;
+      global $panthera, $logged_user, $DATA_ORIGIN, $ID_AZIENDA, $COD_SCHEDULED_JOB;
       $parametri = [
         "PageTo=0",
         "PageFrom=0",
@@ -583,7 +583,9 @@ echo'p1';
       ];
       $separatore = "',CHAR(18),'";
       $par_joined = "CONCAT('" . join($separatore, $parametri) . "',CHAR(18))";
-      $sql = "UPDATE THERA.SCHEDULED_JOB SET JOB_PARAMETERS=$par_joined WHERE SCHEDULED_JOB_ID='$COD_SCHEDULED_JOB'";
+      $sql = "UPDATE THERA.SCHEDULED_JOB
+              SET JOB_PARAMETERS=$par_joined, USER_ID='{$logged_user->nome_utente}_$ID_AZIENDA'
+              WHERE SCHEDULED_JOB_ID='$COD_SCHEDULED_JOB'";
 
       // echo $sql; die();
 

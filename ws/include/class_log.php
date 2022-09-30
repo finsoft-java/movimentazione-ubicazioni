@@ -25,7 +25,7 @@ class LogManager {
             VALUES('$id',
                 'UbicazioneLL',
                 CONCAT('$ID_AZIENDA',CHAR(22),'$idMagazzino',CHAR(22),'$codUbicazione'),
-                '${ID_AZIENDA}_$logged_user->nome_utente',
+                '{$logged_user->nome_utente}_$ID_AZIENDA',
                 '$attributeName',
                 '$oldValue',
                 '$newValue')";

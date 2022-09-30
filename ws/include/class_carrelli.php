@@ -126,7 +126,7 @@ class CarrelliManager {
         $progressivo = $progressivo+1;
       }
       $sql = "INSERT INTO THIPPERS.YUBICAZIONI_CARRELLO(ID_AZIENDA, ID_CARRELLO, R_UBICAZIONE, PROGRESSIVO, STATO, R_UTENTE_CRZ, R_UTENTE_AGG) VALUES 
-              ('$ID_AZIENDA','$codCarrello','$codUbicazione', '$progressivo', 'V', '$logged_user->nome_utente','$logged_user->nome_utente') ";
+              ('$ID_AZIENDA','$codCarrello','$codUbicazione', '$progressivo', 'V', '{$logged_user->nome_utente}_$ID_AZIENDA','{$logged_user->nome_utente}_$ID_AZIENDA') ";
       $panthera->execute_update($sql);
       $ubicazioniManager->updateDatiComuniUbicazione($codUbicazione);
     }
