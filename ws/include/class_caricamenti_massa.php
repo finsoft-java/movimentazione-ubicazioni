@@ -169,27 +169,21 @@ class CaricamentiMassaManager {
         if ($panthera->mock) {
             return;
         }
-echo'p1';
         $carrello = $carrelliManager->getContenutoCarrello($codCarrello);
         if (count($carrello) == 0) {
           print_error(404, "Nulla da trasferire, carrello vuoto: $codCarrello");
         }
-        echo'p2';
         $ubi1 = $ubicazioniManager->getUbicazione($carrello[0]['R_UBICAZIONE']);
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
-        echo'p3';
         $id = $panthera->get_numeratore('MOVUBI');  
         $magazziniManager->checkMagazzino($codMagazzinoDest);
-        echo'p4';
         // l'algoritmo cambia a seconda che l'ubicazione sia piena o vuota
         $codUbicazioniVuote = [];
         $codUbicazioniNonVuote = [];
-        var_dump($carrello);
         foreach($carrello as $c) {
           $codUbicazione = $c['R_UBICAZIONE'];
           //$trasferibile = $ubicazioniManager->checkUbicazione($codUbicazione);
           $trasferibile = $ubicazioniManager->check_stato_ubicazione($codUbicazione);
-          echo'p5---'.$trasferibile.'-------';
           if (!$trasferibile) {
             print_error(404, "Ubicazione dichiarata non trasferibile: $codUbicazione");
           }

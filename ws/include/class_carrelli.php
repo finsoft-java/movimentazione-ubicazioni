@@ -98,6 +98,16 @@ class CarrelliManager {
       return $countY > 0;
     }
 
+    function check_carrelloUbi($codCarrello,$codUbicazione) {
+      global $panthera, $ID_AZIENDA;
+
+      $sql = "SELECT count(*) FROM THIPPERS.YUBICAZIONI_CARRELLO WHERE R_UBICAZIONE='$codUbicazione' AND ID_CARRELLO='$codCarrello'";
+      $stato = $panthera->select_single_value($sql);
+      if ($stato > 0) {
+        print_error(404, "Ubicazione $codUbicazione già inserita");
+      } 
+    }
+
     function check_carrello($codCarrello) {
       global $panthera, $ID_AZIENDA;
 

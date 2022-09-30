@@ -18,7 +18,6 @@ let ubicazione;
 
 document.getElementById("qrcode_ubi").addEventListener("keyup", function(event) {
     this.value = this.value.toUpperCase();
-    
     console.log("listening to keyup")
     if (event.keyCode === 13) {
         ubicazione = $("#qrcode_ubi").val();
@@ -66,13 +65,9 @@ document.getElementById("qrcode_ubi").addEventListener("keyup", function(event) 
 
             },
             error: function(data, status){
-                $("#qrcode").attr('placeholder','UBICAZIONE ORIGINE');
-                console.log('ERRORE -> Interrogazione', data);
                 showError(data);
-                $("#qrcode").val('');
+                $("#qrcode_ubi").val('');
                 ubicazione = null;
-                i = 0;
-                return false;
             }
         });
     }
@@ -81,6 +76,11 @@ document.getElementById("qrcode_ubi").addEventListener("keyup", function(event) 
 function associa() {
     $("#qrcode").prop("disabled",true).css("display","none");
     $("#qrcode_ubi").prop("disabled",false).css("display","block");
+    $("#qrcode_ubi").focus();
+    setInterval(function() {
+        console.log("Focusing");
+        $("#qrcode_ubi").get(0).focus();
+    }, 1000);
     $(".listaOsai").css("display","none");
     $("#btnAssocia").css("display","");
     $("#btnDissocia").css("display","none");
@@ -93,6 +93,11 @@ function associa() {
 function trasferisciCarrello() {
     $("#qrcode").prop("disabled",true).css("display","none");
     $("#qrcode_ubi").prop("disabled",false).css("display","block").attr("placeholder","MAGAZZINO");
+    $("#qrcode_ubi").focus();
+    setInterval(function() {
+        console.log("Focusing");
+        $("#qrcode_ubi").get(0).focus();
+    }, 1000);
     $(".listaOsai").css("display","none");
     $("#btnAssocia").css("display","none");
     $("#btnDissocia").css("display","none");
@@ -142,6 +147,11 @@ function trasferisciCarrello() {
 function disassocia() {
     $("#qrcode").prop("disabled",true).css("display","none");
     $("#qrcode_ubi").prop("disabled",false).css("display","block");
+    $("#qrcode_ubi").focus();
+    setInterval(function() {
+        console.log("Focusing");
+        $("#qrcode_ubi").get(0).focus();
+    }, 1000);
     $(".listaOsai").css("display","none");
     $("#btnAssocia").css("display","none");
     $("#btnDissocia").css("display","");
@@ -221,7 +231,7 @@ function confermaAssociazione() {
             error: function(data, status){            
                 console.log("ERRORE in confermaAssociazione", data, status);
                 showError(data);
-                $("#qrcode").val('');
+                $("#qrcode_ubi").val('');
             }
         });
     }
@@ -244,9 +254,9 @@ function confermaTrasferimento() {
             location.reload(true);
         },
         error: function(data, status){            
+            $("#qrcode_ubi").val("");
             console.log("ERRORE in confermaAssociazione", data, status);
             showError(data);
-            $("#qrcode").val('');
         }
     });
 }
