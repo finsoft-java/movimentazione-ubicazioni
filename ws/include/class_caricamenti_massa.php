@@ -46,16 +46,8 @@ class CaricamentiMassaManager {
         $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazione, $codMagazzinoDest, $codUbicazione);
         //echo ">4< ";
 
-        // SCHEDULED_JOB
-        $this->aggiorna_scheduled_job($id);
-        //echo ">5< ";
-
-        // lancia davvero il CM su Panthera
-        $this->chiama_ws_panthera();
-
-        if (!$this->checkCM($id)) {
-          print_error(500, 'Il caricamento di massa non è andato a buon fine');
-        }
+        // SCHEDULED_JOB + webservice
+        $this->loop_job_panthera($id);
     }
 
     private function trasferisciUbicazioneVuota($codUbicazione, $codMagazzinoDest) {
@@ -106,15 +98,7 @@ class CaricamentiMassaManager {
         $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty);
         //echo ">4< ";
 
-        // SCHEDULED_JOB
-        $this->aggiorna_scheduled_job($id);
-        //echo ">5< ";
-
-        // lancia davvero il CM su Panthera
-        $this->chiama_ws_panthera();
-        if (!$this->checkCM($id)) {
-          print_error(500, 'Il caricamento di massa non è andato a buon fine');
-        }
+        $this->loop_job_panthera($id);
     }
 
     /**
@@ -144,17 +128,8 @@ class CaricamentiMassaManager {
 
         // CM_DOC_TRA_RIG
         $this->creaRigheDocumento($id, $CAU_RIGA_SVUOTA, $codMagazzinoSrc, $codUbicazione, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA);
-        //echo ">4< ";
 
-        // SCHEDULED_JOB
-        $this->aggiorna_scheduled_job($id);
-        //echo ">5< ";
-
-        // lancia davvero il CM su Panthera
-        $this->chiama_ws_panthera();
-        if (!$this->checkCM($id)) {
-          print_error(500, 'Il caricamento di massa non è andato a buon fine');
-        }
+        $this->aggiornaloop_job_panthera_scheduled_job($id);
         
         $ubicazioniManager->updateDatiComuniUbicazione($codUbicazione);
     }
@@ -217,18 +192,8 @@ class CaricamentiMassaManager {
         foreach($codUbicazioniVuote as $codUbicazione) {
           $row = $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazione, $codMagazzinoDest, $codUbicazione, null, null, $row);
         }
-        //echo ">4< ";
 
-        // SCHEDULED_JOB
-        $this->aggiorna_scheduled_job($id);
-        //echo ">5< ";
-
-        // lancia davvero il CM su Panthera
-        $this->chiama_ws_panthera();
-
-        if (!$this->checkCM($id)) {
-          print_error(500, 'Il caricamento di massa non è andato a buon fine');
-        }
+        $this->aggiornaloop_job_panthera_scheduled_job($id);
     }
 
     function creaTestataCaricamento($id) {
@@ -618,5 +583,29 @@ class CaricamentiMassaManager {
         sleep($SLEEP_SECONDI);
       }
       return false;
+    }
+
+    function loop_job_panthera($id) {
+      
+      $semaforo = $sem_get($DATA_ORIGIN);
+
+      if (!sem_acquire($semaforo)) {
+        print_error(500, 'Troppi caricamenti di massa contemporanei, impossibile acquisire il semaforo!');
+      }
+
+      $this->aggiorna_scheduled_job($id);
+
+      $this->chiama_ws_panthera();
+
+      if (!$this->checkCM($id)) {
+        $errore_cm = true;
+      }
+
+      sem_release($semaforo);
+      sem_remove($semaforo);
+
+      if ($errore_cm) {
+        print_error(500, 'Il caricamento di massa non è andato a buon fine');
+      }
     }
 }
