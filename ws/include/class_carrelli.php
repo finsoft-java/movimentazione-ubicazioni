@@ -98,16 +98,6 @@ class CarrelliManager {
       return $countY > 0;
     }
 
-    function check_carrelloUbi($codCarrello,$codUbicazione) {
-      global $panthera, $ID_AZIENDA;
-
-      $sql = "SELECT count(*) FROM THIPPERS.YUBICAZIONI_CARRELLO WHERE R_UBICAZIONE='$codUbicazione' AND ID_CARRELLO='$codCarrello'";
-      $stato = $panthera->select_single_value($sql);
-      if ($stato > 0) {
-        print_error(404, "Ubicazione $codUbicazione già inserita");
-      } 
-    }
-
     function check_carrello($codCarrello) {
       global $panthera, $ID_AZIENDA;
 
@@ -120,6 +110,16 @@ class CarrelliManager {
       }
     }
 
+    function check_ubicazione_associata($codCarrello,$codUbicazione) {
+      global $panthera, $ID_AZIENDA;
+
+      $sql = "SELECT count(*) FROM THIPPERS.YUBICAZIONI_CARRELLO WHERE R_UBICAZIONE='$codUbicazione' AND ID_CARRELLO='$codCarrello' AND ID_AZIENDA='$ID_AZIENDA' ";
+      $cnt = $panthera->select_single_value($sql);
+      if ($cnt > 0) {
+        print_error(404, "Ubicazione $codUbicazione già inserita");
+      } 
+    }
+
     function associa($codCarrello, $codUbicazione) {
       global $panthera, $ID_AZIENDA, $logManager, $ubicazioniManager,$logged_user;
 
@@ -128,13 +128,18 @@ class CarrelliManager {
       }
 
       $this->check_stato_ubicazione($codUbicazione);
-      $sql = "SELECT MAX(PROGRESSIVO) FROM THIPPERS.YUBICAZIONI_CARRELLO WHERE ID_CARRELLO='$codCarrello'";
-      $progressivo = $panthera->select_single_value($sql);
-      if($progressivo == null){
-        $progressivo = 1;
-      } else {
-        $progressivo = $progressivo+1;
+      //check_ubicazione_associata -> va in errore se l'ubicazione è già presente nel carrello
+      $this->check_ubicazione_associata($codCarrello,$codUbicazione);
+
+      $codMagazzinoCarrello = $this->getMagazzinoCarrello($codCarrello);
+      $ubicazione = $ubicazioniManager->getUbicazione($codUbicazione);
+
+      if($codMagazzinoCarrello != $ubicazione['ID_MAGAZZINO']) {
+        print_error(404, "Magazzini incompatibili : $codMagazzinoCarrello - ".$ubicazione['ID_MAGAZZINO']);
       }
+
+      $sql = "SELECT ISNULL(MAX(PROGRESSIVO),0)+1 FROM THIPPERS.YUBICAZIONI_CARRELLO WHERE ID_CARRELLO='$codCarrello'";
+      $progressivo = $panthera->select_single_value($sql);
       $sql = "INSERT INTO THIPPERS.YUBICAZIONI_CARRELLO(ID_AZIENDA, ID_CARRELLO, R_UBICAZIONE, PROGRESSIVO, STATO, R_UTENTE_CRZ, R_UTENTE_AGG) VALUES 
               ('$ID_AZIENDA','$codCarrello','$codUbicazione', '$progressivo', 'V', '{$logged_user->nome_utente}_$ID_AZIENDA','{$logged_user->nome_utente}_$ID_AZIENDA') ";
       $panthera->execute_update($sql);

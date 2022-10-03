@@ -20,16 +20,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($codUbicazione)) {
         print_error(400, "Missing argument codUbicazione");
     }
-    
-    $cnt = $carrelliManager->check_carrelloUbi($codCarrello,$codUbicazione);
-    if($cnt > 0){
-        header('Content-Type: application/json');
-        echo '{"msg":"ERRORE"}';
-    } else { 
-        $carrelliManager->associa($codCarrello, $codUbicazione);        
-        header('Content-Type: application/json');
-        echo '{"msg":"OK"}';
-    }
+    $carrelliManager->check_carrelloUbi($codCarrello,$codUbicazione);
+
+    $carrelliManager->associa($codCarrello, $codUbicazione);        
+    header('Content-Type: application/json');
+    echo '{"msg":"OK"}';    
    
 } else {
     //==========================================================
