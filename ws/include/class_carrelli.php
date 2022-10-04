@@ -58,13 +58,11 @@ class CarrelliManager {
               FROM THIP.UBICAZIONI_LL U
               JOIN THIPPERS.YUBICAZIONI_LL YU
                 ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
-              WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione'
-                ";
+              WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione'";
       $count = $panthera->select_single_value($sql);
       if ($count == 0) {
         print_error(404, "Ubicazione inesistente: $codUbicazione");
       }
-
       $sql = "SELECT COUNT(*)
               FROM THIP.UBICAZIONI_LL U
               JOIN THIPPERS.YUBICAZIONI_LL YU
@@ -75,7 +73,6 @@ class CarrelliManager {
       if ($count == 0) {
         print_error(404, "Ubicazione esistente ma in stato non valido: $codUbicazione");
       }
-
       $sql = "SELECT COUNT(*)
                 FROM THIP.UBICAZIONI_LL U
                 JOIN THIPPERS.YUBICAZIONI_LL YU
@@ -83,6 +80,7 @@ class CarrelliManager {
                 WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND YU.TRASFERIBILE='Y' AND U.STATO='V'
                   ";
       $countY = $panthera->select_single_value($sql);
+      
       $sql = "SELECT COUNT(*)
                 FROM THIP.UBICAZIONI_LL U
                 JOIN THIPPERS.YUBICAZIONI_LL YU
@@ -126,18 +124,15 @@ class CarrelliManager {
       if ($panthera->mock) {
         return;
       }
-
       $this->check_stato_ubicazione($codUbicazione);
       //check_ubicazione_associata -> va in errore se l'ubicazione è già presente nel carrello
       $this->check_ubicazione_associata($codCarrello,$codUbicazione);
 
       $codMagazzinoCarrello = $this->getMagazzinoCarrello($codCarrello);
       $ubicazione = $ubicazioniManager->getUbicazione($codUbicazione);
-
-      if($codMagazzinoCarrello != $ubicazione['ID_MAGAZZINO']) {
+      if($codMagazzinoCarrello != null && ($codMagazzinoCarrello['ID_MAGAZZINO'] != $ubicazione['ID_MAGAZZINO'])) {
         print_error(404, "Magazzini incompatibili : $codMagazzinoCarrello - ".$ubicazione['ID_MAGAZZINO']);
       }
-
       $sql = "SELECT ISNULL(MAX(PROGRESSIVO),0)+1 FROM THIPPERS.YUBICAZIONI_CARRELLO WHERE ID_CARRELLO='$codCarrello'";
       $progressivo = $panthera->select_single_value($sql);
       $sql = "INSERT INTO THIPPERS.YUBICAZIONI_CARRELLO(ID_AZIENDA, ID_CARRELLO, R_UBICAZIONE, PROGRESSIVO, STATO, R_UTENTE_CRZ, R_UTENTE_AGG) VALUES 
@@ -171,12 +166,11 @@ class CarrelliManager {
               WHERE C.ID_AZIENDA='$ID_AZIENDA' AND C.ID_CARRELLO='$codCarrello'
               ORDER BY UC.PROGRESSIVO ";
       $primaUbicazione = $panthera->select_single($sql);
-
       if ($primaUbicazione == null) {
         // carrello vuoto: quindi il magazzino non è definito
         return null;
       }
 
-      return $ubicazioniManager->getUbicazione($primaUbicazione)['ID_MAGAZZINO'];
+      return $ubicazioniManager->getUbicazione($primaUbicazione['R_UBICAZIONE']);
     }
 }

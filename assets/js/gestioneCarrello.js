@@ -17,78 +17,8 @@ $(document).ready(function(){
 });
 
 let ubicazione;
-/*
-
-document.getElementById("qrcode_ubi").addEventListener("keyup", function(event) {
-    this.value = this.value.toUpperCase();
-    console.log("listening to keyup")
-    if (event.keyCode === 13) {
-        ubicazione = $("#qrcode_ubi").val();
-        $.get({
-            url: "./ws/GetUbicazione.php?codUbicazione=" + ubicazione,
-            dataType: 'json',
-            headers: {
-                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
-            },
-            success: function(data, status) {
-
-                const dati = data.value;
-                ubicazioni.push(dati.ID_UBICAZIONE);
-                console.log(ubicazioni);
-                let datiStampati = ""; 
-                
-                $("#appendData").append(datiStampati);
-                if(operazioneCarrello == "associa"){
-                    datiStampati += "<p class='pOsai'> Ubicazione: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
-                    datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati.ID_MAGAZZINO+"</strong></p><hr/>";
-                    $("#btnAssocia").attr("disabled",false);
-                    $("#btnDissocia").attr("disabled",true);
-                } else if(operazioneCarrello == 'disassocia'){
-                    datiStampati += "<p class='pOsai'> Ubicazione: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
-                    datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati.ID_MAGAZZINO+"</strong></p><hr/>";
-                    $("#btnAssocia").attr("disabled",true);
-                    $("#btnDissocia").attr("disabled",false);
-                } else if(operazioneCarrello == 'trasferisci'){
-                    $("#btnAssocia").attr("disabled",true);
-                    $("#btnDissocia").attr("disabled",true);
-                    console.log(ubicazione);
-                    if(!arrUbicazioniDest.includes(ubicazione)) {         
-                        showError("Magazzino non valido");
-                        $("#qrcode").val('');
-                        magazzinoDest = null;
-                        return false;
-                    }
-                    $("#btnTrasferisci").attr("disabled",false);
-                    magazzinoDest = ubicazione;
-                    $("#magazzinoDest").val(ubicazione);
-                    $("#magazzinoDest").trigger("change");
-                    //compare select con tutti i magazzini                    
-                }
-                $("#appendData").append(datiStampati);
-
-            },
-            error: function(data, status){
-                showError(data);
-                $("#qrcode_ubi").val('');
-                ubicazione = null;
-            }
-        });
-    }
-});
-*/
-
 
 function disassocia() {
-    /*
-    $("#qrcode").prop("disabled",true).css("display","none");
-    $("#qrcode_ubi").prop("disabled",false).css("display","block");
-    $("#qrcode_ubi").focus();
-    setInterval(function() {
-        console.log("Focusing");
-        $("#qrcode_ubi").get(0).focus();
-    }, 1000);
-    */
-    
     $("#qrcode").prop("disabled",false);
     timerOn = true;
     $("#qrcode").attr("placeholder","COD UBICAZIONE");
@@ -137,7 +67,7 @@ function trasferisciCarrello() {
     $("#qrcode").prop("disabled",false);
     timerOn = true;
     
-    $("#qrcode").attr("placeholder","COD UBICAZIONE");
+    $("#qrcode").attr("placeholder","COD MAGAZZINO");
     $(".listaOsai").css("display","none");
     $("#btnAssocia").css("display","none");
     $("#btnDissocia").css("display","none");
@@ -184,14 +114,13 @@ function trasferisciCarrello() {
 
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     this.value = this.value.toUpperCase();
-    console.log("listening to keyup")
+
     if (event.keyCode === 13) {
         value = $("#qrcode").val();
+        console.log(contatoreFasi);
         if(contatoreFasi == 0){
-
-
             $.get({
-                url: "./ws/Carrelli.php?codCarrello=" + value,
+                url: "./ws/Carrelli.php?codCarrello=" + value.trim(),
                 dataType: 'json',
                 headers: {
                     'Authorization': 'Bearer ' + sessionStorage.getItem('token')
@@ -222,7 +151,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
         } else {
 
             $.get({
-                url: "./ws/GetUbicazione.php?codUbicazione=" + ubicazione,
+                url: "./ws/GetUbicazione.php?codUbicazione=" + value.trim(),
                 dataType: 'json',
                 headers: {
                     'Authorization': 'Bearer ' + sessionStorage.getItem('token')
@@ -231,7 +160,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
     
                     const dati = data.value;
                     ubicazioni.push(dati.ID_UBICAZIONE);
-                    console.log(ubicazioni);
+                    console.log("aggiungo ubicazione ", ubicazioni);
                     let datiStampati = ""; 
                     
                     $("#appendData").append(datiStampati);
@@ -262,12 +191,13 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         //compare select con tutti i magazzini                    
                     }
                     $("#appendData").append(datiStampati);
-    
+                    $("#qrcode").val('');
                 },
                 error: function(data, status){
                     showError(data);
-                    $("#qrcode_ubi").val('');
+                    $("#qrcode").val('');
                     ubicazione = null;
+                    console.log("ubicazione = ",ubicazione);
                 }
             });
         }
@@ -291,25 +221,31 @@ function confermaAssociazione() {
     for(let i=0; i < ubicazioni.length; i++){
         ub = ubicazioni[i];
         $.post({
-            url: "./ws/Associa.php?codCarrello="+codCarrello+"&codUbicazione=" + ub,
+            url: "./ws/Associa.php?codCarrello="+codCarrello.trim()+"&codUbicazione=" + ub.trim(),
             dataType: 'json',
             headers: {
                 'Authorization': 'Bearer ' + sessionStorage.getItem('token')
             },
             success: function(data, status) {
                 showSuccessMsg("Ubicazione " + ub + " associata con successo al carrello "+codCarrello);
+                //location.reload(true);
                 $("#appendData").html("");
                 ubicazioni = [];
                 $("#btnAssocia").attr("disabled",true);
                 $("#btnDissocia").attr("disabled",true);
                 $("#btnTrasferisci").attr("disabled",true);
-                $("#qrcode_ubi").val("");
                 $("#qrcode").val("");
             },
             error: function(data, status){            
                 console.log("ERRORE in confermaAssociazione", data, status);
                 showError(data);
-                $("#qrcode_ubi").val('');
+                $("#qrcode").val('');
+                $("#btnAssocia").attr("disabled",true);
+                $("#btnDissocia").attr("disabled",true);
+                $("#btnTrasferisci").attr("disabled",true);
+                $("#appendData").html("");
+                ubicazioni = [];
+                console.log("ubicazione = ",ubicazioni);
             }
         });
     }
@@ -332,9 +268,11 @@ function confermaTrasferimento() {
             location.reload(true);
         },
         error: function(data, status){            
-            $("#qrcode_ubi").val("");
+            $("#qrcode").val("");
             console.log("ERRORE in confermaAssociazione", data, status);
             showError(data);
+            ubicazioni = [];
+            console.log("azzero ubicazione = ",ubicazioni);
         }
     });
 }
@@ -351,18 +289,25 @@ function confermaDisassociazione() {
             },
             success: function(data, status) {
                 showSuccessMsg("Ubicazione " + ub + " disassociata con successo dal carrello "+codCarrello);
+                //location.reload(true);
                 $("#appendData").html("");
                 ubicazioni = [];
+                console.log("azzero ubicazione successo = ",ubicazioni);
                 $("#btnAssocia").attr("disabled",true);
                 $("#btnDissocia").attr("disabled",true);
                 $("#btnTrasferisci").attr("disabled",true);
-                $("#qrcode_ubi").val("");
                 $("#qrcode").val("");
             },
             error: function(data, status){            
                 console.log("ERRORE in confermaDisassociazione", data, status);
                 showError(data);
                 $("#qrcode").val('');
+                $("#btnAssocia").attr("disabled",true);
+                $("#btnDissocia").attr("disabled",true);
+                $("#btnTrasferisci").attr("disabled",true);
+                $("#appendData").html("");
+                ubicazioni = [];
+                console.log("azzero ubicazione errore = ",ubicazioni);
             }
         });
     }
