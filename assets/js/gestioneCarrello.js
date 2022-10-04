@@ -4,9 +4,11 @@ let ubicazioni = [];
 let magazzinoDest;
 let codCarrello;
 let arrUbicazioniDest = [];
+let contatoreFasi = 0;
 $(document).ready(function(){
     $(".focus").focus();
     setInterval(function() {
+        console.log(timerOn);
         if(timerOn) {
             console.log("Focusing");
             $("#qrcode").get(0).focus();
@@ -15,6 +17,7 @@ $(document).ready(function(){
 });
 
 let ubicazione;
+/*
 
 document.getElementById("qrcode_ubi").addEventListener("keyup", function(event) {
     this.value = this.value.toUpperCase();
@@ -72,8 +75,11 @@ document.getElementById("qrcode_ubi").addEventListener("keyup", function(event) 
         });
     }
 });
+*/
 
-function associa() {
+
+function disassocia() {
+    /*
     $("#qrcode").prop("disabled",true).css("display","none");
     $("#qrcode_ubi").prop("disabled",false).css("display","block");
     $("#qrcode_ubi").focus();
@@ -81,6 +87,33 @@ function associa() {
         console.log("Focusing");
         $("#qrcode_ubi").get(0).focus();
     }, 1000);
+    */
+    
+    $("#qrcode").prop("disabled",false);
+    timerOn = true;
+    $("#qrcode").attr("placeholder","COD UBICAZIONE");
+    $(".listaOsai").css("display","none");
+    $("#btnAssocia").css("display","none");
+    $("#btnDissocia").css("display","");
+    $("#bottoniStep1").css("display","none");
+    $("#bottoniStep2").css("display","");
+    $(".titleOsai").html("Disassociazione dal carrello");
+    operazioneCarrello = "disassocia";
+} 
+
+function associa() {
+    /*
+    $("#qrcode").prop("disabled",true).css("display","none");
+    $("#qrcode_ubi").prop("disabled",false).css("display","block");
+    $("#qrcode_ubi").focus();
+    setInterval(function() {
+        console.log("Focusing");
+        $("#qrcode_ubi").get(0).focus();
+    }, 1000);
+    */
+    $("#qrcode").prop("disabled",false);
+    timerOn = true;
+    $("#qrcode").attr("placeholder","COD UBICAZIONE");
     $(".listaOsai").css("display","none");
     $("#btnAssocia").css("display","");
     $("#btnDissocia").css("display","none");
@@ -91,6 +124,8 @@ function associa() {
 }
 
 function trasferisciCarrello() {
+    
+    /*
     $("#qrcode").prop("disabled",true).css("display","none");
     $("#qrcode_ubi").prop("disabled",false).css("display","block").attr("placeholder","MAGAZZINO");
     $("#qrcode_ubi").focus();
@@ -98,6 +133,11 @@ function trasferisciCarrello() {
         console.log("Focusing");
         $("#qrcode_ubi").get(0).focus();
     }, 1000);
+    */
+    $("#qrcode").prop("disabled",false);
+    timerOn = true;
+    
+    $("#qrcode").attr("placeholder","COD UBICAZIONE");
     $(".listaOsai").css("display","none");
     $("#btnAssocia").css("display","none");
     $("#btnDissocia").css("display","none");
@@ -130,7 +170,6 @@ function trasferisciCarrello() {
             setTimeout(function() {
                     console.log("appendSelect");
                     $("#appendSelect").html(datiStampati);
-                    $("#qrcode_ubi").val("");
                     $("#qrcode").val("");
             }, 500);
         },
@@ -138,27 +177,9 @@ function trasferisciCarrello() {
             showError(data);
             $(".listaOsai").html("");
             $(".btnCarrello").css('display','none');
-            $("#qrcode_ubi").val("");
-            $("#qrcode").val("");
+            $("#qrcode").val("").attr("placeholder","CODICE CARRELLO");;
         }
     });
-} 
-
-function disassocia() {
-    $("#qrcode").prop("disabled",true).css("display","none");
-    $("#qrcode_ubi").prop("disabled",false).css("display","block");
-    $("#qrcode_ubi").focus();
-    setInterval(function() {
-        console.log("Focusing");
-        $("#qrcode_ubi").get(0).focus();
-    }, 1000);
-    $(".listaOsai").css("display","none");
-    $("#btnAssocia").css("display","none");
-    $("#btnDissocia").css("display","");
-    $("#bottoniStep1").css("display","none");
-    $("#bottoniStep2").css("display","");
-    $(".titleOsai").html("Disassociazione dal carrello");
-    operazioneCarrello = "disassocia";
 } 
 
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
@@ -166,33 +187,90 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
     console.log("listening to keyup")
     if (event.keyCode === 13) {
         value = $("#qrcode").val();
-        $.get({
-            url: "./ws/Carrelli.php?codCarrello=" + value,
-            dataType: 'json',
-            headers: {
-                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
-            },
-            success: function(data, status) {
-                console.log(data);
-                let dati = data["data"];
-                let datiStampati = "";
-                $("#codCarrello").html("<p>Cod Carrello: <strong>" + value + "</strong></p>");
-                codCarrello = value;
-                for(let i = 0; i < Object.keys(dati).length;i++) {
-                    datiStampati += getHtmlArticolo(dati[i]);
+        if(contatoreFasi == 0){
+
+
+            $.get({
+                url: "./ws/Carrelli.php?codCarrello=" + value,
+                dataType: 'json',
+                headers: {
+                    'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                },
+                success: function(data, status) {
+                    console.log(data);
+                    let dati = data["data"];
+                    let datiStampati = "";
+                    $("#codCarrello").html("<p>Cod Carrello: <strong>" + value + "</strong></p>");
+                    codCarrello = value;
+                    for(let i = 0; i < Object.keys(dati).length;i++) {
+                        datiStampati += getHtmlArticolo(dati[i]);
+                    }
+                    $(".listaOsai").html(datiStampati);
+                    $(".btnCarrello").css('display','block');
+                    $("#qrcode").prop("disabled",true);
+                    timerOn = false;
+                },
+                error: function(data, status){
+                    showError(data);
+                    $("#qrcode").val('');
+                    $(".listaOsai").html("");
+                    $(".btnCarrello").css('display','none');
                 }
-                $(".listaOsai").html(datiStampati);
-                $(".btnCarrello").css('display','block');
-                timerOn = false;
-            },
-            error: function(data, status){
-                showError(data);
-                $("#qrcode").val('');
-                $(".listaOsai").html("");
-                $(".btnCarrello").css('display','none');
-            }
-        });
-        $("#qrcode").val("");
+            });
+            $("#qrcode").val("");
+            contatoreFasi = contatoreFasi+1;
+        } else {
+
+            $.get({
+                url: "./ws/GetUbicazione.php?codUbicazione=" + ubicazione,
+                dataType: 'json',
+                headers: {
+                    'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                },
+                success: function(data, status) {
+    
+                    const dati = data.value;
+                    ubicazioni.push(dati.ID_UBICAZIONE);
+                    console.log(ubicazioni);
+                    let datiStampati = ""; 
+                    
+                    $("#appendData").append(datiStampati);
+                    if(operazioneCarrello == "associa"){
+                        datiStampati += "<p class='pOsai'> Ubicazione: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
+                        datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati.ID_MAGAZZINO+"</strong></p><hr/>";
+                        $("#btnAssocia").attr("disabled",false);
+                        $("#btnDissocia").attr("disabled",true);
+                    } else if(operazioneCarrello == 'disassocia'){
+                        datiStampati += "<p class='pOsai'> Ubicazione: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
+                        datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati.ID_MAGAZZINO+"</strong></p><hr/>";
+                        $("#btnAssocia").attr("disabled",true);
+                        $("#btnDissocia").attr("disabled",false);
+                    } else if(operazioneCarrello == 'trasferisci'){
+                        $("#btnAssocia").attr("disabled",true);
+                        $("#btnDissocia").attr("disabled",true);
+                        console.log(ubicazione);
+                        if(!arrUbicazioniDest.includes(ubicazione)) {         
+                            showError("Magazzino non valido");
+                            $("#qrcode").val('');
+                            magazzinoDest = null;
+                            return false;
+                        }
+                        $("#btnTrasferisci").attr("disabled",false);
+                        magazzinoDest = ubicazione;
+                        $("#magazzinoDest").val(ubicazione);
+                        $("#magazzinoDest").trigger("change");
+                        //compare select con tutti i magazzini                    
+                    }
+                    $("#appendData").append(datiStampati);
+    
+                },
+                error: function(data, status){
+                    showError(data);
+                    $("#qrcode_ubi").val('');
+                    ubicazione = null;
+                }
+            });
+        }
     }
 });
 

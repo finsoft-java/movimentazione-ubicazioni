@@ -112,12 +112,12 @@ class CarrelliManager {
 
     function check_ubicazione_associata($codCarrello,$codUbicazione) {
       global $panthera, $ID_AZIENDA;
-
+      if ($panthera->mock) {
+        return 0;
+      }
       $sql = "SELECT count(*) FROM THIPPERS.YUBICAZIONI_CARRELLO WHERE R_UBICAZIONE='$codUbicazione' AND ID_CARRELLO='$codCarrello' AND ID_AZIENDA='$ID_AZIENDA' ";
       $cnt = $panthera->select_single_value($sql);
-      if ($cnt > 0) {
-        print_error(404, "Ubicazione $codUbicazione già inserita");
-      } 
+      return $cnt;
     }
 
     function associa($codCarrello, $codUbicazione) {

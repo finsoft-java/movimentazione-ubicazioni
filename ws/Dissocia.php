@@ -20,6 +20,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($codUbicazione)) {
         print_error(400, "Missing argument codUbicazione");
     }
+    
+    $cnt = $carrelliManager->check_ubicazione_associata($codCarrello,$codUbicazione);
+    if ($cnt < 0) {
+        print_error(404, "Ubicazione $codUbicazione non presente nel carrello");
+    } 
     $carrelliManager->dissocia($codCarrello, $codUbicazione);
     
         
