@@ -129,7 +129,7 @@ class CaricamentiMassaManager {
         // CM_DOC_TRA_RIG
         $this->creaRigheDocumento($id, $CAU_RIGA_SVUOTA, $codMagazzinoSrc, $codUbicazione, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA);
 
-        $this->aggiornaloop_job_panthera_scheduled_job($id);
+        $this->loop_job_panthera($id);
         
         $ubicazioniManager->updateDatiComuniUbicazione($codUbicazione);
     }
@@ -162,7 +162,7 @@ class CaricamentiMassaManager {
           if (!$trasferibile) {
             print_error(404, "Ubicazione dichiarata non trasferibile: $codUbicazione");
           }
-          $ubi1 = $ubicazioniManager->getUbicazione();
+          $ubi1 = $ubicazioniManager->getUbicazione($codUbicazione);
           $contenuto = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
           if (empty($contenuto) || count($contenuto) == 0) {
             $codUbicazioniVuote[] = $codUbicazione;
@@ -170,7 +170,6 @@ class CaricamentiMassaManager {
             $codUbicazioniNonVuote[] = $codUbicazione;
           }
         }
-        echo'p6';
         foreach($codUbicazioniVuote as $codUbicazione) {
           $this->trasferisciUbicazioneVuota($codUbicazione, $codMagazzinoDest);
         }
@@ -192,8 +191,7 @@ class CaricamentiMassaManager {
         foreach($codUbicazioniVuote as $codUbicazione) {
           $row = $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazione, $codMagazzinoDest, $codUbicazione, null, null, $row);
         }
-
-        $this->aggiornaloop_job_panthera_scheduled_job($id);
+        $this->loop_job_panthera($id);
     }
 
     function creaTestataCaricamento($id) {
@@ -542,6 +540,10 @@ class CaricamentiMassaManager {
       ];
       $separatore = "',CHAR(18),'";
       $par_joined = "CONCAT('" . join($separatore, $parametri) . "',CHAR(18))";
+      if($logged_user->nome_utente == "finsoft"){
+        $logged_user->nome_utente = "lmarosaitest";
+        $ID_AZIENDA = "001";
+      }
       $sql = "UPDATE THERA.SCHEDULED_JOB
               SET JOB_PARAMETERS=$par_joined, USER_ID='{$logged_user->nome_utente}_$ID_AZIENDA'
               WHERE SCHEDULED_JOB_ID='$COD_SCHEDULED_JOB'";
@@ -586,21 +588,15 @@ class CaricamentiMassaManager {
     }
 
     function loop_job_panthera($id) {
-      
-      $semaforo = $sem_get($DATA_ORIGIN);
-
+      $semaforo = sem_get($DATA_ORIGIN);
       if (!sem_acquire($semaforo)) {
         print_error(500, 'Troppi caricamenti di massa contemporanei, impossibile acquisire il semaforo!');
       }
-
       $this->aggiorna_scheduled_job($id);
-
       $this->chiama_ws_panthera();
-
       if (!$this->checkCM($id)) {
         $errore_cm = true;
       }
-
       sem_release($semaforo);
       sem_remove($semaforo);
 

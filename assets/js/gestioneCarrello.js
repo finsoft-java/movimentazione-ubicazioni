@@ -16,6 +16,67 @@ $(document).ready(function(){
     }, 1000);
 });
 
+/*
+
+document.getElementById("qrcode_ubi").addEventListener("keyup", function(event) {
+    this.value = this.value.toUpperCase();
+    console.log("listening to keyup")
+    if (event.keyCode === 13) {
+        ubicazione = $("#qrcode_ubi").val();
+        $.get({
+            url: "./ws/GetUbicazione.php?codUbicazione=" + ubicazione,
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+            },
+            success: function(data, status) {
+
+                const dati = data.value;
+                ubicazioni.push(dati.ID_UBICAZIONE);
+                console.log(ubicazioni);
+                let datiStampati = ""; 
+                
+                $("#appendData").append(datiStampati);
+                if(operazioneCarrello == "associa"){
+                    datiStampati += "<p class='pOsai'> Ubicazione: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
+                    datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati.ID_MAGAZZINO+"</strong></p><hr/>";
+                    $("#btnAssocia").attr("disabled",false);
+                    $("#btnDissocia").attr("disabled",true);
+                } else if(operazioneCarrello == 'disassocia'){
+                    datiStampati += "<p class='pOsai'> Ubicazione: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
+                    datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati.ID_MAGAZZINO+"</strong></p><hr/>";
+                    $("#btnAssocia").attr("disabled",true);
+                    $("#btnDissocia").attr("disabled",false);
+                } else if(operazioneCarrello == 'trasferisci'){
+                    $("#btnAssocia").attr("disabled",true);
+                    $("#btnDissocia").attr("disabled",true);
+                    console.log(ubicazione);
+                    if(!arrUbicazioniDest.includes(ubicazione)) {         
+                        showError("Magazzino non valido");
+                        $("#qrcode").val('');
+                        magazzinoDest = null;
+                        return false;
+                    }
+                    $("#btnTrasferisci").attr("disabled",false);
+                    magazzinoDest = ubicazione;
+                    $("#magazzinoDest").val(ubicazione);
+                    $("#magazzinoDest").trigger("change");
+                    //compare select con tutti i magazzini                    
+                }
+                $("#appendData").append(datiStampati);
+
+            },
+            error: function(data, status){
+                showError(data);
+                $("#qrcode_ubi").val('');
+                ubicazione = null;
+            }
+        });
+    }
+});
+*/
+
+
 let ubicazione;
 
 function disassocia() {
@@ -149,57 +210,77 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             $("#qrcode").val("");
             contatoreFasi = contatoreFasi+1;
         } else {
-
-            $.get({
-                url: "./ws/GetUbicazione.php?codUbicazione=" + value.trim(),
-                dataType: 'json',
-                headers: {
-                    'Authorization': 'Bearer ' + sessionStorage.getItem('token')
-                },
-                success: function(data, status) {
-    
-                    const dati = data.value;
-                    ubicazioni.push(dati.ID_UBICAZIONE);
-                    console.log("aggiungo ubicazione ", ubicazioni);
-                    let datiStampati = ""; 
-                    
-                    $("#appendData").append(datiStampati);
-                    if(operazioneCarrello == "associa"){
-                        datiStampati += "<p class='pOsai'> Ubicazione: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
-                        datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati.ID_MAGAZZINO+"</strong></p><hr/>";
-                        $("#btnAssocia").attr("disabled",false);
-                        $("#btnDissocia").attr("disabled",true);
-                    } else if(operazioneCarrello == 'disassocia'){
-                        datiStampati += "<p class='pOsai'> Ubicazione: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
-                        datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati.ID_MAGAZZINO+"</strong></p><hr/>";
-                        $("#btnAssocia").attr("disabled",true);
-                        $("#btnDissocia").attr("disabled",false);
-                    } else if(operazioneCarrello == 'trasferisci'){
-                        $("#btnAssocia").attr("disabled",true);
-                        $("#btnDissocia").attr("disabled",true);
-                        console.log(ubicazione);
-                        if(!arrUbicazioniDest.includes(ubicazione)) {         
-                            showError("Magazzino non valido");
-                            $("#qrcode").val('');
-                            magazzinoDest = null;
-                            return false;
-                        }
-                        $("#btnTrasferisci").attr("disabled",false);
-                        magazzinoDest = ubicazione;
-                        $("#magazzinoDest").val(ubicazione);
-                        $("#magazzinoDest").trigger("change");
-                        //compare select con tutti i magazzini                    
-                    }
-                    $("#appendData").append(datiStampati);
+            if(operazioneCarrello == 'trasferisci'){
+                $("#btnAssocia").attr("disabled",true);
+                $("#btnDissocia").attr("disabled",true);
+                if(!arrUbicazioniDest.includes(this.value)) {         
+                    showError("Magazzino non valido");
                     $("#qrcode").val('');
-                },
-                error: function(data, status){
-                    showError(data);
-                    $("#qrcode").val('');
-                    ubicazione = null;
-                    console.log("ubicazione = ",ubicazione);
+                    magazzinoDest = null;
+                    return false;
                 }
-            });
+                $("#btnTrasferisci").attr("disabled",false);
+                magazzinoDest = this.value;
+                $("#magazzinoDest").val(this.value);
+                $("#magazzinoDest").trigger("change");
+                //compare select con tutti i magazzini                    
+            
+                $("#appendData").append(datiStampati);
+                $("#qrcode").val('');    
+            } else {
+
+                
+                $.get({
+                    url: "./ws/GetUbicazione.php?codUbicazione=" + value.trim(),
+                    dataType: 'json',
+                    headers: {
+                        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                    },
+                    success: function(data, status) {
+        
+                        const dati = data.value;
+                        ubicazioni.push(dati.ID_UBICAZIONE);
+                        console.log("aggiungo ubicazione ", ubicazioni);
+                        let datiStampati = ""; 
+                        
+                        $("#appendData").append(datiStampati);
+                        if(operazioneCarrello == "associa"){
+                            datiStampati += "<p class='pOsai'> Ubicazione: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
+                            datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati.ID_MAGAZZINO+"</strong></p><hr/>";
+                            $("#btnAssocia").attr("disabled",false);
+                            $("#btnDissocia").attr("disabled",true);
+                        } else if(operazioneCarrello == 'disassocia'){
+                            datiStampati += "<p class='pOsai'> Ubicazione: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
+                            datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati.ID_MAGAZZINO+"</strong></p><hr/>";
+                            $("#btnAssocia").attr("disabled",true);
+                            $("#btnDissocia").attr("disabled",false);
+                        } else if(operazioneCarrello == 'trasferisci'){
+                            $("#btnAssocia").attr("disabled",true);
+                            $("#btnDissocia").attr("disabled",true);
+                            console.log(ubicazione);
+                            if(!arrUbicazioniDest.includes(dati.ID_MAGAZZINO)) {         
+                                showError("Magazzino non valido");
+                                $("#qrcode").val('');
+                                magazzinoDest = null;
+                                return false;
+                            }
+                            $("#btnTrasferisci").attr("disabled",false);
+                            magazzinoDest = ubicazione;
+                            $("#magazzinoDest").val(dati.ID_MAGAZZINO);
+                            $("#magazzinoDest").trigger("change");
+                            //compare select con tutti i magazzini                    
+                        }
+                        $("#appendData").append(datiStampati);
+                        $("#qrcode").val('');
+                    },
+                    error: function(data, status){
+                        showError(data);
+                        $("#qrcode").val('');
+                        ubicazione = null;
+                        console.log("ubicazione = ",ubicazione);
+                    }
+                });
+            }
         }
     }
 });
