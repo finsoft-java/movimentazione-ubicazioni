@@ -98,7 +98,7 @@ class CaricamentiMassaManager {
 
         // CM_DOC_TRA_RIG
         //importante passare commessa
-        $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty, $commessa);
+        $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty, 0, $commessa);
         //echo ">4< ";
 
         $this->loop_job_panthera($id);
@@ -511,7 +511,7 @@ class CaricamentiMassaManager {
         }
       }
 
-      // echo $sql; die();
+      //echo $sql; die();
 
       $panthera->execute_update($sql);
 
