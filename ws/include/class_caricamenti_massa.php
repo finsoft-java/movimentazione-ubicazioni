@@ -68,7 +68,7 @@ class CaricamentiMassaManager {
      */
 
     //da aggiungere commessa
-    function trasferisciArticolo($codUbicazioneSrc, $codUbicazioneDest, $articolo, $qty) {
+    function trasferisciArticolo($codUbicazioneSrc, $codUbicazioneDest, $articolo, $qty, $commessa) {
         global $panthera, $ubicazioniManager, $CAU_TESTATA, $CAU_RIGA;
 
         if ($panthera->mock) {
@@ -98,7 +98,7 @@ class CaricamentiMassaManager {
 
         // CM_DOC_TRA_RIG
         //importante passare commessa
-        $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty);
+        $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty, $commessa);
         //echo ">4< ";
 
         $this->loop_job_panthera($id);

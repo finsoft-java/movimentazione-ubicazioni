@@ -121,17 +121,33 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     }
                     maxQty = dati[0].QTA_GIAC_PRM;
                     let datiStampati = ""; 
-                        datiStampati += "<p class='pOsai'> Ubicazione di partenza: <strong>"+dati[0].ID_UBICAZIONE+"</strong></p>";
-                        datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
-                        datiStampati += "<p class='pOsai'> Ubicazione dest.: <strong>" + ubicazioneDest + " </strong> </p>";
-                        datiStampati += "<p class='pOsai'> Articolo: <strong>"+dati[0].ID_ARTICOLO+"</strong></p>";
-                        datiStampati += "<p class='pOsai'> Disegno: <strong>"+dati[0].DISEGNO+"</strong> </p>";
-                        datiStampati += "<p class='pOsai'> Descrizione: <strong>"+dati[0].DESCRIZIONE+"</strong> </p>";
-                        datiStampati += "<div class='input-group inputDiv'>  <div class='input-group-prepend'><button class='btn btnInputForm btnMinus' type='button' onClick='minus()'>-</button></div>";
-                        datiStampati += "<input type='number' class='form-control inputOsai' onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='0.001' max='" + dati[0].QTA_GIAC_PRM + "' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
-                        datiStampati += "<div class='input-group-append'><button class='btn btnInputForm btnPlus' type='button' onClick='plus("+maxQty+")'>+</button></div>";
-                        datiStampati += "<button class='btn btnInputForm btnAll' type='button' onClick='selezionaTutti("+maxQty+")'> Tutti </button></div>";
-                        datiStampati += "<p class='pOsai'> Quantita Totale: <strong>"+dati[0].QTA_GIAC_PRM+ " "+ dati[0].R_UM_PRM_MAG +"</strong> </p>";
+                    let arrayCommessa = [];
+                    let optCommessa = "";
+                    optCommessa += "<select id='selectCommessa' class='form-control'>";
+                    let nomeCommessa = "";
+                    for(let i = 0; i < dati.length; i++){
+                        if(dati[i].ID_COMMESSA == null){
+                            arrayCommessa.push("-");
+                            nomeCommessa = "-";                            
+                        } else {
+                            nomeCommessa = dati[i].ID_COMMESSA;
+                            arrayCommessa.push(dati[i].ID_COMMESSA);
+                        }
+                        optCommessa += "<option value='"+dati[i].QTA_GIAC_PRM+"' data-prm='"+dati[i].R_UM_PRM_MAG+"'>"+nomeCommessa+"</option>";
+                    }
+                    optCommessa += "</select>";
+                    datiStampati += "<p class='pOsai'> Ubicazione di partenza: <strong>"+dati[0].ID_UBICAZIONE+"</strong></p>";
+                    datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
+                    datiStampati += "<p class='pOsai'> Ubicazione dest.: <strong>" + ubicazioneDest + " </strong> </p>";
+                    datiStampati += "<p class='pOsai'> Articolo: <strong>"+dati[0].ID_ARTICOLO+"</strong></p>";
+                    datiStampati += "<p class='pOsai'> Disegno: <strong>"+dati[0].DISEGNO+"</strong> </p>";
+                    datiStampati += "<p class='pOsai'> Descrizione: <strong>"+dati[0].DESCRIZIONE+"</strong> </p>";
+                    datiStampati += "<p class='pOsai'> Commessa:  </p>"+optCommessa;
+                    datiStampati += "<div class='input-group inputDiv'>  <div class='input-group-prepend'><button class='btn btnInputForm btnMinus' type='button' onClick='minus()'>-</button></div>";
+                    datiStampati += "<input type='number' class='form-control inputOsai' disabled onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='0.001' max='' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
+                    datiStampati += "<div class='input-group-append'><button class='btn btnInputForm btnPlus' type='button' onClick=''>+</button></div>";
+                    datiStampati += "<button class='btn btnInputForm btnAll' type='button' onClick=''> Tutti </button></div>";
+                    datiStampati += "<p class='pOsai'> Quantita Totale: <strong id='commessaQty'></strong> </p>";
                     $("#appendData").html(datiStampati);
                 },
                 error: function(data, status){
@@ -146,6 +162,13 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             $("#qrcode").val("");
         }
     }
+});
+
+$(document).on("change", "#selectCommessa", function(){
+    $("#commessaQty").html($(this).val()+" "+$(this).find('option:selected').data('prm'));
+    $("#qty").attr("max",$(this).val()).attr("disabled",false);
+    $(".btnPlus").attr('onClick','plus('+$(this).val()+')');
+    $(".btnAll").attr('onClick','selezionaTutti('+$(this).val()+')');    
 });
 
 // $(document).on('input', 'input[type=number]', checkQty);
@@ -176,7 +199,7 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
     $("#btnRipeti").attr('disabled',true);
 
     $.post({
-        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + qty  + "&codUbicazioneDest=" +ubicazioneDest,
+        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + qty  + "&codUbicazioneDest=" +ubicazioneDest+ "&commessa=" +$("#selectCommessa").val(),
         dataType: 'json',
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
