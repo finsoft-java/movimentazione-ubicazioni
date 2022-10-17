@@ -115,7 +115,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     let dati = data["data"];
                     if(dati == null || dati.length === 0) {
                         showError("Articolo inesistente si prega di riprovare");
-                        $("#qrcode").val("").attr('placeholder','ARTICOLO');
+                        $("#qrcode").val("").attr('placeholder','ARTICOLO').attr('disabled',false);
                         i=2;
                         return false;
                     }
@@ -137,7 +137,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 error: function(data, status){
                     console.log("ERRORE in i == 3 trasferimentoArticoli", data);
                     showError(data);
-                    $("#qrcode").val('');
+                    $("#qrcode").val('').attr('disabled',false);
                     i=2;
                     $("#btnTrasferimento").attr('disabled',true);
                     $("#btnRipeti").attr('disabled',true);

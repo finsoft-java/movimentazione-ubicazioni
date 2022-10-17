@@ -62,7 +62,7 @@ function getHtmlArticolo(x) {
     return "<p>Articolo: <strong>" + x.ID_ARTICOLO + "</strong> | Quantita: <strong>" + x.QTA_GIAC_PRM + " " + x.R_UM_PRM_MAG + "</strong></p>"
         + "<p>Disegno: <strong>" + x.DISEGNO + "</strong></p>"
         + "<p>Descrizione: <strong>" + x.DESCRIZIONE + "</strong></p>"
-        + (x.ID_COMMESSA ? "<p>Commessa: <strong>" + x.ID_COMMESSA + "</strong></p>" : "")
+        + (x.ID_COMMESSA ? "<p>Commessa: <strong>" + x.ID_COMMESSA + "</strong></p>" : "<p>Commessa: <strong> - </strong></p>")
         + "<hr/>";
 }
 

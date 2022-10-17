@@ -44,7 +44,7 @@ class UbicazioniManager {
                   WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND S.ID_ARTICOLO='$codArticolo' $str_trasferibile AND U.STATO='V' AND S.QTA_GIAC_PRM>0 ";
           
           $sql3 = " ORDER BY S.ID_ARTICOLO";
-          $count = $panthera->select_single_value($sql0 . $sql2);
+         $count = $panthera->select_single_value($sql0 . $sql2);
           $data = $panthera->select_list($sql1 . $sql2 . $sql3);
       }
       

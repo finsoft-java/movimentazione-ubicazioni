@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($codUbicazioneDest)) {
         print_error(400, "Missing argument codUbicazioneDest");
     }
-
+    //da aggiungere anche la commessa
     $caricamentiMassaManager->trasferisciArticolo($codUbicazione, $codUbicazioneDest, $codArticolo, $qty);
     
     header('Content-Type: application/json');

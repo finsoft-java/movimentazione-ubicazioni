@@ -66,6 +66,8 @@ class CaricamentiMassaManager {
     /**
      * FUNZIONE "Trasferisci articolo da una ubicazione a un'altra"
      */
+
+    //da aggiungere commessa
     function trasferisciArticolo($codUbicazioneSrc, $codUbicazioneDest, $articolo, $qty) {
         global $panthera, $ubicazioniManager, $CAU_TESTATA, $CAU_RIGA;
 
@@ -95,6 +97,7 @@ class CaricamentiMassaManager {
         //echo ">3< ";
 
         // CM_DOC_TRA_RIG
+        //importante passare commessa
         $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty);
         //echo ">4< ";
 
@@ -355,8 +358,9 @@ class CaricamentiMassaManager {
         $panthera->execute_update($sql);
     }
 
+    //aggiungere commessa 
     function creaRigheDocumento($id, $cauRiga, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest,
-                                                              $codUbicazioneDest, $articolo=null, $qty=null, $baseRowIndex=0) {
+                                                              $codUbicazioneDest, $articolo=null, $qty=null, $baseRowIndex=0, $commessa=null) {
       global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $logged_user;
 
       if (empty($articolo) || empty($qty)) {
@@ -500,6 +504,11 @@ class CaricamentiMassaManager {
 
       if (!empty($articolo)) {
         $sql .= " AND S.ID_ARTICOLO='$articolo' ";
+        if (!empty($commessa)) {
+          $sql .= " AND S.ID_COMMESSA='$commessa' ";
+        } else {
+          $sql .= " AND S.ID_COMMESSA IS NULL ";
+        }
       }
 
       // echo $sql; die();
