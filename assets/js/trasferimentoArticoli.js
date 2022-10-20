@@ -125,6 +125,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     let optCommessa = "";
                     optCommessa += "<select id='selectCommessa' class='form-control'>";
                     let nomeCommessa = "";
+                    let giacenzaIniziale = 0;
                     for(let i = 0; i < dati.length; i++){
                         if(dati[i].ID_COMMESSA == null){
                             arrayCommessa.push("-");
@@ -132,6 +133,9 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         } else {
                             nomeCommessa = dati[i].ID_COMMESSA;
                             arrayCommessa.push(dati[i].ID_COMMESSA);
+                        }
+                        if(i == 0){
+                            giacenzaIniziale = dati[i].QTA_GIAC_PRM;
                         }
                         optCommessa += "<option value='"+dati[i].QTA_GIAC_PRM+"' data-prm='"+dati[i].R_UM_PRM_MAG+"'>"+nomeCommessa+"</option>";
                     }
@@ -144,10 +148,10 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     datiStampati += "<p class='pOsai'> Descrizione: <strong>"+dati[0].DESCRIZIONE+"</strong> </p>";
                     datiStampati += "<p class='pOsai'> Commessa:  </p>"+optCommessa;
                     datiStampati += "<div class='input-group inputDiv'>  <div class='input-group-prepend'><button class='btn btnInputForm btnMinus' type='button' onClick='minus()'>-</button></div>";
-                    datiStampati += "<input type='number' class='form-control inputOsai' disabled onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='0.001' max='' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
-                    datiStampati += "<div class='input-group-append'><button class='btn btnInputForm btnPlus' type='button' onClick=''>+</button></div>";
-                    datiStampati += "<button class='btn btnInputForm btnAll' type='button' onClick=''> Tutti </button></div>";
-                    datiStampati += "<p class='pOsai'> Quantita Totale: <strong id='commessaQty'></strong> </p>";
+                    datiStampati += "<input type='number' class='form-control inputOsai' disabled onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='0.001' max='"+giacenzaIniziale+"' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
+                    datiStampati += "<div class='input-group-append'><button class='btn btnInputForm btnPlus' type='button' onClick='plus("+giacenzaIniziale+")'>+</button></div>";
+                    datiStampati += "<button class='btn btnInputForm btnAll' type='button' onClick='selezionaTutti("+giacenzaIniziale+")'> Tutti </button></div>";
+                    datiStampati += "<p class='pOsai'> Quantita Totale: <strong id='commessaQty'>"+giacenzaIniziale+"</strong> </p>";
                     $("#appendData").html(datiStampati);
                 },
                 error: function(data, status){

@@ -197,8 +197,9 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     }
                     $(".listaOsai").html(datiStampati);
                     $(".btnCarrello").css('display','block');
-                    $("#qrcode").prop("disabled",true);
+                    $("#qrcode").prop("disabled",true).val('');
                     timerOn = false;
+                    contatoreFasi = contatoreFasi+1;
                 },
                 error: function(data, status){
                     showError(data);
@@ -207,8 +208,6 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     $(".btnCarrello").css('display','none');
                 }
             });
-            $("#qrcode").val("");
-            contatoreFasi = contatoreFasi+1;
         } else {
             if(operazioneCarrello == 'trasferisci'){
                 $("#btnAssocia").attr("disabled",true);
@@ -309,9 +308,37 @@ function confermaAssociazione() {
             },
             success: function(data, status) {
                 showSuccessMsg("Ubicazione " + ub + " associata con successo al carrello "+codCarrello);
-                //location.reload(true);
+                
+                
                 $("#appendData").html("");
                 ubicazioni = [];
+                $.get({
+                    url: "./ws/Carrelli.php?codCarrello=" + codCarrello,
+                    dataType: 'json',
+                    headers: {
+                        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                    },
+                    success: function(data, status) {
+                        let dati = data["data"];
+                        let datiStampati = "";
+                        $("#codCarrello").html("<p>Cod Carrello: <strong>" + codCarrello + "</strong></p>");
+                        for(let i = 0; i < Object.keys(dati).length;i++) {
+                            datiStampati += getHtmlArticolo(dati[i]);
+                        }
+                        $(".listaOsai").html(datiStampati).css("display","block");
+                        $(".btnCarrello").css('display','block');
+                        $("#qrcode").prop("disabled",true).val('');
+                    },
+                    error: function(data, status){
+                        showError(data);
+                        $("#qrcode").val('');
+                        $(".listaOsai").html("");
+                        $(".btnCarrello").css('display','none');
+                    }
+                });
+                
+                $("#bottoniStep2").css("display","none");
+                $("#bottoniStep1").css("display","block");
                 $("#btnAssocia").attr("disabled",true);
                 $("#btnDissocia").attr("disabled",true);
                 $("#btnTrasferisci").attr("disabled",true);
@@ -370,7 +397,36 @@ function confermaDisassociazione() {
             },
             success: function(data, status) {
                 showSuccessMsg("Ubicazione " + ub + " disassociata con successo dal carrello "+codCarrello);
-                //location.reload(true);
+                $("#appendData").html("");
+                ubicazioni = [];
+                $.get({
+                    url: "./ws/Carrelli.php?codCarrello=" + codCarrello,
+                    dataType: 'json',
+                    headers: {
+                        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                    },
+                    success: function(data, status) {
+                        let dati = data["data"];
+                        let datiStampati = "";
+                        $("#codCarrello").html("<p>Cod Carrello: <strong>" + codCarrello + "</strong></p>");
+                        for(let i = 0; i < Object.keys(dati).length;i++) {
+                            datiStampati += getHtmlArticolo(dati[i]);
+                        }
+                        $(".listaOsai").html(datiStampati).css("display","block");
+                        $(".btnCarrello").css('display','block');
+                        $("#qrcode").prop("disabled",true).val('');
+                    },
+                    error: function(data, status){
+                        showError(data);
+                        $("#qrcode").val('');
+                        $(".listaOsai").html("");
+                        $(".btnCarrello").css('display','none');
+                    }
+                });
+                
+                $("#bottoniStep2").css("display","none");
+                $("#bottoniStep1").css("display","block");
+
                 $("#appendData").html("");
                 ubicazioni = [];
                 console.log("azzero ubicazione successo = ",ubicazioni);

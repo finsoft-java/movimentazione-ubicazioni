@@ -16,16 +16,17 @@ class CaricamentiMassaManager {
         if ($panthera->mock) {
             return;
         }
-
         $ubi1 = $ubicazioniManager->getUbicazione($codUbicazione);
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
 
-        $trasferibile = $ubicazioniManager->checkUbicazione($codUbicazione);
+
+        $trasferibile = $ubicazioniManager->check_stato_ubicazione($codUbicazione);
         if (!$trasferibile) {
           print_error(404, "Ubicazione dichiarata non trasferibile: $codUbicazione");
         }
-
+        
         $id = $panthera->get_numeratore('MOVUBI');  
+        
         $magazziniManager->checkMagazzino($codMagazzinoDest);
         // l'algoritmo cambia a seconda che l'ubicazione sia piena o vuota
         $contenuto = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
@@ -160,7 +161,6 @@ class CaricamentiMassaManager {
         $codUbicazioniNonVuote = [];
         foreach($carrello as $c) {
           $codUbicazione = $c['R_UBICAZIONE'];
-          //$trasferibile = $ubicazioniManager->checkUbicazione($codUbicazione);
           $trasferibile = $ubicazioniManager->check_stato_ubicazione($codUbicazione);
           if (!$trasferibile) {
             print_error(404, "Ubicazione dichiarata non trasferibile: $codUbicazione");
@@ -362,7 +362,7 @@ class CaricamentiMassaManager {
     function creaRigheDocumento($id, $cauRiga, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest,
                                                               $codUbicazioneDest, $articolo=null, $qty=null, $baseRowIndex=0, $commessa=null) {
       global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $logged_user;
-
+      
       if (empty($articolo) || empty($qty)) {
         $qty = 'S.QTA_GIAC_PRM';
         $qtySec = 'S.QTA_GIAC_SEC';
