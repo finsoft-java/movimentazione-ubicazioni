@@ -20,6 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($codUbicazione)) {
         print_error(400, "Missing argument codUbicazione");
     }
+    $trasferibile = $ubicazioniManager->check_stato_ubicazione($codUbicazione);
+    if (!$trasferibile) {
+        print_error(404, "Ubicazione dichiarata non trasferibile: $codUbicazione");
+    }
     $cnt = $carrelliManager->check_ubicazione_associata($codCarrello,$codUbicazione);
     if ($cnt > 0) {
         print_error(404, "Ubicazione $codUbicazione già inserita");

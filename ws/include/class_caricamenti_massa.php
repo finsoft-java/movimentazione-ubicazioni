@@ -191,7 +191,7 @@ class CaricamentiMassaManager {
  
         // CM_DOC_TRA_RIG
         $row = 0;
-        foreach($codUbicazioniVuote as $codUbicazione) {
+        foreach($codUbicazioniNonVuote as $codUbicazione) {
           $row = $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazione, $codMagazzinoDest, $codUbicazione, null, null, $row);
         }
         $this->loop_job_panthera($id);
@@ -551,6 +551,7 @@ class CaricamentiMassaManager {
       $par_joined = "CONCAT('" . join($separatore, $parametri) . "',CHAR(18))";
       if($logged_user->nome_utente == "finsoft"){
         $logged_user->nome_utente = "lmarosaitest";
+        //$logged_user->nome_utente = "latzosai";
         $ID_AZIENDA = "001";
       }
       $sql = "UPDATE THERA.SCHEDULED_JOB
@@ -592,6 +593,9 @@ class CaricamentiMassaManager {
           return true;
         }
         sleep($SLEEP_SECONDI);
+      }
+      if($l["TOTAL_RECS"] == null){
+        print_error(500, 'Impossibile avviare il caricamento di massa. Privilegi utente mancanti?');
       }
       return false;
     }
