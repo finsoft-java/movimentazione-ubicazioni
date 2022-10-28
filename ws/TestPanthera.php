@@ -19,22 +19,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     
 // DO NOT require_logged_user_JWT();
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    //==========================================================
-
-
 
 $panthera->execute_update("SET ANSI_WARNINGS OFF");
 
-    $query_exec = "
-DELETE FROM THIP.CM_DOC_TRA_TES;
-  
-";
-	//$panthera->execute_update($query_exec);
-
-    $query = "
+$query = "
 --SELECT * from INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'THERA' ORDER BY TABLE_TYPE, TABLE_NAME
---SELECT * from INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'THIPPERS' and TABLE_NAME='YUBICAZIONI_CARRELLO'
+--SELECT * from INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'THIP' and TABLE_NAME='DOC_TRA_TES'
 --SELECT MAX(PROGRESSIVO) FROM THIPPERS.YUBICAZIONI_CARRELLO WHERE ID_CARRELLO='A01'
 --SELECT count(*) FROM THIPPERS.YUBICAZIONI_CARRELLO WHERE R_UBICAZIONE='PL-0001' AND ID_CARRELLO='A01'
 --SELECT * FROM THERA.NUMERATOR WHERE NUMERATOR_ID='MOVUBI'
@@ -42,22 +32,50 @@ DELETE FROM THIP.CM_DOC_TRA_TES;
 --SELECT * FROM THERA.SCHEDULED_JOB;
 --SELECT TOP 100 * FROM THIP.SALDI_UBICAZIONE
 --SELECT * FROM THIPPERS.YUBICAZIONI_CARRELLO; --WHERE R_UBICAZIONE='PL-0001' AND ID_CARRELLO='A01' AND ID_AZIENDA='001';
---SELECT TOP 10 * from THIP.CM_DOC_TRA_TES  WHERE RUN_ID >= 193 ORDER BY RUN_ID DESC
-SELECT TOP 10 * from THIP.CM_DOC_TRA_RIG WHERE RUN_ID >= 193 ORDER BY RUN_ID DESC
+--SELECT TOP 10 * from THIP.CM_DOC_TRA_TES WHERE RUN_ID >= 193 ORDER BY RUN_ID DESC
+SELECT TOP 10 * from THIP.CM_DOC_TRA_RIG WHERE ID_NUMERO_DOC='DT  000173' --RUN_ID >= 193 ORDER BY RUN_ID DESC
 --SELECT * FROM THIPPERS.YCARRELLO 
 --SELECT * FROM THIPPERS.YUBICAZIONI_CARRELLO C 
 --WHERE C.ID_AZIENDA='001' AND C.ID_CARRELLO='A01'
+--SELECT TOP 10 * FROM THIP.DOC_TRA_RIG  WHERE ID_ANNO_DOC='2022'  AND ID_NUMERO_DOC='DT  000173'   --
+--SELECT TOP 10 * from THIP.CM_DOC_TRA_TES  WHERE RUN_ID=217  --ID_ANNO_DOC='2022'  AND ID_NUMERO_DOC='DT  000173'
+--update THIP.CM_DOC_TRA_RIG set RUN_ID=217 where RUN_ID=0 AND DATA_ORIGIN='CM-MOV-UBI';
 ";
-//echo $query;die();
-    $result = $panthera->select_list($query);
 
-    //header('Content-Type: application/json');
-    //echo json_encode(['data' => $result]);
-	echo "<html>" . print_query_html($result) . "</html>";
+?>
 
-} else {
-    //==========================================================
-    print_error(405, "Unsupported method in request: " . $_SERVER['REQUEST_METHOD']);
+<html>
+<body>
+<div style="margin:5px">
+	<form id="mainForm" action="./TestPanthera.php" method="POST">
+	<textarea style="width:100%;height:4cm" name="query">
+<?php echo $query; ?>
+
+
+    </textarea>
+	<input type="hidden" value="0" id="update" name="update"/>
+	</form>
+	<button type="button" onclick="document.getElementById('update').value='0';document.getElementById('mainForm').submit();">Execute SELECT</button>
+	<button type="button" onclick="document.getElementById('update').value='1';document.getElementById('mainForm').submit();">Execute UPDATE</button>
+</div>
+
+<?php
+
+if (!empty($_REQUEST['query'])) {
+    $query = $_REQUEST['query'];
+
+    if ($_REQUEST['update'] == '1') {
+        $panthera->execute_update($query);
+    } else {
+        $result = $panthera->select_list($query);
+        //header('Content-Type: application/json');
+        //echo json_encode(['data' => $result]);
+        //die();
+        echo "<html>" . print_query_html($result) . "</html>";
+    }
 }
 
 ?>
+
+</body>
+</html>
