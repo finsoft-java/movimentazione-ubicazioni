@@ -360,7 +360,7 @@ class CaricamentiMassaManager {
 
     //aggiungere commessa 
     function creaRigheDocumento($id, $cauRiga, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest,
-                                                              $codUbicazioneDest, $articolo=null, $qty=null, $baseRowIndex=0, $commessa=null) {
+                                                              $codUbicazioneDest, $articolo=null, $qty=null, $baseRow=0, $commessa=null) {
       global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $logged_user;
       
       if (empty($articolo) || empty($qty)) {
@@ -570,6 +570,10 @@ class CaricamentiMassaManager {
       curl_setopt($curl, CURLOPT_URL, $URL_CM);
       curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
       $result = curl_exec($curl);
+      $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+      if ($httpcode != 200) {
+        print_error(500, "Errore nell'invocazione del webservice. HTTP code $httpcode. Response: " . $result);
+      }
       curl_close($curl);
 
       // il $result è assolutamente inutile, se non magari per il JobId
@@ -601,7 +605,7 @@ class CaricamentiMassaManager {
     }
 
     function loop_job_panthera($id) {
-      $semaforo = sem_get($DATA_ORIGIN);
+      $semaforo = sem_get(167167);
       if (!sem_acquire($semaforo)) {
         print_error(500, 'Troppi caricamenti di massa contemporanei, impossibile acquisire il semaforo!');
       }
