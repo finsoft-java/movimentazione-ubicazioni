@@ -31,6 +31,7 @@ $ID_AZIENDA = '001';
 $DATA_ORIGIN = 'CM-MOV-UBI';
 $CAU_TESTATA = 'LL4';
 $CAU_RIGA = 'LL2';
+$SERIE = 'DT';
 $COD_SCHEDULED_JOB = 'CMDocTrasf';
 $URL_CM = 'http://172.18.0.15/panth01/ws?id=JOBLA&user=CAD&pwd=CADQWER&company=001&key=CMDocTrasf';
 $CAU_TESTATA_SVUOTA = 'SVT';

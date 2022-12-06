@@ -223,7 +223,7 @@ class CaricamentiMassaManager {
     }
 
     function creaTestataDocumento($id, $cauTestata, $codMagazzinoSrc, $codMagazzinoDest) {
-        global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $logged_user;
+        global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $SERIE, $logged_user;
 
         // FIXME RUN_ID
         $sql = "INSERT INTO THIP.CM_DOC_TRA_TES (
@@ -299,7 +299,7 @@ class CaricamentiMassaManager {
           '$cauTestata',
           '$YEAR',
           '$id',                       -- 10
-          null,
+          '$SERIE',
           '$DATE',
           null,
           '$codMagazzinoSrc',
@@ -570,9 +570,11 @@ class CaricamentiMassaManager {
       curl_setopt($curl, CURLOPT_URL, $URL_CM);
       curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
       $result = curl_exec($curl);
-      $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+      $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
       if ($httpcode != 200) {
-        print_error(500, "Errore nell'invocazione del webservice. HTTP code $httpcode. Response: " . $result);
+        $msg = "Errore nell'invocazione del webservice. HTTP code $httpcode. Response: " . $result;
+        error_log($msg);
+        print_error(500, $msg);
       }
       curl_close($curl);
 
@@ -606,6 +608,7 @@ class CaricamentiMassaManager {
 
     function loop_job_panthera($id) {
       $semaforo = sem_get(167167);
+      $errore_cm = false;
       if (!sem_acquire($semaforo)) {
         print_error(500, 'Troppi caricamenti di massa contemporanei, impossibile acquisire il semaforo!');
       }
