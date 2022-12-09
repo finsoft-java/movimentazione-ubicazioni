@@ -550,9 +550,8 @@ class CaricamentiMassaManager {
       $separatore = "',CHAR(18),'";
       $par_joined = "CONCAT('" . join($separatore, $parametri) . "',CHAR(18))";
       if($logged_user->nome_utente == "finsoft"){
-        $logged_user->nome_utente = "lmarosaitest";
-        //$logged_user->nome_utente = "latzosai";
-        $ID_AZIENDA = "001";
+        $logged_user->nome_utente = "ADMIN";
+        // lmarosaitest non esiste in prod;
       }
       $sql = "UPDATE THERA.SCHEDULED_JOB
               SET JOB_PARAMETERS=$par_joined, USER_ID='{$logged_user->nome_utente}_$ID_AZIENDA'
