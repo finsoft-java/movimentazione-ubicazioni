@@ -189,6 +189,7 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
         return;
     }
     const qty = parseFloat(qtyInput).toFixed(3);
+    const codCommessa = $("#selectCommessa option:selected").text();
 
     if(repeatFlag) {
         qrcode.attr("disabled", false);
@@ -203,7 +204,7 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
     $("#btnRipeti").attr('disabled',true);
 
     $.post({
-        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + qty  + "&codUbicazioneDest=" +ubicazioneDest+ "&commessa=" +$("#selectCommessa option:selected").text(),
+        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + qty  + "&codUbicazioneDest=" +ubicazioneDest+ "&commessa=" + codCommessa,
         dataType: 'json',
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
