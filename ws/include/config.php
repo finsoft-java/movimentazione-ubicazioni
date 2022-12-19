@@ -14,6 +14,8 @@ define('AD_FILTER', '(memberOf=CN=Gruppo Logistica,OU=OU Osai Groups,DC=osai,DC=
 #define('AD_USERNAME', 'surveyosai@OSAI.LOC');
 #define('AD_PASSWORD', 's0fu3Y2o19!');
 
+define('GRUPPI_ABILITATI', 'GA,MGZZ_O');
+
 /* DATABASE PANTHERA */
 define('MOCK_PANTHERA', 'true');
 define('DB_PTH_HOST', 'tcp:myserver.database.windows.net,1433');

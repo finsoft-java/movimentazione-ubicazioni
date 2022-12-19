@@ -46,7 +46,11 @@ function check_and_load_user($username, $pwd) {
     }
     global $ldapManager, $panthera;
     $user = $ldapManager->login($username, $pwd);
-    if (!$panthera->check_auth($username, ['GA', 'MGZZ_O'])) {
+
+    // l'utente per LDAP non è case sensitive, su Panthera sì -> strtolower
+    // e incrociamo le dita che non contengano mai maiuscole
+    $GRUPPI = explode(",", GRUPPI_ABILITATI);
+    if (!$panthera->check_auth(strtolower($username), $GRUPPI)) {
         print_error(403, "Utente non abilitato in Panthera");
     }
     return $user;   
