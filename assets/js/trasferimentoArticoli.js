@@ -169,10 +169,11 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
 });
 
 $(document).on("change", "#selectCommessa", function(){
-    $("#commessaQty").html($(this).val()+" "+$(this).find('option:selected').data('prm'));
-    $("#qty").attr("max",$(this).val()).attr("disabled",false);
-    $(".btnPlus").attr('onClick','plus('+$(this).val()+')');
-    $(".btnAll").attr('onClick','selezionaTutti('+$(this).val()+')');    
+    maxQty = $(this).val();
+    $("#commessaQty").html(maxQty+" "+$(this).find('option:selected').data('prm'));
+    $("#qty").attr("max",maxQty).attr("disabled",false);
+    $(".btnPlus").attr('onClick','plus('+maxQty+')');
+    $(".btnAll").attr('onClick','selezionaTutti('+maxQty+')');    
 });
 
 // $(document).on('input', 'input[type=number]', checkQty);
