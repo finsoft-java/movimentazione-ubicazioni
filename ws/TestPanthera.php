@@ -42,6 +42,10 @@ SELECT TOP 10 * from THIP.CM_DOC_TRA_RIG WHERE ID_NUMERO_DOC='DT  000173' --RUN_
 --update THIP.CM_DOC_TRA_RIG set RUN_ID=217 where RUN_ID=0 AND DATA_ORIGIN='CM-MOV-UBI';
 ";
 
+if (!empty($_REQUEST['query'])) {
+    $query = $_REQUEST['query'];
+}
+
 ?>
 
 <html>
@@ -62,10 +66,10 @@ SELECT TOP 10 * from THIP.CM_DOC_TRA_RIG WHERE ID_NUMERO_DOC='DT  000173' --RUN_
 <?php
 
 if (!empty($_REQUEST['query'])) {
-    $query = $_REQUEST['query'];
 
     if ($_REQUEST['update'] == '1') {
         $panthera->execute_update($query);
+        echo "OK."; // se ci sono eccezioni SQL invece si spacca di brutto
     } else {
         $result = $panthera->select_list($query);
         //header('Content-Type: application/json');
