@@ -29,7 +29,7 @@ class CaricamentiMassaManager {
         
         $magazziniManager->checkMagazzino($codMagazzinoDest);
         // l'algoritmo cambia a seconda che l'ubicazione sia piena o vuota
-        $contenuto = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
+        [$contenuto, $cnt] = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
         if (empty($contenuto) || count($contenuto) == 0) {
           $this->trasferisciUbicazioneVuota($codUbicazione, $codMagazzinoDest);
           return;
@@ -57,8 +57,8 @@ class CaricamentiMassaManager {
       // FUNZIONE private:
       // assumo di avere gia' controllato che l'ubicazione e' valida e vuota e $codMagazzinoDest e' valido
 
-      $sql = "UPDATE THIP.YUBICAZIONI_LL
-              SET TRASFERIMENTO=CASE WHEN ID_MAGAZZINO='$codMagazzinoDest' THEN 'Y' ELSE 'N' END
+      $sql = "UPDATE THIPPERS.YUBICAZIONI_LL
+              SET TRASFERIBILE=CASE WHEN ID_MAGAZZINO='$codMagazzinoDest' THEN 'Y' ELSE 'N' END
               WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_UBICAZIONE='$codUbicazione' ";
       $panthera->execute_update($sql);
 
@@ -166,7 +166,7 @@ class CaricamentiMassaManager {
             print_error(404, "Ubicazione dichiarata non trasferibile: $codUbicazione");
           }
           $ubi1 = $ubicazioniManager->getUbicazione($codUbicazione);
-          $contenuto = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
+          [$contenuto, $cnt] = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
           if (empty($contenuto) || count($contenuto) == 0) {
             $codUbicazioniVuote[] = $codUbicazione;
           } else {

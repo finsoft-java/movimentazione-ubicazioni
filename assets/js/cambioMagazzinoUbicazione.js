@@ -143,6 +143,7 @@ function cambioMagazzinoUbicazione() {
     let magazzinoDest = $("#magazzinoDest").val();
 
     $("#qrcode").attr("disabled", true);
+    $('#btnCambio').attr("disabled", true);
 
     if(magazzinoDest == -1){
         showError("Magazzino di destinazione inesistente si prega di riprovare");
@@ -164,7 +165,6 @@ function cambioMagazzinoUbicazione() {
             console.log('ERRORE -> cambioMagazzinoUbicazione', data);
             showError(data)
             $("#qrcode").val('');
-            $("#btnCambio").attr('disabled',true);
         }
     });
 }
