@@ -16,3 +16,4 @@ include("class_ubicazioni.php");
 include("class_carrelli.php");
 include("class_caricamenti_massa.php");
 include("class_log.php");
+include("class_richieste.php");
