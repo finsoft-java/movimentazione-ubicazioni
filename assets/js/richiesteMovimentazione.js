@@ -165,10 +165,10 @@ function ridisegnaElencoRigheDocumenti() {
 function getHtmlGrigliaRighe(idDoc, idRiga, riga) {
     // QUI x dovrebbe essere documenti[id].RIGHE[id2]
     let commessa = riga.R_COMMESSA || '-';
-    let giaPrelevato = riga.QTA_RESIDUA <= 0 ? "&#10003;" : "";
+    let stato = riga.QTA_RESIDUA <= 0 ? "&#10003;" : "&bullet;";
     return `<div class="rigaDocumenti" onclick="openRow(${idDoc},${idRiga})">
-                &bullet; Art. ${riga.R_ARTICOLO} Comm. ${commessa} ${riga.QTA_UM_PRM} Qta. richiesta ${riga.R_UM_PRM_MAG}
-                Qta. residua ${riga.QTA_RESIDUA} ${giaPrelevato}
+                ${stato} Art. ${riga.R_ARTICOLO} Comm. ${commessa} ${riga.QTA_UM_PRM} Qta. richiesta ${riga.R_UM_PRM_MAG}
+                Qta. residua ${riga.QTA_RESIDUA} 
             </div>`;
 }
 
