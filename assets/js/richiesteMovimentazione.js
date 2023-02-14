@@ -1,6 +1,6 @@
 var loaded = 0;
 var maxItems = 1000;
-var lista = [];
+var documenti = [];
 var documentoSelezionato = null;
 var rigaSelezionata = null;
 var ubicazionePredefinita = null;
@@ -21,6 +21,7 @@ function initStato(i) {
         $("#divElencoRigheDocumentiContainer").hide();
         $("#divSingolaRigaContainer").hide();
         $('#btnConfirm').hide();
+        $('#btnPreleva').hide();
         $('#btnBack').hide();
         $('.qrcode').hide();
     } else if (statoCorrente == 1) {
@@ -31,6 +32,7 @@ function initStato(i) {
         $("#divElencoRigheDocumentiContainer").show();
         $("#divSingolaRigaContainer").hide();
         $('#btnConfirm').hide();
+        $('#btnPreleva').hide();
         $('#btnBack').show();
         $('.qrcode').show();
         $('#qrcode').attr('placeholder', 'UBICAZ. PREDEFINITA');
@@ -39,7 +41,8 @@ function initStato(i) {
         $("#divElencoDocumentiContainer").hide();
         $("#divElencoRigheDocumentiContainer").hide();
         $("#divSingolaRigaContainer").show();
-        $('#btnConfirm').show().attr('disabled', true);
+        $('#btnPreleva').show().attr('disabled', true);
+        $('#btnConfirm').hide();
         $('#btnBack').show();
         $('.qrcode').show();
         $('#qrcode').attr('placeholder', 'UBICAZIONE');
@@ -49,6 +52,7 @@ function initStato(i) {
 function indietro() {
     if (statoCorrente == 2) {
         initStato(1);
+        ridisegnaElencoRigheDocumenti();
     } else if (statoCorrente == 1) {
         initStato(0);
     } else {
@@ -71,7 +75,7 @@ function loadMore() {
         success: function(data, status) {
             maxItems = data.count;
             let elementiCaricati = data.data;
-            lista = lista.concat(elementiCaricati);
+            documenti = documenti.concat(elementiCaricati);
             elementiCaricati.forEach(x => {
                 $("#divElencoDocumenti").append(getHtmlGrigliaDocumenti(loaded++, x));
             });
@@ -112,18 +116,17 @@ function showError(data) {
     alert(err);
 }
 
-function getHtmlGrigliaDocumenti(id, x) {
-    // qui x dovrebbe essere uguale a lista[id]
-    return `<div class="rigaDocumenti" onclick="openDoc(${id})">
+function getHtmlGrigliaDocumenti(idDoc, x) {
+    // qui x dovrebbe essere uguale a documenti[id]
+    return `<div class="rigaDocumenti" onclick="openDoc(${idDoc})">
                 <strong>${x.NUMERO_DOC_FMT}</strong><br/>del ${x.DATA_DOC}
             </div>`;
 }
 
-function openDoc(id) {
-    documentoSelezionato = id;
-    let item = lista[id];
+function openDoc(idDoc) {
+    documentoSelezionato = idDoc;
+    let item = documenti[documentoSelezionato];
     initStato(1);
-    $("#divElencoRigheDocumenti").html(`Doc. <strong>${item.NUMERO_DOC_FMT}</strong>`);
     $("#divSingolaUbicazPredef").html("");
     $.get({
         url: "./ws/RichiesteMovimentazione.php?idAnnoDoc=" + item.ID_ANNO_DOC + "&idNumeroDoc=" + item.ID_NUMERO_DOC,
@@ -133,43 +136,105 @@ function openDoc(id) {
         },
         success: function(data, status) {
             item.RIGHE = data.data;
-            let id2 = 0;
-            data.data.forEach(x => {
-                $("#divElencoRigheDocumenti").append(getHtmlGrigliaRighe(id, id2++, x));
+            item.RIGHE.forEach(riga => {
+                // aggiungo i campi che non esistono server-side
+                riga.PRELIEVI = [];
+                riga.QTA_RESIDUA = parseFloat(riga.QTA_UM_PRM);
             });
+            ridisegnaElencoRigheDocumenti();
         },
         error: function(data, status) {
-            console.log('ERRORE nel caricare la lista delle righe', data);
+            console.log('ERRORE nel caricare la documenti delle righe', data);
             showError(data);
         }
     });    
 }
 
-function getHtmlGrigliaRighe(id, id2, x) {
-    // QUI x dovrebbe essere lista[id].RIGHE[id2]
-    return `<div class="rigaDocumenti" onclick="openRow(${id},${id2})">
-                ${x.ID_RIGA_DOC} Art. ${x.R_ARTICOLO} ${x.QTA_UM_PRM} ${x.R_UM_PRM_MAG}
+function ridisegnaElencoRigheDocumenti() {
+    let doc = documenti[documentoSelezionato];
+    $("#divElencoRigheDocumenti").html(`Doc. <strong>${doc.NUMERO_DOC_FMT}</strong>`);
+    let numRiga = 0;
+    let tuttoPrelevato = true;
+    doc.RIGHE.forEach(riga => {
+        $("#divElencoRigheDocumenti").append(getHtmlGrigliaRighe(documentoSelezionato, numRiga++, riga));
+        if (riga.QTA_RESIDUA > 0) tuttoPrelevato = false;
+    });
+    $("#btnConfirm").attr("disabled", !tuttoPrelevato);
+}
+
+function getHtmlGrigliaRighe(idDoc, idRiga, riga) {
+    // QUI x dovrebbe essere documenti[id].RIGHE[id2]
+    let commessa = riga.R_COMMESSA || '-';
+    let giaPrelevato = riga.QTA_RESIDUA <= 0 ? "&#10003;" : "";
+    return `<div class="rigaDocumenti" onclick="openRow(${idDoc},${idRiga})">
+                &bullet; Art. ${riga.R_ARTICOLO} Comm. ${commessa} ${riga.QTA_UM_PRM} Qta. richiesta ${riga.R_UM_PRM_MAG}
+                Qta. residua ${riga.QTA_RESIDUA} ${giaPrelevato}
             </div>`;
 }
 
-function openRow(id, id2, usaUbicazioneCorrente) {
-    documentoSelezionato = id;
-    rigaSelezionata = id2;
+function openRow(idDoc, idRiga, usaUbicazioneCorrente) {
+    documentoSelezionato = idDoc;
+    rigaSelezionata = idRiga;
     initStato(2);
-    let x = lista[id].RIGHE[id2];
+    let x = documenti[documentoSelezionato].RIGHE[rigaSelezionata];
 
     $("#divSingolaRiga").html(`Articolo ${x.R_ARTICOLO} ${x.QTA_UM_PRM} ${x.R_UM_PRM_MAG}<br/>`);
 
-    if (usaUbicazioneCorrente && ubicazioneCorrente) {
-        interrogaUbicazione(ubicazioneCorrente, x.R_ARTICOLO, (giacenza) => {
-            $("#divSingolaRiga").append(`Ubicazione ${ubicazioneCorrente} giacenza ${giacenza}`);
-        })
-    } else if (ubicazionePredefinita) {
-        interrogaUbicazione(ubicazionePredefinita, x.R_ARTICOLO, (giacenza) => {
-            $("#divSingolaRiga").append(`Ubicazione predefinita ${ubicazionePredefinita} giacenza ${giacenza}`);
+    let ubicazioneDaMostrare = ubicazionePredefinita;
+    if (usaUbicazioneCorrente) {
+        ubicazioneDaMostrare = ubicazioneCorrente = ubicazioneCorrente || ubicazionePredefinita;
+    }
+
+    if (ubicazioneDaMostrare) {
+        interrogaUbicazione(ubicazioneDaMostrare, x.R_ARTICOLO, (documentiGiacenze) => {
+            let datiStampati = `Ubicazione ${ubicazioneCorrente}.<br/>
+            Seleziona quantità oppure cambia ubicazione.
+            <select id='selectCommessa' class='form-control' onchange='setGiacenzaCommessaSelezionata()'>`;
+            documentiGiacenze.forEach(x => {
+                let commessa = x.ID_COMMESSA || '-';
+                let selected = (commessa == x.R_COMMESSA) ? " selected " : "";
+                datiStampati += `<option value='${x.QTA_GIAC_PRM}' data-prm='${x.R_UM_PRM_MAG}' ${selected}>${commessa}</option>`
+            });
+            datiStampati += `</select>
+            <input type='number' class='form-control inputOsai' disabled onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='0.001' placeholder='Quantità da prelevare' aria-label='Quantità da prelevare' aria-describedby='basic-addon2' onchange='checkQty()'>
+            `;
+            $("#divSingolaRiga").append(datiStampati);
+            setGiacenzaCommessaSelezionata();
         })
     } else {
         $("#divSingolaRiga").append("Scegliere una ubicazione:");
+    }
+}
+
+function setGiacenzaCommessaSelezionata() {
+    let giacenzaSelezionata = $("#selectCommessa").val(); // spero che funzioni
+    console.log("giacenzaSelezionata=", giacenzaSelezionata);
+    $("#qty").val(giacenzaSelezionata);
+    checkQty();
+}
+
+function checkQty() {
+    let qty = $("#qty").val();
+    $("#btnPreleva").attr('disabled', qty > 0 ? false : true);
+}
+
+function preleva() {
+    let item = documenti[documentoSelezionato].RIGHE[rigaSelezionata];
+
+    let commessa = $("#selectCommessa option:selected").text();
+    if (commessa == '-') commessa = null;
+    let qty = parseFloat($("#qty").val());
+    item.PRELIEVI.push({
+        UBICAZIONE: ubicazioneCorrente,
+        COMMESSA: commessa,
+        QUANTITA: qty
+    });
+    item.QTA_RESIDUA -= qty;
+
+    if (item.QTA_RESIDUA > 0) {
+        openRow(documentoSelezionato, rigaSelezionata, true);
+    } else {
+        indietro();
     }
 }
 
@@ -180,7 +245,7 @@ function sparaQrcode() {
         ubicazionePredefinita = ubicazione;
         $("#divUbicazionePredef").html(`Ubicazione predefinita <strong>${ubicazionePredefinita}</strong>`);
     } else if (statoCorrente == 2) {
-        let x = lista[documentoSelezionato].RIGHE[rigaSelezionata];
+        let x = documenti[documentoSelezionato].RIGHE[rigaSelezionata];
         openRow(documentoSelezionato, rigaSelezionata, true);
     }
     $('#qrcode').val("");
@@ -194,11 +259,8 @@ function interrogaUbicazione(ubicazione, articolo, callback) {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
         },
         success: function(data, status) {
-            let dati = data["data"];
-            // per ora me ne frego delle commesse
-            let qty = 0.0;
-            dati.forEach(x => { qty += x.QTA_GIAC_PRM });
-            callback(qty);
+            let documenti = data["data"];
+            callback(documenti);
         },
         error: function(data, status) {
             console.log('ERRORE nel caricare i saldi', data);

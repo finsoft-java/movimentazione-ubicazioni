@@ -86,7 +86,7 @@ class RichiesteMovimentazioneManager {
                       'STATO' => 'V',
                       'R_UTENTE_CRZ' => 'mfalosai_001',
                       'R_ARTICOLO' => '00000000',
-                      'R_COMMESSE' => null,
+                      'R_COMMESSA' => null,
                       'R_UM_PRM_MAG' => 'NR',
                       'QTA_UM_PRM' => '10'
                     ],
@@ -102,7 +102,7 @@ class RichiesteMovimentazioneManager {
                       'STATO' => 'V',
                       'R_UTENTE_CRZ' => 'mfalosai_001',
                       'R_ARTICOLO' => '11111111',
-                      'R_COMMESSE' => null,
+                      'R_COMMESSA' => null,
                       'R_UM_PRM_MAG' => 'NR',
                       'QTA_UM_PRM' => '100'
                     ],
@@ -118,7 +118,7 @@ class RichiesteMovimentazioneManager {
                       'STATO' => 'V',
                       'R_UTENTE_CRZ' => 'mfalosai_001',
                       'R_ARTICOLO' => '22222222',
-                      'R_COMMESSE' => 'C0001',
+                      'R_COMMESSA' => 'C0001',
                       'R_UM_PRM_MAG' => 'LT',
                       'QTA_UM_PRM' => '1000'
                     ]
