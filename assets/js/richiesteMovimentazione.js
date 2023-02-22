@@ -3,7 +3,8 @@ var maxItems = 1000;
 var documenti = [];
 var documentoSelezionato = null;
 var rigaSelezionata = null;
-var ubicazionePredefinita = null;
+var magazzinoCorrente = null;
+var commessaCorrente = null;
 var ubicazioneCorrente = null;
 var statoCorrente = 0;
 
@@ -16,14 +17,13 @@ function initStato(i) {
         // griglia dei documenti
         rigaSelezionata = null;
         documentoSelezionato = null;
-        ubicazionePredefinita = null;
+        ubicazioneCorrente = null;
         $("#divElencoDocumentiContainer").show();
         $("#divElencoRigheDocumentiContainer").hide();
         $("#divSingolaRigaContainer").hide();
         $('#btnConfirm').hide();
         $('#btnPreleva').hide();
         $('#btnBack').hide();
-        $('.qrcode').hide();
     } else if (statoCorrente == 1) {
         // griglia delle righe del documento
         // deve anche mostrare l'ubicazione 
@@ -34,8 +34,6 @@ function initStato(i) {
         $('#btnConfirm').hide();
         $('#btnPreleva').hide();
         $('#btnBack').show();
-        $('.qrcode').show();
-        $('#qrcode').attr('placeholder', 'UBICAZ. PREDEFINITA');
     } else if (statoCorrente == 2) {
         // maschera di scelta dell'ubicazione
         $("#divElencoDocumentiContainer").hide();
@@ -44,15 +42,18 @@ function initStato(i) {
         $('#btnPreleva').show().attr('disabled', true);
         $('#btnConfirm').hide();
         $('#btnBack').show();
-        $('.qrcode').show();
-        $('#qrcode').attr('placeholder', 'UBICAZIONE');
     }
 }
 
 function indietro() {
     if (statoCorrente == 2) {
-        initStato(1);
-        ridisegnaElencoRigheDocumenti();
+        let riga = documenti[documentoSelezionato].RIGHE[rigaSelezionata];
+        if (riga.PRELIEVI.length == 0 || confirm('Stai per annullare tutti i prelievi in corso, sei sicuro?')) {
+            riga.PRELIEVI = [];
+            riga.QTA_RESIDUA = parseFloat(riga.QTA_UM_PRM);
+            initStato(1);
+            ridisegnaElencoRigheDocumenti();
+        }
     } else if (statoCorrente == 1) {
         initStato(0);
     } else {
@@ -168,25 +169,23 @@ function getHtmlGrigliaRighe(idDoc, idRiga, riga) {
     let stato = riga.QTA_RESIDUA <= 0 ? "&#10003;" : "&bullet;";
     return `<div class="rigaDocumenti" onclick="openRow(${idDoc},${idRiga})">
                 ${stato} Art. ${riga.R_ARTICOLO} Comm. ${commessa} ${riga.QTA_UM_PRM} Qta. richiesta ${riga.R_UM_PRM_MAG}
-                Qta. residua ${riga.QTA_RESIDUA} 
             </div>`;
 }
 
-function openRow(idDoc, idRiga, usaUbicazioneCorrente) {
+function openRow(idDoc, idRiga) {
     documentoSelezionato = idDoc;
     rigaSelezionata = idRiga;
     initStato(2);
     let x = documenti[documentoSelezionato].RIGHE[rigaSelezionata];
+    magazzinoCorrente = x.R_MAGAZZINO;
 
     $("#divSingolaRiga").html(`Articolo ${x.R_ARTICOLO} ${x.QTA_UM_PRM} ${x.R_UM_PRM_MAG}<br/>`);
 
-    let ubicazioneDaMostrare = ubicazionePredefinita;
-    if (usaUbicazioneCorrente) {
-        ubicazioneDaMostrare = ubicazioneCorrente = ubicazioneCorrente || ubicazionePredefinita;
-    }
+    // TODO qui devo fare apparire un menu a tendina con tutti i magazzini, con preselezionato il magazzinoCorrente,
+    // e poi un altro con tutte le ubicazioni del magazzino selezionato che contengano l'articolo x.R_ARTICOLO
 
-    if (ubicazioneDaMostrare) {
-        interrogaUbicazione(ubicazioneDaMostrare, x.R_ARTICOLO, (documentiGiacenze) => {
+    /*if (ubicazioneCorrente) {
+        interrogaUbicazione(ubicazioneCorrente, x.R_ARTICOLO, (documentiGiacenze) => {
             let datiStampati = `Ubicazione ${ubicazioneCorrente}.<br/>
             Seleziona quantità oppure cambia ubicazione.
             <select id='selectCommessa' class='form-control' onchange='setGiacenzaCommessaSelezionata()'>`;
@@ -196,14 +195,14 @@ function openRow(idDoc, idRiga, usaUbicazioneCorrente) {
                 datiStampati += `<option value='${x.QTA_GIAC_PRM}' data-prm='${x.R_UM_PRM_MAG}' ${selected}>${commessa}</option>`
             });
             datiStampati += `</select>
-            <input type='number' class='form-control inputOsai' disabled onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='0.001' placeholder='Quantità da prelevare' aria-label='Quantità da prelevare' aria-describedby='basic-addon2' onchange='checkQty()'>
+            <input type='number' class='form-control inputOsai' disabled id='qty' class='inputOsai' value='1' min='0.001' placeholder='Quantità da prelevare' aria-label='Quantità da prelevare' aria-describedby='basic-addon2' onchange='checkQty()'>
             `;
             $("#divSingolaRiga").append(datiStampati);
             setGiacenzaCommessaSelezionata();
         })
     } else {
         $("#divSingolaRiga").append("Scegliere una ubicazione:");
-    }
+    }*/
 }
 
 function setGiacenzaCommessaSelezionata() {
@@ -232,23 +231,10 @@ function preleva() {
     item.QTA_RESIDUA -= qty;
 
     if (item.QTA_RESIDUA > 0) {
-        openRow(documentoSelezionato, rigaSelezionata, true);
+        openRow(documentoSelezionato, rigaSelezionata);
     } else {
         indietro();
     }
-}
-
-function sparaQrcode() {
-    let ubicazione = $('#qrcode').val();
-    ubicazioneCorrente = ubicazione;
-    if (statoCorrente == 1) {
-        ubicazionePredefinita = ubicazione;
-        $("#divUbicazionePredef").html(`Ubicazione predefinita <strong>${ubicazionePredefinita}</strong>`);
-    } else if (statoCorrente == 2) {
-        let x = documenti[documentoSelezionato].RIGHE[rigaSelezionata];
-        openRow(documentoSelezionato, rigaSelezionata, true);
-    }
-    $('#qrcode').val("");
 }
 
 function interrogaUbicazione(ubicazione, articolo, callback) {
@@ -268,12 +254,3 @@ function interrogaUbicazione(ubicazione, articolo, callback) {
         }
     });
 }
-
-var timerOn = false;
-$(document).ready(function(){
-    setInterval(function() {
-        if (timerOn) {
-            $("#qrcode").get(0).focus();
-        }
-    }, 1000);
-});
