@@ -701,3 +701,7 @@ div.area-messaggi.esaurimento {
 	bottom: 10px;
 	right: 15px;
 }
+
+div.rigaDocumenti:hover {
+	background-color: #eee;
+}
