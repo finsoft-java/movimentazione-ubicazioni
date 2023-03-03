@@ -22,8 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     } else {
         [$data, $count] = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
     }
-    
-        
+            
     header('Content-Type: application/json');
     echo json_encode(['data' => $data, 'count' => $count]);
 } else {

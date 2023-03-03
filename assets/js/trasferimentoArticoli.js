@@ -20,6 +20,7 @@ let ubicazione;
 let articolo;
 let ubicazioneDest;
 let maxQty;
+let arrayCommessa = [];
 
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     this.value = this.value.toUpperCase();
@@ -102,9 +103,11 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 return false;
             }
             articolo = barCode;
-            $("#qrcode").val("").attr('placeholder','ARTICOLO').attr('disabled',true);
+            $("#qrcode").val("").attr('placeholder','ARTICOLO').attr('disabled',false);
             $("#btnTrasferimento").attr('disabled',false);
             $("#btnRipeti").attr('disabled',false);
+            
+
             $.get({
                 url: "./ws/Interrogazione.php?codUbicazione=" + ubicazione + "&codArticolo=" +articolo,
                 dataType: 'json',
@@ -121,7 +124,6 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     }
                     maxQty = dati[0].QTA_GIAC_PRM;
                     let datiStampati = ""; 
-                    let arrayCommessa = [];
                     let optCommessa = "";
                     optCommessa += "<select id='selectCommessa' class='form-control'>";
                     let nomeCommessa = "";
@@ -149,12 +151,42 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     datiStampati += "<p class='pOsai'> Disegno: <strong>"+dati[0].DISEGNO+"</strong> </p>";
                     datiStampati += "<p class='pOsai'> Descrizione: <strong>"+dati[0].DESCRIZIONE+"</strong> </p>";
                     datiStampati += "<p class='pOsai'> Commessa:  </p>"+optCommessa;
-                    datiStampati += "<div class='input-group inputDiv'>  <div class='input-group-prepend'><button class='btn btnInputForm btnMinus' type='button' onClick='minus()'>-</button></div>";
-                    datiStampati += "<input type='number' class='form-control inputOsai' disabled onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='0.001' max='"+giacenzaIniziale+"' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
-                    datiStampati += "<div class='input-group-append'><button class='btn btnInputForm btnPlus' type='button' onClick='plus("+giacenzaIniziale+")'>+</button></div>";
+                    datiStampati += "<div class='input-group inputDiv'>  <div class='input-group-prepend'><button class='btn btnInputForm btnMinus' type='button' onClick='minus(1,\""+ubicazioneDest+"\")'>-</button></div>";
+                    if(whiteList.includes(ubicazioneDest)){
+                        datiStampati += "<input type='number' class='form-control inputOsai' disabled onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='' max='"+giacenzaIniziale+"' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
+                    } else {
+                        datiStampati += "<input type='number' class='form-control inputOsai' disabled onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='0.001' max='"+giacenzaIniziale+"' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
+                    }
+                    
+                    datiStampati += "<div class='input-group-append'><button class='btn btnInputForm btnPlus' type='button' onClick='plus("+giacenzaIniziale+",\""+ubicazioneDest+"\")'>+</button></div>";
                     datiStampati += "<button class='btn btnInputForm btnAll' type='button' onClick='selezionaTutti("+giacenzaIniziale+")'> Tutti </button></div>";
                     datiStampati += "<p class='pOsai'> Quantita Totale: <strong id='commessaQty'>"+giacenzaIniziale+" "+um+"</strong></p>";
-                    $("#appendData").html(datiStampati);
+
+                    $.get({
+                        url: "./ws/Interrogazione.php?codUbicazione=" + ubicazioneDest + "&codArticolo=" +articolo,
+                        dataType: 'json',
+                        headers: {
+                            'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                        },
+                        success: function(data, status) {
+                            console.log(data);
+                            let dati = data["data"];
+                            console.log(dati);
+                            datiStampati += "<p class='pOsai'> Quantita Ubicazione Destinazione: <strong id='commessaQty'>"+dati[0].QTA_GIAC_PRM+" "+dati[0].R_UM_PRM_MAG+"</strong></p>";
+                            
+                            $("#appendData").html(datiStampati);
+                            $("#qrcode").val("").attr('placeholder','COMMESSA');
+                        },
+                        error: function(data, status){
+                            console.log("ERRORE in i == 3 trasferimentoArticoli", data);
+                            showError(data);
+                            $("#qrcode").val('').attr('disabled',false);
+                            i=2;
+                            $("#btnTrasferimento").attr('disabled',true);
+                            $("#btnRipeti").attr('disabled',true);
+                        }
+                    });
+
                 },
                 error: function(data, status){
                     console.log("ERRORE in i == 3 trasferimentoArticoli", data);
@@ -167,6 +199,29 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             });
             $("#qrcode").val("");
         }
+        
+        if(i == 4) {
+            $("#qrcode").val('').attr('disabled',false);
+            if(barCode.trim() != ""){
+                magazzinoDest = barCode; 
+            } else {
+                $("#qrcode").attr('placeholder','COMMESSA');
+                showError("Commessa inesistente si prega di riprovare");
+                $("#qrcode").val('');
+                i=3;
+                return false;
+            }
+            if(!arrayCommessa.includes(barCode)) {         
+                $("#qrcode").attr('placeholder','COMMESSA');
+                showError("COMMESSA non valida");
+                $("#qrcode").val('');
+                magazzinoDest= null;
+                i=3;
+                return false;
+            } else {
+                $("#qrcode").val('').attr('disabled',true);
+            }
+        }
     }
 });
 
@@ -177,8 +232,6 @@ $(document).on("change", "#selectCommessa", function(){
     $(".btnPlus").attr('onClick','plus('+maxQty+')');
     $(".btnAll").attr('onClick','selezionaTutti('+maxQty+')');    
 });
-
-// $(document).on('input', 'input[type=number]', checkQty);
 
 function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> conferma e esce
     const qtyInput = $("#qty").val();
@@ -231,25 +284,33 @@ function showError(data) {
 }
 
 function showSuccessMsg(msg) {
-    alert(msg);
+    alert(msg); 
+    setTimeout(function() { 
+        window.close();
+    }, 1000);
 }
 
-function plus(maxQty) {
-    if($("#qty").val() <= maxQty - 1) {
+function plus(maxQty, ubicazione) {
+    //devo fare il controllo in whitelist non c'è max quindi se ci sono 10 pz ne posso prelevare anche 12 e va in negativo
+    if(whiteList.includes(ubicazioneDest)) {
         $("#qty").val((parseFloat($("#qty").val())+1).toFixed(3));    
+    } else {
+        if($("#qty").val() <= maxQty - 1) {
+            $("#qty").val((parseFloat($("#qty").val())+1).toFixed(3));    
+        }
     }
 }
 
-function minus(minimum = 1) {
-    if($("#qty").val() >= minimum + 1) {
+function minus(minimum = 1, ubicazione) {
+    if(whiteList.includes(ubicazione)) {
         $("#qty").val((parseFloat($("#qty").val())-1).toFixed(3));
-    }
+    } else {
+        if($("#qty").val() >= minimum + 1) {
+            $("#qty").val((parseFloat($("#qty").val())-1).toFixed(3));
+        }
+    }   
 }
 
 function selezionaTutti(maxQty) {
     $("#qty").val(maxQty);
 }
-
-
-
-

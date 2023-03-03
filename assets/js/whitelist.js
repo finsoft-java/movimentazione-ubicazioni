@@ -1,0 +1,1 @@
+let whiteList = ["EEE","AAA"];

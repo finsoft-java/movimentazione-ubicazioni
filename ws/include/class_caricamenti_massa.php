@@ -57,8 +57,8 @@ class CaricamentiMassaManager {
       // FUNZIONE private:
       // assumo di avere gia' controllato che l'ubicazione e' valida e vuota e $codMagazzinoDest e' valido
 
-      $sql = "UPDATE THIPPERS.YUBICAZIONI_LL
-              SET TRASFERIBILE=CASE WHEN ID_MAGAZZINO='$codMagazzinoDest' THEN 'Y' ELSE 'N' END
+      $sql = "UPDATE THIP.UBICAZIONI_LL
+              SET STATO=CASE WHEN ID_MAGAZZINO='$codMagazzinoDest' THEN 'V' ELSE 'A' END
               WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_UBICAZIONE='$codUbicazione' ";
       $panthera->execute_update($sql);
 
