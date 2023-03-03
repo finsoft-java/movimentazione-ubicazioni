@@ -151,7 +151,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     datiStampati += "<p class='pOsai'> Disegno: <strong>"+dati[0].DISEGNO+"</strong> </p>";
                     datiStampati += "<p class='pOsai'> Descrizione: <strong>"+dati[0].DESCRIZIONE+"</strong> </p>";
                     datiStampati += "<p class='pOsai'> Commessa:  </p>"+optCommessa;
-                    datiStampati += "<div class='input-group inputDiv'>  <div class='input-group-prepend'><button class='btn btnInputForm btnMinus' type='button' onClick='minus(1,\""+ubicazioneDest+"\")'>-</button></div>";
+                    datiStampati += "<div class='input-group inputDiv'>  <div class='input-group-prepend'><button class='btn btnInputForm btnMinus' type='button' onClick='minus(1,\""+ubicazione+"\")'>-</button></div>";
                     if(whiteList.includes(ubicazioneDest)){
                         datiStampati += "<input type='number' class='form-control inputOsai' disabled onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='' max='"+giacenzaIniziale+"' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
                     } else {
@@ -236,7 +236,8 @@ $(document).on("change", "#selectCommessa", function(){
 function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> conferma e esce
     const qtyInput = $("#qty").val();
     const qrcode = $("#qrcode");
-
+    
+    //fixme devo controllare se è in whitelist
     if((!qtyInput.match(/^\d+(,\d+|\.\d+)?$/)) || !qtyInput || (parseFloat(qtyInput) < 0.001 || parseFloat(qtyInput) > maxQty)) { 
         showError("Inserire una quantità valida tra uno e " + maxQty + " (numeri decimali con il punto)");
         i=3;
@@ -302,6 +303,7 @@ function plus(maxQty, ubicazione) {
 }
 
 function minus(minimum = 1, ubicazione) {
+    //controllo se è in whitelist l'ubicazione di partenza 
     if(whiteList.includes(ubicazione)) {
         $("#qty").val((parseFloat($("#qty").val())-1).toFixed(3));
     } else {

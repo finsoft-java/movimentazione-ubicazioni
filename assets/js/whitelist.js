@@ -1,1 +1,1 @@
-let whiteList = ["EEE","AAA"];
+let whiteList = ["EEE","AAA","D"];

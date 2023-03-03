@@ -45,12 +45,23 @@ class RichiesteMovimentazioneManager {
           $count = 10; // metto 10 anziche' 3 per testare l'infinity scroll
       } else {
 
+/*
+STATO 
+  A = ANNULLATO
+  V = VALIDO
+  S= SOSPESO
+STATO AVANZAMENTO 
+  1= DEFINITIVO
+  0= PROVVISORIO 
+R_CAU_DOC_TRA
+  CAUSALI DEFINITE DA config.php
+*/
 
         $sql0 = "SELECT COUNT(*) AS cnt ";
         $sql1 = "SELECT * ";
         $sql = "FROM THIP.DOC_TRA_TES
                 WHERE ID_AZIENDA='$ID_AZIENDA'
-                AND STATO <>'A' AND STATO_AVANZAMENTO='0'
+                AND STATO = 'V' AND STATO_AVANZAMENTO='0'
                 AND R_CAU_DOC_TRA IN ('" . implode("','", $CAUSALI_RICHIESTE_MOV) . "')";
         $count = $panthera->select_single_value($sql0 . $sql);
 
@@ -127,7 +138,7 @@ class RichiesteMovimentazioneManager {
 
         $sql = "SELECT * FROM THIP.DOC_TRA_RIG
                 WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_ANNO_DOC='$idAnnoDoc' AND ID_NUMERO_DOC='$idNumeroDoc'
-                AND STATO<>'A' AND STATO_AVANZAMENTO='0'
+                AND STATO= 'V' AND STATO_AVANZAMENTO='0'
                 ORDER BY ID_RIGA_DOC";
         $data = $panthera->select_list($sql);
       }
