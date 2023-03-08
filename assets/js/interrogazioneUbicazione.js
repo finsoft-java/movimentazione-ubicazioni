@@ -49,6 +49,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             }
         });
         $("#qrcode").val("");
+        $("#searchAll").css("display","block");
     }
 });
 
@@ -78,4 +79,5 @@ function ripetiInterrogazione() {
     timerOn = true;
     $("#btnInterroga").hide();
     $("#qrcode").show();
+    $("#searchAll").css("display","none");
 }

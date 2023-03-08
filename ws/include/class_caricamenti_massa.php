@@ -57,8 +57,8 @@ class CaricamentiMassaManager {
       // FUNZIONE private:
       // assumo di avere gia' controllato che l'ubicazione e' valida e vuota e $codMagazzinoDest e' valido
 
-      $sql = "UPDATE THIPPERS.YUBICAZIONI_LL
-              SET TRASFERIBILE=CASE WHEN ID_MAGAZZINO='$codMagazzinoDest' THEN 'Y' ELSE 'N' END
+      $sql = "UPDATE THIP.UBICAZIONI_LL
+              SET STATO=CASE WHEN ID_MAGAZZINO='$codMagazzinoDest' THEN 'V' ELSE 'A' END
               WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_UBICAZIONE='$codUbicazione' ";
       $panthera->execute_update($sql);
 
@@ -224,8 +224,16 @@ class CaricamentiMassaManager {
 
     function creaTestataDocumento($id, $cauTestata, $codMagazzinoSrc, $codMagazzinoDest) {
         global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $SERIE, $logged_user;
+      //RUN ACTION
+      //I = INSERT
+      //D = DELETE
+      //U = UPDATE
 
-        // FIXME RUN_ID
+      //TRANSFER STATUS
+      //2 = ERRORE
+      //3 = OK
+      //1 = SIMULAZIONE OK (NON HA FATTO NIENTE IN VERITA)
+      
         $sql = "INSERT INTO THIP.CM_DOC_TRA_TES (
           DATA_ORIGIN,            -- 1
           RUN_ID,
@@ -606,6 +614,8 @@ class CaricamentiMassaManager {
     }
 
     function loop_job_panthera($id) {
+      //USATI I SEMAFORI (BLOCCO PER CARICAMENTI SUCCESSIVI SE CE NE UNO IN AZIONE) DEL SISTEMA OPERATIVI
+      //migliorare magari con file di lock? (chiedere a Mauri e Gio usano in datastage/Oracle) (php esempio F_LCOK)
       $semaforo = sem_get(167167);
       $errore_cm = false;
       if (!sem_acquire($semaforo)) {
