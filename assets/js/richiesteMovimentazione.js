@@ -179,7 +179,65 @@ function openRow(idDoc, idRiga) {
     let x = documenti[documentoSelezionato].RIGHE[rigaSelezionata];
     magazzinoCorrente = x.R_MAGAZZINO;
 
-    $("#divSingolaRiga").html(`Articolo ${x.R_ARTICOLO} ${x.QTA_UM_PRM} ${x.R_UM_PRM_MAG}<br/>`);
+    $("#divSingolaRiga").html(`Articolo ${x.R_ARTICOLO} Comm. ${x.R_COMMESSA} - ${x.QTA_UM_PRM} ${x.R_UM_PRM_MAG}<br/>`);
+
+    $.get({
+        url: "./ws/GetMagazziniAlternativi.php",
+        dataType: 'json',
+        headers: {
+            'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+        },
+        success: function(data, status) { 
+            let dati = data["data"];
+            arrUbicazioniDest = dati;
+            if(dati[0] == null || dati.length === 0) {
+                showError("Errore interno nel reperire i magazzini");
+                $("#qrcode").val('');
+                return false;
+            }
+            
+            datiStampati += "<select onchange='onChangeMagazzino();'' onclick='timerOn = false' id='magazzinoOrigine' onfocusout='timerOn = true' class='form-control'>";    
+            datiStampati += "<option value='-1'> Seleziona magazzino partenza </option>";                            
+            for (let i = 0; i < dati.length; i++) {
+                // FIXME di default mettere quello che arriva dalla riga del documento
+                datiStampati += "<option value='"+dati[i]+"'>" + dati[i] + "</option>";                    
+            } 
+            datiStampati+= "</select>";
+            $("#divSingolaRiga").append(datiStampati);
+
+            $.get({
+                url: `./ws/Interrogazione.php?codArticolo=${x.R_ARTICOLO}`,
+                dataType: 'json',
+                headers: {
+                    'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                },
+                success: function(data, status) { 
+                    let dati = data["data"];
+                    arrUbicazioniDest = dati;
+                    if(dati[0] == null || dati.length === 0) {
+                        showError("Nessuna ubicazione disponibile");
+                        $("#qrcode").val('');
+                        return false;
+                    }
+                    
+                    datiStampati += "<select onchange='onChangeUbicazione();'' onclick='timerOn = false' id='ubicazioneOrigine' onfocusout='timerOn = true' class='form-control'>";    
+                    datiStampati += "<option value='-1'> Seleziona ubicazione partenza </option>";                            
+                    for (let i = 0; i < dati.length; i++) {
+                        datiStampati += "<option value='"+dati[i]+"'>" + dati[i] + "</option>";                    
+                    } 
+                    datiStampati+= "</select>";
+                    $("#divSingolaRiga").append(datiStampati);
+                    
+                }, error: function(data, status) {
+                    console.log('ERRORE -> Interrogazione', data);
+                    showError(data);
+                }
+            });
+        }, error: function(data, status) {
+            console.log('ERRORE -> getMagazziniAlternativi', data);
+            showError(data);
+        }
+    });
 
     // TODO qui devo fare apparire un menu a tendina con tutti i magazzini, con preselezionato il magazzinoCorrente,
     // e poi un altro con tutte le ubicazioni del magazzino selezionato che contengano l'articolo x.R_ARTICOLO
