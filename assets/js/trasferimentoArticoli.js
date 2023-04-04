@@ -220,6 +220,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 return false;
             } else {
                 $("#qrcode").val('').attr('disabled',true);
+                timerOn = false;
             }
         }
     }
@@ -231,6 +232,7 @@ $(document).on("change", "#selectCommessa", function(){
     $("#qty").attr("max",maxQty).attr("disabled",false);
     $(".btnPlus").attr('onClick','plus('+maxQty+')');
     $(".btnAll").attr('onClick','selezionaTutti('+maxQty+')');    
+    timerOn = false;
 });
 
 function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> conferma e esce
