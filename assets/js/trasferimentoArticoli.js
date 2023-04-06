@@ -231,11 +231,11 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
 
 $(document).on("change", "#selectCommessa", function(){
     maxQty = $(this).find('option:selected').data("maxqty");
-    console.log(maxQty);
     $("#commessaQty").html(maxQty+" "+$(this).find('option:selected').data('prm'));
     $("#qty").attr("max",maxQty).attr("disabled",false);
     $(".btnPlus").attr('onClick','plus('+maxQty+')');
     $(".btnAll").attr('onClick','selezionaTutti('+maxQty+')');
+    $("#qrcode").val('').attr('disabled',true);
     timerOn = false;
 });
 
@@ -322,3 +322,7 @@ function minus(minimum = 1, ubicazione) {
 function selezionaTutti(maxQty) {
     $("#qty").val(maxQty);
 }
+
+$(document).on("click","#selectCommessa",function(){
+    timerOn = false;
+});
