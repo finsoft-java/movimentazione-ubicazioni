@@ -27,13 +27,14 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             },
             success: function(data, status) {
                 let dati = data["data"];
+                console.log(dati);
                 if(dati[0] == null || dati.length === 0) {   
                     showError("Articoli non presenti ");
                     $("#qrcode").val('');
                     return false;
                 }
                 console.log("dati ", dati);
-                let datiStampati = getHtmlTestata(dati[0]);
+                let datiStampati = "";
                 for(let i = 0; i < Object.keys(dati).length;i++){
                     datiStampati += getHtmlArticolo(dati[i]);
                 }
@@ -54,16 +55,13 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
     }
 });
 
-function getHtmlTestata(x) {
-    return "<p>Magazzino: <strong style='text-transform:uppercase'>" + x.ID_MAGAZZINO + "</strong></p>"
-        + "<p>Ult. modifica: " + x.TIMESTAMP_AGG + " " + x.R_UTENTE_AGG + "</p>"
-        + "<hr/>";
-}
-
 function getHtmlArticolo(x) {
     return "<p>Articolo: <strong>" + x.ID_ARTICOLO + "</strong> | Quantita: <strong>" + x.QTA_GIAC_PRM + " " + x.R_UM_PRM_MAG + "</strong></p>"
         + "<p>Disegno: <strong>" + x.DISEGNO + "</strong></p>"
         + "<p>Descrizione: <strong>" + x.DESCRIZIONE + "</strong></p>"
+        + "<p>Ubicazione: <strong>" + x.ID_UBICAZIONE + "</strong></p>"
+        + "<p>Magazzino: <strong style='text-transform:uppercase'>" + x.ID_MAGAZZINO + "</strong></p>"
+        + "<p>Ult. modifica: " + x.TIMESTAMP_AGG + " " + x.R_UTENTE_AGG + "</p>"
         + (x.ID_COMMESSA ? "<p>Commessa: <strong>" + x.ID_COMMESSA + "</strong></p>" : "<p>Commessa: <strong> - </strong></p>")
         + "<hr/>";
 }
