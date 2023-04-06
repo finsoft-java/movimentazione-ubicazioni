@@ -20,7 +20,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
     if (event.keyCode === 13) {
         value = $("#qrcode").val();
         $.get({
-            url: "./ws/Interrogazione.php?codUbicazione=" + value,
+            url: "./ws/Interrogazione.php?codArticolo=" + value+ "&codCommessa=" + $("#selectCommessa").val(),
             dataType: 'json',
             headers: {
                 'Authorization': 'Bearer ' + sessionStorage.getItem('token')
@@ -28,11 +28,11 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             success: function(data, status) {
                 let dati = data["data"];
                 if(dati[0] == null || dati.length === 0) {   
-                    showError("Ubicazione vuota");
+                    showError("Articoli non presenti ");
                     $("#qrcode").val('');
                     return false;
                 }
-                console.log("dati ", dati)
+                console.log("dati ", dati);
                 let datiStampati = getHtmlTestata(dati[0]);
                 for(let i = 0; i < Object.keys(dati).length;i++){
                     datiStampati += getHtmlArticolo(dati[i]);
@@ -88,7 +88,7 @@ $(document).on("click","#selectCommessa",function(){
 });
 
 $(document).on("change","#selectCommessa",function(){
-    if($("#qrcode").val().trim() != null){
+    if($("#qrcode").val().trim() != ''){
         timerOn=false;
     } else {
         timerOn=true;
