@@ -15,17 +15,21 @@ $codArticolo = isset($_GET['codArticolo']) ? $panthera->escape_string($_GET['cod
 $codCommessa = isset($_GET['codCommessa']) ? $panthera->escape_string($_GET['codCommessa']) : null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    if (empty($codUbicazione)) {
-        print_error(400, "Missing argument codUbicazione");
-    }
-    if (!empty($codArticolo)){
-        if (!empty($codArticolo)) {
-            [$data, $count] = $ubicazioniManager->getContenutoUbicazioneArticolo($codUbicazione, $codArticolo);
-        } else {
-            [$data, $count] = $ubicazioniManager->getUbicazioniPerArticolo($codArticolo);
-        }
+    //if (empty($codUbicazione)) {
+    //    print_error(400, "Missing argument codUbicazione");
+    //}
+    if (!empty($codCommessa) && !empty($codArticolo)) {
+        [$data, $count] = $ubicazioniManager->getUbicazioniPerArticoloCommessa($codArticolo,$codCommessa);
     } else {
-        [$data, $count] = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
+        if (!empty($codArticolo)){
+            if (!empty($codArticolo) && !empty($codUbicazione)) {
+                [$data, $count] = $ubicazioniManager->getContenutoUbicazioneArticolo($codUbicazione, $codArticolo);
+            } else {
+                [$data, $count] = $ubicazioniManager->getUbicazioniPerArticolo($codArticolo);
+            }
+        } else {
+            [$data, $count] = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
+        }
     }
             
     header('Content-Type: application/json');
