@@ -14,11 +14,11 @@ $codUbicazione = isset($_GET['codUbicazione']) ? $panthera->escape_string($_GET[
 $codArticolo = isset($_GET['codArticolo']) ? $panthera->escape_string($_GET['codArticolo']) : null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    if (empty($codUbicazione)) {
-        print_error(400, "Missing argument codUbicazione");
-    }
+    //if (empty($codUbicazione)) {
+    //    print_error(400, "Missing argument codUbicazione");
+    //}
     if (!empty($codArticolo)){
-        if (!empty($codArticolo)) {
+        if (!empty($codArticolo) && !empty($codUbicazione)) {
             [$data, $count] = $ubicazioniManager->getContenutoUbicazioneArticolo($codUbicazione, $codArticolo);
         } else {
             [$data, $count] = $ubicazioniManager->getUbicazioniPerArticolo($codArticolo);

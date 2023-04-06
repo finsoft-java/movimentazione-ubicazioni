@@ -195,6 +195,7 @@ function openRow(idDoc, idRiga) {
         },
         success: function(data, status) { 
             let dati = data["data"];
+            let datiStampati = "";
             arrUbicazioniDest = dati;
             if(dati[0] == null || dati.length === 0) {
                 showError("Errore interno nel reperire i magazzini");
@@ -219,6 +220,7 @@ function openRow(idDoc, idRiga) {
                 },
                 success: function(data, status) { 
                     let dati = data["data"];
+                    let datiStampati = "";
                     arrUbicazioniDest = dati;
                     if(dati[0] == null || dati.length === 0) {
                         showError("Nessuna ubicazione disponibile");
@@ -229,7 +231,7 @@ function openRow(idDoc, idRiga) {
                     datiStampati += "<select onchange='onChangeUbicazione();'' onclick='timerOn = false' id='ubicazioneOrigine' onfocusout='timerOn = true' class='form-control'>";    
                     datiStampati += "<option value='-1'> Seleziona ubicazione partenza </option>";                            
                     for (let i = 0; i < dati.length; i++) {
-                        datiStampati += "<option value='"+dati[i]+"'>" + dati[i] + "</option>";                    
+                        datiStampati += "<option value='"+dati[i].ID_UBICAZIONE+"'>" + dati[i].ID_UBICAZIONE + "</option>";                    
                     } 
                     datiStampati+= "</select>";
                     $("#divSingolaRiga").append(datiStampati);
