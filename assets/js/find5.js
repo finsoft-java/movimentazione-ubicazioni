@@ -35,7 +35,7 @@ onclick="show();">
 var enable_site_search = 0; // 0 = Don't enable; 1 = Enable site search along with page search
 var find_window_fixed = 0; // 0 = User can move window with mouse; 1 = Window is fixed at top of screen // Version 5.4f
 var find_window_background = "white"; // the color of the pop-up window
-var find_window_border = "blue"; // the border color of pop-up window
+var find_window_border = "#049ddd"; // the border color of pop-up window
 var find_text_color = "black"; // the color of the text in window
 var find_title_color = "white"; // color of window title text
 var find_window_width = 255; // width of window // Version 5.4h - From 245 to 255
@@ -718,7 +718,7 @@ function create_div(dleft, dtop, dwidth, dheight)
     findwindow.style.backgroundColor = find_window_background;
     findwindow.style.border = '2px solid ' + find_window_border;
     findwindow.style.color = find_text_color;
-	findwindow.style.width = find_window_width + 'px';
+	findwindow.style.width = 'calc(100% - 60px)';
 	//findwindow.style.height = + find_window_height + 'px'; // Version 5.3f - No longer using
     findwindow.style.top = '20px';
 	findwindow.style.left = '20px';
@@ -732,7 +732,7 @@ function create_div(dleft, dtop, dwidth, dheight)
 	var string = '<div style="text-align: center'
 	+ ';width: 100%' // Version 5.4e Was: // + ';width: ' + (find_window_width-20) + 'px'
 	+ ';cursor: ' + cursor  // Version 5.4h - Turn mouse arrow to default or move icon 
-	+ ';color: ' + find_title_color
+	+ ';padding:10px 0px;color: ' + find_title_color
 	+ ';border: 1px solid ' + find_text_color
 	+ ';background-color: ' + find_window_border
 	//+ ';float: left' // Version 5.4e
@@ -752,13 +752,14 @@ function create_div(dleft, dtop, dwidth, dheight)
 	+ 'X' // write the letter X
 	+ '</div>\n'; // Version 5.4h - Removed <br />
 // This part creates the instructions and the "find" button
-	string += '<div id="window_body" style="padding: 5px;" data-info="'+info+'">'
-	+ '<form style="margin:0px;" onsubmit="return false;"><input type="search" size="25" maxlength="25" id="fwtext"' // Version 5.4h - Added form style="margin:0px;"
-	+ ' style="width:100%; font-size:16px;"' // Version 5.4e - // Version 5.4g - Added font-size:16px to prevent iphone from zooming in on focus
-	+ ' onchange="resettext();" placeholder="Enter text to find">'
-	+ '<input type="button" value=" < " onclick="this.blur(); findit(2);" title="Find Previous">' // Ver 5.4f - Changed Find Next and Find Prev to just < and > - // Version 5.4f Changed findprev() to findit(0) // Version 5.4g - Added title attribute and this.blur()
-	+ '<input type="button" value=" > " onclick="this.blur(); findit();" title="Find Next">' // ver 5.3 - 5/15/2015 - added this.blur(); // Version 5.4g - Added title attribute
-	+ ' <span id="find_msg"> </span>'; // From <br /> to space
+	string += '<div id="window_body" style="padding: 20px;" data-info="'+info+'">'
+	+ '<form style="margin:0px;" onsubmit="return false;">'
+	+ '<input type="button" value=" < " onclick="this.blur(); findit(2);" title="Previous" style="padding: 10px 10px;margin: 0px 8px;height: 42px;">' // Ver 5.4f - Changed Find Next and Find Prev to just < and > - // Version 5.4f Changed findprev() to findit(0) // Version 5.4g - Added title attribute and this.blur()
+	+ '<input type="search" id="fwtext"' // Version 5.4h - Added form style="margin:0px;"
+	+ ' style="border:1px solid #e9e9ed!important;height: 42px;border-radius: 5px 5px 5px 5px;padding: 15px 32px;width: calc(100% - 115px);background-color: #f6f6f6;color: #0d0d0d;text-align: center; text-decoration: none; font-size:16px;"' // Version 5.4e - // Version 5.4g - Added font-size:16px to prevent iphone from zooming in on focus
+	+ ' onchange="resettext();" placeholder="Trova Articolo">'
+	+ '<input type="button" value=" > " onclick="this.blur(); findit();" title="Next" style="padding: 10px 10px;margin: 0px 8px;height: 42px;">' // ver 5.3 - 5/15/2015 - added this.blur(); // Version 5.4g - Added title attribute
+	+ ' <span id="find_msg" style="text-align: center; width: 100%; display: inline-block; margin-top: 15px;"> </span>'; // From <br /> to space
 	if (enable_site_search) { // Version 5.4
 		string += ' <label><input type="radio" name="search_type" value="page" checked>Page</label>'+ // Version 5.4h - Removed <br /> at beginning
 		'<label><input type="radio" name="search_type" value="site" id="find_site_search">Site</label>';	

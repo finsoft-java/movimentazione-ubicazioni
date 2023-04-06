@@ -39,7 +39,7 @@ function initStato(i) {
         $("#divElencoDocumentiContainer").hide();
         $("#divElencoRigheDocumentiContainer").hide();
         $("#divSingolaRigaContainer").show();
-        $('#btnPreleva').show().attr('disabled', true);
+        $('#btnPreleva button').show().attr('disabled', true);
         $('#btnConfirm').hide();
         $('#btnBack').show();
     }
@@ -74,9 +74,11 @@ function loadMore() {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
         },
         success: function(data, status) {
+            $("#divElencoDocumenti").html("");
             maxItems = data.count;
             let elementiCaricati = data.data;
             documenti = documenti.concat(elementiCaricati);
+            console.log("----------------",elementiCaricati);
             elementiCaricati.forEach(x => {
                 $("#divElencoDocumenti").append(getHtmlGrigliaDocumenti(loaded++, x));
             });
@@ -120,7 +122,7 @@ function showError(data) {
 function getHtmlGrigliaDocumenti(idDoc, x) {
     // qui x dovrebbe essere uguale a documenti[id]
     return `<div class="rigaDocumenti" onclick="openDoc(${idDoc})">
-                <strong>${x.NUMERO_DOC_FMT}</strong><br/>del ${x.DATA_DOC}
+                <p style="padding: 10px 15px; margin: 0px; text-align: center;">Richiesta Doc.: <strong>${x.NUMERO_DOC_FMT}</strong><br/>del ${x.DATA_DOC}</p><hr/>
             </div>`;
 }
 
@@ -153,22 +155,26 @@ function openDoc(idDoc) {
 
 function ridisegnaElencoRigheDocumenti() {
     let doc = documenti[documentoSelezionato];
-    $("#divElencoRigheDocumenti").html(`Doc. <strong>${doc.NUMERO_DOC_FMT}</strong>`);
+    $("#divElencoRigheDocumenti").html('');
+    $("#divElencoRigheDocumenti").html(`<p style="text-align: center; margin-top: 30px;">Doc. <strong>${doc.NUMERO_DOC_FMT}</strong></p>`);
     let numRiga = 0;
     let tuttoPrelevato = true;
     doc.RIGHE.forEach(riga => {
         $("#divElencoRigheDocumenti").append(getHtmlGrigliaRighe(documentoSelezionato, numRiga++, riga));
         if (riga.QTA_RESIDUA > 0) tuttoPrelevato = false;
     });
-    $("#btnConfirm").attr("disabled", !tuttoPrelevato);
+    $("#btnConfirm button").attr("disabled", !tuttoPrelevato);
 }
 
 function getHtmlGrigliaRighe(idDoc, idRiga, riga) {
     // QUI x dovrebbe essere documenti[id].RIGHE[id2]
     let commessa = riga.R_COMMESSA || '-';
-    let stato = riga.QTA_RESIDUA <= 0 ? "&#10003;" : "&bullet;";
-    return `<div class="rigaDocumenti" onclick="openRow(${idDoc},${idRiga})">
-                ${stato} Art. ${riga.R_ARTICOLO} Comm. ${commessa} ${riga.QTA_UM_PRM} Qta. richiesta ${riga.R_UM_PRM_MAG}
+    return `<div class="rigaDocumenti" onclick="openRow(${idDoc},${idRiga})" style="text-align:center;border-top: 1px solid rgba(0,0,0,.1);padding: 10px 15px;">
+               <p style="margin:0px;">
+                Art.: <strong> ${riga.R_ARTICOLO}</strong> <br/>
+                Comm. :<strong>${commessa} </strong> <br/>
+                Qta presente. : <strong>${riga.QTA_UM_PRM}</strong> - Qta. richiesta <strong>${riga.R_UM_PRM_MAG} </strong>
+               </p>
             </div>`;
 }
 
@@ -272,7 +278,7 @@ function setGiacenzaCommessaSelezionata() {
 
 function checkQty() {
     let qty = $("#qty").val();
-    $("#btnPreleva").attr('disabled', qty > 0 ? false : true);
+    $("#btnPreleva button").attr('disabled', qty > 0 ? false : true);
 }
 
 function preleva() {
