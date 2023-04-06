@@ -12,6 +12,7 @@ require_logged_user_JWT();
 
 $codUbicazione = isset($_GET['codUbicazione']) ? $panthera->escape_string($_GET['codUbicazione']) : null;
 $codArticolo = isset($_GET['codArticolo']) ? $panthera->escape_string($_GET['codArticolo']) : null;
+$codCommessa = isset($_GET['codCommessa']) ? $panthera->escape_string($_GET['codCommessa']) : null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (empty($codUbicazione)) {
