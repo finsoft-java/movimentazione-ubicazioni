@@ -107,7 +107,6 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             $("#btnTrasferimento").attr('disabled',false);
             $("#btnRipeti").attr('disabled',false);
             
-
             $.get({
                 url: "./ws/Interrogazione.php?codUbicazione=" + ubicazione + "&codArticolo=" +articolo,
                 dataType: 'json',
@@ -125,23 +124,24 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     maxQty = dati[0].QTA_GIAC_PRM;
                     let datiStampati = ""; 
                     let optCommessa = "";
-                    optCommessa += "<select id='selectCommessa' class='form-control'>";
+                    optCommessa += "<select id='selectCommessa' class='form-control'>"
+                                  +"<option selected='selected' value='0'>Seleziona Commessa</option>";
                     let nomeCommessa = "";
                     let giacenzaIniziale = 0;
                     let um = "";
                     for(let i = 0; i < dati.length; i++){
-                        if(dati[i].ID_COMMESSA == null){
+                        if(dati[i].ID_COMMESSA == null) {
                             arrayCommessa.push("-");
                             nomeCommessa = "-";                            
                         } else {
                             nomeCommessa = dati[i].ID_COMMESSA;
                             arrayCommessa.push(dati[i].ID_COMMESSA);
                         }
-                        if(i == 0){
+                        if(i == 0) {
                             giacenzaIniziale = dati[i].QTA_GIAC_PRM;
                             um = dati[i].R_UM_PRM_MAG;
                         }
-                        optCommessa += "<option value='"+dati[i].QTA_GIAC_PRM+"' data-prm='"+dati[i].R_UM_PRM_MAG+"'>"+nomeCommessa+"</option>";
+                        optCommessa += "<option value='"+nomeCommessa+"' data-maxQty='"+dati[i].QTA_GIAC_PRM+"' data-prm='"+dati[i].R_UM_PRM_MAG+"'>"+nomeCommessa+"</option>";
                     }
                     optCommessa += "</select>";
                     datiStampati += "<p class='pOsai'> Ubicazione di partenza: <strong>"+dati[0].ID_UBICAZIONE+"</strong></p>";
@@ -220,6 +220,9 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                 return false;
             } else {
                 $("#qrcode").val('').attr('disabled',true);
+                console.log("selectCommessa "+barCode);
+                $("#selectCommessa").val(barCode);
+                $("#selectCommessa").trigger("change");
                 timerOn = false;
             }
         }
@@ -227,11 +230,12 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
 });
 
 $(document).on("change", "#selectCommessa", function(){
-    maxQty = $(this).val();
+    maxQty = $(this).find('option:selected').data("maxqty");
+    console.log(maxQty);
     $("#commessaQty").html(maxQty+" "+$(this).find('option:selected').data('prm'));
     $("#qty").attr("max",maxQty).attr("disabled",false);
     $(".btnPlus").attr('onClick','plus('+maxQty+')');
-    $(".btnAll").attr('onClick','selezionaTutti('+maxQty+')');    
+    $(".btnAll").attr('onClick','selezionaTutti('+maxQty+')');
     timerOn = false;
 });
 
