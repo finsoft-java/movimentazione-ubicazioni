@@ -15,44 +15,50 @@ let ubicazione;
 
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     this.value = this.value.toUpperCase();
-    console.log("listening to keyup")
-    //q
-    if (event.keyCode === 13) {
-        value = $("#qrcode").val();
-        $.get({
-            url: "./ws/Interrogazione.php?codArticolo=" + value+ "&codCommessa=" + $("#selectCommessa").val(),
-            dataType: 'json',
-            headers: {
-                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
-            },
-            success: function(data, status) {
-                let dati = data["data"];
-                console.log(dati);
-                if(dati[0] == null || dati.length === 0) {   
-                    showError("Articoli non presenti ");
+    console.log("listening to keyup");
+    if($("#selectCommessa").val() == ""){
+        $("#selectCommessa").attr("style","border-color: red !important;");
+    } else {
+        
+        if (event.keyCode === 13) {
+            value = $("#qrcode").val();
+            $.get({
+                url: "./ws/Interrogazione.php?codArticolo=" + value+ "&codCommessa=" + $("#selectCommessa").val(),
+                dataType: 'json',
+                headers: {
+                    'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                },
+                success: function(data, status) {
+                    let dati = data["data"];
+                    console.log(dati);
+                    if(dati[0] == null || dati.length === 0) {   
+                        showError("Articoli non presenti ");
+                        $("#qrcode").val('');
+                        return false;
+                    }
+                    console.log("dati ", dati);
+                    let datiStampati = "";
+                    for(let i = 0; i < Object.keys(dati).length;i++){
+                        datiStampati += getHtmlArticolo(dati[i]);
+                    }
+                    $(".listaOsai").html(datiStampati);
+                    timerOn = false;
+                    $("#qrcode").hide();
+                    $("#btnInterroga").show();
+                    $("#selectCommessa").prop("disabled",true);
+                    $("#selectCommessa").removeAttr("style");    
+                },
+                error: function(data, status){
+                    showError(data);
                     $("#qrcode").val('');
-                    return false;
+                    $(".listaOsai").html("");
                 }
-                console.log("dati ", dati);
-                let datiStampati = "";
-                for(let i = 0; i < Object.keys(dati).length;i++){
-                    datiStampati += getHtmlArticolo(dati[i]);
-                }
-                $(".listaOsai").html(datiStampati);
-                timerOn = false;
-                $("#qrcode").hide();
-                $("#btnInterroga").show();
-
-            },
-            error: function(data, status){
-                showError(data);
-                $("#qrcode").val('');
-                $(".listaOsai").html("");
-            }
-        });
-        $("#qrcode").val("");
-        $("#searchAll").css("display","block");
+            });
+            $("#qrcode").val("");
+            $("#searchAll").css("display","block");
+        }
     }
+    
 });
 
 function getHtmlArticolo(x) {
@@ -79,6 +85,7 @@ function ripetiInterrogazione() {
     $("#btnInterroga").hide();
     $("#qrcode").show();
     $("#searchAll").css("display","none");
+    $("#selectCommessa").prop("disabled",false);
 }
 
 $(document).on("click","#selectCommessa",function(){
@@ -88,6 +95,39 @@ $(document).on("click","#selectCommessa",function(){
 $(document).on("change","#selectCommessa",function(){
     if($("#qrcode").val().trim() != ''){
         timerOn=false;
+        $("#qrcode").change;
+        $.get({
+            url: "./ws/Interrogazione.php?codArticolo=" + $("#qrcode").val().trim() + "&codCommessa=" + $("#selectCommessa").val(),
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+            },
+            success: function(data, status) {
+                let dati = data["data"];
+                console.log(dati);
+                if(dati[0] == null || dati.length === 0) {   
+                    showError("Articoli non presenti ");
+                    $("#qrcode").val('');
+                    return false;
+                }
+                console.log("dati ", dati);
+                let datiStampati = "";
+                for(let i = 0; i < Object.keys(dati).length;i++){
+                    datiStampati += getHtmlArticolo(dati[i]);
+                }
+                $(".listaOsai").html(datiStampati);
+                timerOn = false;
+                $("#qrcode").hide();
+                $("#btnInterroga").show();
+                $("#selectCommessa").prop("disabled",true);
+
+            },
+            error: function(data, status){
+                showError(data);
+                $("#qrcode").val('');
+                $(".listaOsai").html("");
+            }
+        });
     } else {
         timerOn=true;
         $("#selectCommessa").prop("disabled",true);
