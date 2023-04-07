@@ -169,11 +169,12 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
                         },
                         success: function(data, status) {
-                            console.log(data);
                             let dati = data["data"];
-                            console.log(dati);
-                            datiStampati += "<p class='pOsai'> Quantita Ubicazione Destinazione: <strong id='commessaQty'>"+dati[0].QTA_GIAC_PRM+" "+dati[0].R_UM_PRM_MAG+"</strong></p>";
-                            
+                            if(data["count"] > 0){
+                                datiStampati += "<p class='pOsai'> Quantita Ubicazione Destinazione: <strong id='commessaQty'>"+dati[0].QTA_GIAC_PRM+" "+dati[0].R_UM_PRM_MAG+"</strong></p>";
+                            } else {
+                                datiStampati += "<p class='pOsai'> Non ci sono articoli <strong>"+articolo+"</strong> in questa ubicazione <strong>"+ubicazioneDest+"</strong></p>";
+                            }
                             $("#appendData").html(datiStampati);
                             $("#qrcode").val("").attr('placeholder','COMMESSA');
                         },
