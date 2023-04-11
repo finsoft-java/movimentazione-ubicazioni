@@ -231,13 +231,18 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
 });
 
 $(document).on("change", "#selectCommessa", function(){
-    maxQty = $(this).find('option:selected').data("maxqty");
-    $("#commessaQty").html(maxQty+" "+$(this).find('option:selected').data('prm'));
-    $("#qty").attr("max",maxQty).attr("disabled",false);
-    $(".btnPlus").attr('onClick','plus('+maxQty+')');
-    $(".btnAll").attr('onClick','selezionaTutti('+maxQty+')');
-    $("#qrcode").val('').attr('disabled',true);
-    timerOn = false;
+    if($(this).val() != 0){
+        maxQty = $(this).find('option:selected').data("maxqty");
+        $("#commessaQty").html(maxQty+" "+$(this).find('option:selected').data('prm'));
+        $("#qty").attr("max",maxQty).attr("disabled",false);
+        $(".btnPlus").attr('onClick','plus('+maxQty+')');
+        $(".btnAll").attr('onClick','selezionaTutti('+maxQty+')');
+        $("#qrcode").val('').attr('disabled',true);
+        timerOn = false;
+    } else {
+        $("#qrcode").val('').attr('disabled',false);
+        timerOn = true;
+    }    
 });
 
 function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> conferma e esce
@@ -254,7 +259,13 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
     }
     const qty = parseFloat(qtyInput).toFixed(3);
     const codCommessa = $("#selectCommessa option:selected").text();
-
+    if(codCommessa == "Seleziona Commessa"){
+        showError("Inserire una commessa valida");
+        i=4;
+        $("#btnTrasferimento").attr('disabled',false);
+        $("#btnRipeti").attr('disabled',false);
+        return;
+    }
     if(repeatFlag) {
         qrcode.attr("disabled", false);
         qrcode.val("").attr('placeholder','ARTICOLO');

@@ -465,7 +465,7 @@ class CaricamentiMassaManager {
         S.ID_VERSIONE,              -- 20
         S.ID_CONFIG,
         null,
-        S.ID_COMMESSA,
+        '$commessa',
         null,
         null,
         null,

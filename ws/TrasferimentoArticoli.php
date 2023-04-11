@@ -29,6 +29,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($codUbicazioneDest)) {
         print_error(400, "Missing argument codUbicazioneDest");
     }
+    if (empty($commessa)) {
+        print_error(400, "Missing argument commessa");
+    }
     //da aggiungere anche la commessa
     $caricamentiMassaManager->trasferisciArticolo($codUbicazione, $codUbicazioneDest, $codArticolo, $qty, $commessa);
     
