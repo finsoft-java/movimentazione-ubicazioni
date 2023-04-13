@@ -115,10 +115,11 @@ class CaricamentiMassaManager {
             return;
         }
 
+        //$ubi1 = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
         $ubi1 = $ubicazioniManager->getUbicazione($codUbicazione);
+
         if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazione' inesistente");
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
-
         $id = $panthera->get_numeratore('MOVUBI');
         //echo ">1< ";
 
@@ -131,8 +132,12 @@ class CaricamentiMassaManager {
         //echo ">3< ";
 
         // CM_DOC_TRA_RIG
-        $this->creaRigheDocumento($id, $CAU_RIGA_SVUOTA, $codMagazzinoSrc, $codUbicazione, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA);
-
+        //$a=0;
+        foreach($ubi1[0] as $ubicazione) {          
+          //echo "Riga: $a ".$ubicazione['ID_ARTICOLO']." ".$ubicazione['QTA_GIAC_PRM']." ".$ubicazione['ID_COMMESSA'];
+          //$a++;
+          $this->creaRigheDocumento($id, $CAU_RIGA_SVUOTA, $codMagazzinoSrc, $codUbicazione, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA, $ubicazione['ID_ARTICOLO'], $ubicazione['QTA_GIAC_PRM'],0,$ubicazione['ID_COMMESSA']);
+        }
         $this->loop_job_panthera($id);
         
         $ubicazioniManager->updateDatiComuniUbicazione($codUbicazione);
@@ -173,8 +178,8 @@ class CaricamentiMassaManager {
             $codUbicazioniNonVuote[] = $codUbicazione;
           }
         }
-        foreach($codUbicazioniVuote as $codUbicazione) {
-          $this->trasferisciUbicazioneVuota($codUbicazione, $codMagazzinoDest);
+        foreach($codUbicazioniVuote as $ubiVuote) {
+          $this->trasferisciUbicazioneVuota($ubiVuote, $codMagazzinoDest);
         }
 
         if (count($codUbicazioniNonVuote) == 0) {
