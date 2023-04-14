@@ -105,37 +105,70 @@ class CaricamentiMassaManager {
         $this->loop_job_panthera($id);
     }
 
+    function trasferisciContenuto($codUbicazione, $codUbicazioneDest) {
+      global $panthera, $ubicazioniManager, $CAU_TESTATA_SVUOTA, $CAU_RIGA_SVUOTA, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA;
+
+      if ($panthera->mock) {
+          return;
+      }
+
+      $ubi1 = $ubicazioniManager->getUbicazione($codUbicazione);
+      if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazione' inesistente");
+      $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
+
+      $id = $panthera->get_numeratore('MOVUBI');
+      //echo ">1< ";
+
+      // BATCH_LOAD_HDR
+      $this->creaTestataCaricamento($id);
+      //echo ">2< ";
+
+      // CM_DOC_TRA_TES
+      $this->creaTestataDocumento($id, $CAU_TESTATA_SVUOTA, $codMagazzinoSrc, $codUbicazioneDest);
+      //echo ">3< ";
+
+      // CM_DOC_TRA_RIG
+      $this->creaRigheDocumento($id, $CAU_RIGA_SVUOTA, $codMagazzinoSrc, $codUbicazione, $codMagazzinoSrc, $codUbicazioneDest);
+
+      $this->loop_job_panthera($id);
+      
+      $ubicazioniManager->updateDatiComuniUbicazione($codUbicazione);
+  }
+
+
     /**
      * FUNZIONE "Svuota ubicazione"
      */
     function svuotaUbicazione($codUbicazione) {
-        global $panthera, $ubicazioniManager, $CAU_TESTATA_SVUOTA, $CAU_RIGA_SVUOTA, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA;
+      global $panthera, $ubicazioniManager, $CAU_TESTATA_SVUOTA, $CAU_RIGA_SVUOTA, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA;
 
-        if ($panthera->mock) {
-            return;
-        }
+      if ($panthera->mock) {
+          return;
+      }
 
-        $ubi1 = $ubicazioniManager->getUbicazione($codUbicazione);
-        if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazione' inesistente");
-        $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
+      //$ubi1 = $ubicazioniManager->getContenutoUbicazione($codUbicazione);
+      $ubi1 = $ubicazioniManager->getUbicazione($codUbicazione);
 
-        $id = $panthera->get_numeratore('MOVUBI');
-        //echo ">1< ";
+      if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazione' inesistente");
+      $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
+      $id = $panthera->get_numeratore('MOVUBI');
+      //echo ">1< ";
 
-        // BATCH_LOAD_HDR
-        $this->creaTestataCaricamento($id);
-        //echo ">2< ";
+      // BATCH_LOAD_HDR
+      $this->creaTestataCaricamento($id);
+      //echo ">2< ";
 
-        // CM_DOC_TRA_TES
-        $this->creaTestataDocumento($id, $CAU_TESTATA_SVUOTA, $codMagazzinoSrc, $COD_MAGAZ_SVUOTA);
-        //echo ">3< ";
+      // CM_DOC_TRA_TES
+      $this->creaTestataDocumento($id, $CAU_TESTATA_SVUOTA, $codMagazzinoSrc, $COD_MAGAZ_SVUOTA);
+      //echo ">3< ";
 
-        // CM_DOC_TRA_RIG
-        $this->creaRigheDocumento($id, $CAU_RIGA_SVUOTA, $codMagazzinoSrc, $codUbicazione, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA);
+      // CM_DOC_TRA_RIG
+      //$a=0;
+      $this->creaRigheDocumento($id, $CAU_RIGA_SVUOTA, $codMagazzinoSrc, $codUbicazione, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA);
 
-        $this->loop_job_panthera($id);
-        
-        $ubicazioniManager->updateDatiComuniUbicazione($codUbicazione);
+      $this->loop_job_panthera($id);
+      
+      $ubicazioniManager->updateDatiComuniUbicazione($codUbicazione);
     }
 
     /**
