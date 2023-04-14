@@ -109,13 +109,13 @@ function trasferisciContenuto()  {
 
     //TODO cambiare la post
     $.post({
-        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + qty  + "&codUbicazioneDest=" +ubicazioneDest+ "&commessa=" + codCommessa,
+        url: "./ws/TrasferimentoContenuto.php?codUbicazione=" + ubicazione + "&codUbicazioneDest=" +ubicazioneDest,
         dataType: 'json',
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
         },
         success: function(data, status) {
-            showSuccessMsg("Trasferimento avvenuto con successo \n (ubicazione di partenza: " + ubicazione + ", ubicazione dest.: " + ubicazioneDest + ", articolo: " + articolo + ", quantità: " + qty + ")");
+            showSuccessMsg("Trasferimento avvenuto con successo \n (ubicazione di partenza: " + ubicazione + ", ubicazione dest.: " + ubicazioneDest + ")");
         },
         error: function(data, status){
             console.log("ERRORE in trasferimentoArticoli", data);
