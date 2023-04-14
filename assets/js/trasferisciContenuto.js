@@ -20,12 +20,15 @@ let ubicazione;
 let ubicazioneDest;
 
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
+    $("#btnTrasferimento").attr('disabled', true);
     this.value = this.value.toUpperCase();
+
     if (event.keyCode === 13) {
         event.preventDefault();
         i++;
         barCode = $("#qrcode").val();
         if(i == 1) {
+            $("#btnTrasferimento").attr('disabled', true);
             if(barCode.trim() != ""){       
                 ubicazione =  barCode;
                 $.get({
@@ -120,6 +123,11 @@ function trasferisciContenuto()  {
             qrcode.val('');
         }
     });
+}
+
+function cancel() {
+    $("#btnTrasferimento").attr('disabled',true);
+    window.location.reload();
 }
 
 function showError(data) {

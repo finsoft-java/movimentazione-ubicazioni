@@ -283,6 +283,12 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
     });
 }
 
+function cancel() {
+    $("#btnTrasferimento").attr('disabled',true);
+    $("#btnRipeti").attr('disabled',true);
+    window.location.reload();
+}
+
 function showError(data) {
     const err = typeof data === 'string' ? data :
                 data.responseJSON && data.responseJSON.error && data.responseJSON.error.value.length > 0 ? data.responseJSON.error.value :
