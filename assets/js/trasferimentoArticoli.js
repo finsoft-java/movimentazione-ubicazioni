@@ -134,8 +134,8 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                             arrayCommessa.push("-");
                             nomeCommessa = "-";                            
                         } else {
-                            nomeCommessa = dati[i].ID_COMMESSA;
-                            arrayCommessa.push(dati[i].ID_COMMESSA);
+                            nomeCommessa = dati[i].ID_COMMESSA.trim();
+                            arrayCommessa.push(dati[i].ID_COMMESSA.trim());
                         }
                         if(i == 0) {
                             giacenzaIniziale = dati[i].QTA_GIAC_PRM;
