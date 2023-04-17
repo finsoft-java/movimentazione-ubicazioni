@@ -68,7 +68,6 @@ class CaricamentiMassaManager {
      * FUNZIONE "Trasferisci articolo da una ubicazione a un'altra"
      */
 
-    //da aggiungere commessa
     function trasferisciArticolo($codUbicazioneSrc, $codUbicazioneDest, $articolo, $qty, $commessa) {
         global $panthera, $ubicazioniManager, $CAU_TESTATA, $CAU_RIGA;
 
@@ -87,20 +86,15 @@ class CaricamentiMassaManager {
         $ubicazioniManager->check_articolo($articolo);
 
         $id = $panthera->get_numeratore('MOVUBI');
-        //echo ">1< ";
 
         // BATCH_LOAD_HDR
         $this->creaTestataCaricamento($id);
-        //echo ">2< ";
 
         // CM_DOC_TRA_TES
         $this->creaTestataDocumento($id, $CAU_TESTATA, $codMagazzinoSrc, $codMagazzinoDest);
-        //echo ">3< ";
 
         // CM_DOC_TRA_RIG
-        //importante passare commessa
         $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty, 0, $commessa);
-        //echo ">4< ";
 
         $this->loop_job_panthera($id);
     }
@@ -120,15 +114,12 @@ class CaricamentiMassaManager {
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
 
         $id = $panthera->get_numeratore('MOVUBI');
-        //echo ">1< ";
 
         // BATCH_LOAD_HDR
         $this->creaTestataCaricamento($id);
-        //echo ">2< ";
 
         // CM_DOC_TRA_TES
         $this->creaTestataDocumento($id, $CAU_TESTATA_SVUOTA, $codMagazzinoSrc, $COD_MAGAZ_SVUOTA);
-        //echo ">3< ";
 
         // CM_DOC_TRA_RIG
         $this->creaRigheDocumento($id, $CAU_RIGA_SVUOTA, $codMagazzinoSrc, $codUbicazione, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA);
@@ -156,6 +147,7 @@ class CaricamentiMassaManager {
         $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
         $id = $panthera->get_numeratore('MOVUBI');  
         $magazziniManager->checkMagazzino($codMagazzinoDest);
+
         // l'algoritmo cambia a seconda che l'ubicazione sia piena o vuota
         $codUbicazioniVuote = [];
         $codUbicazioniNonVuote = [];
@@ -183,11 +175,9 @@ class CaricamentiMassaManager {
 
         // BATCH_LOAD_HDR
         $this->creaTestataCaricamento($id);
-        //echo ">2< ";
 
         // CM_DOC_TRA_TES
         $this->creaTestataDocumento($id, $CAU_TESTATA, $codMagazzinoSrc, $codMagazzinoDest);
-        //echo ">3< ";
  
         // CM_DOC_TRA_RIG
         $row = 0;
@@ -360,9 +350,7 @@ class CaricamentiMassaManager {
           null
         )
         ";
-
-        // echo $sql; die();
-
+        
         $panthera->execute_update($sql);
     }
 
@@ -518,8 +506,6 @@ class CaricamentiMassaManager {
           $sql .= " AND S.ID_COMMESSA IS NULL ";
         }
       }
-
-      //echo $sql; die();
 
       $panthera->execute_update($sql);
 
