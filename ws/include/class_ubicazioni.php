@@ -37,11 +37,11 @@ class UbicazioniManager {
           $sql2 = "FROM THIP.UBICAZIONI_LL U
                   JOIN THIPPERS.YUBICAZIONI_LL YU
                     ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
-                  JOIN THIP.SALDI_UBICAZIONE_V01 S
+                  JOIN THIP.SALDI_UBICAZIONE S
                     ON U.ID_AZIENDA=S.ID_AZIENDA AND U.ID_UBICAZIONE=S.ID_UBICAZIONE AND U.ID_MAGAZZINO=S.ID_MAGAZZINO
                   JOIN THIP.ARTICOLI A
                     ON S.ID_AZIENDA=A.ID_AZIENDA AND S.ID_ARTICOLO=A.ID_ARTICOLO
-                  WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND S.ID_ARTICOLO='$codArticolo' $str_trasferibile AND U.STATO='V' AND S.QTA_GIAC_PRM>0 ";
+                  WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND S.ID_ARTICOLO='$codArticolo' $str_trasferibile AND U.STATO='V' ";
           
           $sql3 = " ORDER BY S.ID_ARTICOLO";
          $count = $panthera->select_single_value($sql0 . $sql2);
@@ -79,11 +79,11 @@ class UbicazioniManager {
             $sql2 = "FROM THIP.UBICAZIONI_LL U
                     JOIN THIPPERS.YUBICAZIONI_LL YU
                       ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
-                    JOIN THIP.SALDI_UBICAZIONE_V01 S
+                    JOIN THIP.SALDI_UBICAZIONE S
                       ON U.ID_AZIENDA=S.ID_AZIENDA AND U.ID_UBICAZIONE=S.ID_UBICAZIONE AND U.ID_MAGAZZINO=S.ID_MAGAZZINO
                     JOIN THIP.ARTICOLI A
                       ON S.ID_AZIENDA=A.ID_AZIENDA AND S.ID_ARTICOLO=A.ID_ARTICOLO
-                    WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND S.QTA_GIAC_PRM <> 0 $str_trasferibile AND U.STATO='V' AND S.QTA_GIAC_PRM>0 ";
+                    WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND S.QTA_GIAC_PRM <> 0 $str_trasferibile AND U.STATO='V' ";
             $sql3 = " ORDER BY S.ID_ARTICOLO";
             $count = $panthera->select_single_value($sql0 . $sql2);
             $data = $panthera->select_list($sql1 . $sql2 . $sql3);
@@ -123,11 +123,11 @@ class UbicazioniManager {
           $sql2 = "FROM THIP.UBICAZIONI_LL U
                   JOIN THIPPERS.YUBICAZIONI_LL YU
                     ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
-                  JOIN THIP.SALDI_UBICAZIONE_V01 S
+                  JOIN THIP.SALDI_UBICAZIONE S
                     ON U.ID_AZIENDA=S.ID_AZIENDA AND U.ID_UBICAZIONE=S.ID_UBICAZIONE AND U.ID_MAGAZZINO=S.ID_MAGAZZINO
                   JOIN THIP.ARTICOLI A
                     ON S.ID_AZIENDA=A.ID_AZIENDA AND S.ID_ARTICOLO=A.ID_ARTICOLO
-                  WHERE U.ID_AZIENDA='$ID_AZIENDA' AND S.ID_ARTICOLO='$codArticolo' AND U.STATO='V' AND S.QTA_GIAC_PRM>0
+                  WHERE U.ID_AZIENDA='$ID_AZIENDA' AND S.ID_ARTICOLO='$codArticolo' AND U.STATO='V'
                   GROUP BY U.ID_UBICAZIONE, U.ID_MAGAZZINO, U.R_UTENTE_AGG, U.TIMESTAMP_AGG, S.ID_ARTICOLO, A.DESCRIZIONE, A.DISEGNO, A.R_UM_PRM_MAG, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
           
           $sql3 = " ORDER BY U.ID_UBICAZIONE, S.ID_ARTICOLO";

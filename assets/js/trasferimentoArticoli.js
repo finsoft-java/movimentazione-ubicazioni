@@ -250,13 +250,15 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
     const qrcode = $("#qrcode");
     
     //fixme devo controllare se è in whitelist
-    if((!qtyInput.match(/^\d+(,\d+|\.\d+)?$/)) || !qtyInput || (parseFloat(qtyInput) < 0.001 || parseFloat(qtyInput) > maxQty)) { 
-        showError("Inserire una quantità valida tra uno e " + maxQty + " (numeri decimali con il punto)");
-        i=3;
-        $("#btnTrasferimento").attr('disabled',false);
-        $("#btnRipeti").attr('disabled',false);
-        return;
-    }
+    if(!whiteList.includes(ubicazioneDest)){
+        if((!qtyInput.match(/^\d+(,\d+|\.\d+)?$/)) || !qtyInput || (parseFloat(qtyInput) < 0.001 || parseFloat(qtyInput) > maxQty)) { 
+            showError("Inserire una quantità valida tra uno e " + maxQty + " (numeri decimali con il punto)");
+            i=3;
+            $("#btnTrasferimento").attr('disabled',false);
+            $("#btnRipeti").attr('disabled',false);
+            return;
+        }
+    }    
     const qty = parseFloat(qtyInput).toFixed(3);
     const codCommessa = $("#selectCommessa option:selected").text();
     if(codCommessa == "Seleziona Commessa"){
@@ -322,13 +324,13 @@ function plus(maxQty, ubicazione) {
 
 function minus(minimum = 1, ubicazione) {
     //controllo se è in whitelist l'ubicazione di partenza 
-    if(whiteList.includes(ubicazione)) {
-        $("#qty").val((parseFloat($("#qty").val())-1).toFixed(3));
-    } else {
+    //if(whiteList.includes(ubicazione)) {
+    //     $("#qty").val((parseFloat($("#qty").val())-1).toFixed(3));
+    //} else {
         if($("#qty").val() >= minimum + 1) {
             $("#qty").val((parseFloat($("#qty").val())-1).toFixed(3));
         }
-    }   
+    //}   
 }
 
 function selezionaTutti(maxQty) {
