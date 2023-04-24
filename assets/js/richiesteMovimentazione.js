@@ -122,7 +122,7 @@ function showError(data) {
 function getHtmlGrigliaDocumenti(idDoc, x) {
     // qui x dovrebbe essere uguale a documenti[id]
     return `<div class="rigaDocumenti" onclick="openDoc(${idDoc})">
-                <p style="padding: 10px 15px; margin: 0px; text-align: center;">Richiesta Doc.: <strong>${x.NUMERO_DOC_FMT}</strong><br/>del ${x.DATA_DOC}</p><hr/>
+                <p style="padding: 20px 15px; margin: 0px; text-align: center;">Richiesta Doc.: <strong>${x.NUMERO_DOC_FMT}</strong><br/>del ${x.DATA_DOC}</p><hr style="margin:0px;"/>
             </div>`;
 }
 
@@ -169,7 +169,7 @@ function ridisegnaElencoRigheDocumenti() {
 function getHtmlGrigliaRighe(idDoc, idRiga, riga) {
     // QUI x dovrebbe essere documenti[id].RIGHE[id2]
     let commessa = riga.R_COMMESSA || '-';
-    return `<div class="rigaDocumenti" onclick="openRow(${idDoc},${idRiga})" style="text-align:center;border-top: 1px solid rgba(0,0,0,.1);padding: 10px 15px;">
+    return `<div class="rigaDocumenti" onclick="openRow(${idDoc},${idRiga})" style="text-align:center;border-top: 1px solid rgba(0,0,0,.1);padding: 20px 15px;">
                <p style="margin:0px;">
                 Art.: <strong> ${riga.R_ARTICOLO}</strong> <br/>
                 Comm. :<strong>${commessa} </strong> <br/>
@@ -195,6 +195,7 @@ function openRow(idDoc, idRiga) {
         },
         success: function(data, status) { 
             let dati = data["data"];
+            let datiStampati = "";
             arrUbicazioniDest = dati;
             if(dati[0] == null || dati.length === 0) {
                 showError("Errore interno nel reperire i magazzini");
@@ -202,7 +203,7 @@ function openRow(idDoc, idRiga) {
                 return false;
             }
             
-            datiStampati += "<select onchange='onChangeMagazzino();'' onclick='timerOn = false' id='magazzinoOrigine' onfocusout='timerOn = true' class='form-control'>";    
+            datiStampati += "<select onchange='onChangeMagazzino();' onclick='timerOn = false' id='magazzinoOrigine' onfocusout='timerOn = true' class='form-control'>";    
             datiStampati += "<option value='-1'> Seleziona magazzino partenza </option>";                            
             for (let i = 0; i < dati.length; i++) {
                 // FIXME di default mettere quello che arriva dalla riga del documento
@@ -219,6 +220,7 @@ function openRow(idDoc, idRiga) {
                 },
                 success: function(data, status) { 
                     let dati = data["data"];
+                    let datiStampati = "";
                     arrUbicazioniDest = dati;
                     if(dati[0] == null || dati.length === 0) {
                         showError("Nessuna ubicazione disponibile");
@@ -226,10 +228,10 @@ function openRow(idDoc, idRiga) {
                         return false;
                     }
                     
-                    datiStampati += "<select onchange='onChangeUbicazione();'' onclick='timerOn = false' id='ubicazioneOrigine' onfocusout='timerOn = true' class='form-control'>";    
+                    datiStampati += "<select onchange='onChangeUbicazione();' onclick='timerOn = false' id='ubicazioneOrigine' onfocusout='timerOn = true' class='form-control'>";    
                     datiStampati += "<option value='-1'> Seleziona ubicazione partenza </option>";                            
                     for (let i = 0; i < dati.length; i++) {
-                        datiStampati += "<option value='"+dati[i]+"'>" + dati[i] + "</option>";                    
+                        datiStampati += "<option value='"+dati[i].ID_UBICAZIONE+"'>" + dati[i].ID_UBICAZIONE + "</option>";                    
                     } 
                     datiStampati+= "</select>";
                     $("#divSingolaRiga").append(datiStampati);
