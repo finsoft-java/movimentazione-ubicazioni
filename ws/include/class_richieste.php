@@ -51,18 +51,22 @@ STATO
   V = VALIDO
   S= SOSPESO
 STATO AVANZAMENTO 
-  1= DEFINITIVO
-  0= PROVVISORIO 
+  2= DEFINITIVO
+  1= PROVVISORIO
+  0= TEMPLATE 
 R_CAU_DOC_TRA
   CAUSALI DEFINITE DA config.php
 */
 
         $sql0 = "SELECT COUNT(*) AS cnt ";
         $sql1 = "SELECT * ";
-        $sql = "FROM THIP.DOC_TRA_TES
-                WHERE ID_AZIENDA='$ID_AZIENDA'
-                AND STATO = 'V' AND STATO_AVANZAMENTO='0'
-                AND R_CAU_DOC_TRA IN ('" . implode("','", $CAUSALI_RICHIESTE_MOV) . "')";
+        $sql = "FROM THIP.DOC_TRA_TES T
+                WHERE T.ID_AZIENDA='$ID_AZIENDA'
+                AND T.STATO = 'V' 
+                AND T.STATO_AVANZAMENTO='1'
+                AND T.R_CAU_DOC_TRA IN ('" . implode("','", $CAUSALI_RICHIESTE_MOV) . "')
+                AND EXISTS( SELECT 1 FROM THIP.DOC_TRA_RIG R
+                WHERE R.ID_AZIENDA=T.ID_AZIENDA AND R.ID_ANNO_DOC=T.ID_ANNO_DOC AND R.ID_NUMERO_DOC=T.ID_NUMERO_DOC)";
         $count = $panthera->select_single_value($sql0 . $sql);
 
         $sql .= " ORDER BY ID_ANNO_DOC DESC, ID_NUMERO_DOC DESC";
@@ -138,7 +142,7 @@ R_CAU_DOC_TRA
 
         $sql = "SELECT * FROM THIP.DOC_TRA_RIG
                 WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_ANNO_DOC='$idAnnoDoc' AND ID_NUMERO_DOC='$idNumeroDoc'
-                AND STATO= 'V' AND STATO_AVANZAMENTO='0'
+                AND STATO= 'V' AND STATO_AVANZAMENTO='1'
                 ORDER BY ID_RIGA_DOC";
         $data = $panthera->select_list($sql);
       }

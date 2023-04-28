@@ -6,12 +6,17 @@ var rigaSelezionata = null;
 var magazzinoCorrente = null;
 var commessaCorrente = null;
 var ubicazioneCorrente = null;
+var magazzinoDest = null;
+var commessaDest = null;
+var ubicazioneDest = null;
+var articoloMovimentazione = null;
 var statoCorrente = 0;
 
 /**
  * Inizializza l'interfaccia per un certo stato i
  */
 function initStato(i) {
+    console.log("inizio statoCorrente",statoCorrente);
     statoCorrente = i;
     if (statoCorrente == 0) {
         // griglia dei documenti
@@ -36,13 +41,15 @@ function initStato(i) {
         $('#btnBack').show();
     } else if (statoCorrente == 2) {
         // maschera di scelta dell'ubicazione
+        $(".qrcode").show();
         $("#divElencoDocumentiContainer").hide();
         $("#divElencoRigheDocumentiContainer").hide();
         $("#divSingolaRigaContainer").show();
-        $('#btnPreleva button').show().attr('disabled', true);
+        $('#btnPreleva').show().attr('disabled', true);
         $('#btnConfirm').hide();
         $('#btnBack').show();
     }
+    console.log("fine statoCorrente",statoCorrente);
 }
 
 function indietro() {
@@ -121,8 +128,9 @@ function showError(data) {
 
 function getHtmlGrigliaDocumenti(idDoc, x) {
     // qui x dovrebbe essere uguale a documenti[id]
+    var myDate = x.DATA_DOC.split(' ')[0];
     return `<div class="rigaDocumenti" onclick="openDoc(${idDoc})">
-                <p style="padding: 20px 15px; margin: 0px; text-align: center;">Richiesta Doc.: <strong>${x.NUMERO_DOC_FMT}</strong><br/>del ${x.DATA_DOC}</p><hr style="margin:0px;"/>
+                <p style="padding: 30px 15px; margin: 0px; text-align: center;">Documento: <strong>${x.NUMERO_DOC_FMT}</strong> del ${myDate}</p><hr style="margin:0px;"/>
             </div>`;
 }
 
@@ -171,9 +179,8 @@ function getHtmlGrigliaRighe(idDoc, idRiga, riga) {
     let commessa = riga.R_COMMESSA || '-';
     return `<div class="rigaDocumenti" onclick="openRow(${idDoc},${idRiga})" style="text-align:center;border-top: 1px solid rgba(0,0,0,.1);padding: 20px 15px;">
                <p style="margin:0px;">
-                Art.: <strong> ${riga.R_ARTICOLO}</strong> <br/>
-                Comm. :<strong>${commessa} </strong> <br/>
-                Qta presente. : <strong>${riga.QTA_UM_PRM}</strong> - Qta. richiesta <strong>${riga.R_UM_PRM_MAG} </strong>
+                Articolo: <strong> ${riga.R_ARTICOLO}</strong> Commessa :<strong>${commessa} </strong> <br/>
+                Qta. richiesta <strong>${riga.QTA_UM_PRM} </strong>
                </p>
             </div>`;
 }
@@ -183,10 +190,21 @@ function openRow(idDoc, idRiga) {
     rigaSelezionata = idRiga;
     initStato(2);
     let x = documenti[documentoSelezionato].RIGHE[rigaSelezionata];
+    console.log("DATI RIGA",x);
     magazzinoCorrente = x.R_MAGAZZINO;
+    magazzinoDest = x.R_MAGAZZINO_ARR;
+    commessaCorrente = x.R_COMMESSA;
+    commessaDest = x.R_COMMESSA_ARR;
+    ubicazioneCorrente = x.R_UBI_PAR;
+    ubicazioneDest = x.R_UBI_ARR;
+    qntTotaleRichiesta = x.QTA_UM_PRM;
+    articoloMovimentazione = x.R_ARTICOLO;
 
-    $("#divSingolaRiga").html(`Articolo ${x.R_ARTICOLO} Comm. ${x.R_COMMESSA} - ${x.QTA_UM_PRM} ${x.R_UM_PRM_MAG}<br/>`);
-
+    $("#divSingolaRiga").html(`<p style="margin:30px; 0px;text-align:center">
+                                    Articolo: <strong>  ${x.R_ARTICOLO} </strong> Commessa: <strong>${x.R_COMMESSA}</strong> </br>
+                                    Richiesta quantità: <strong>${qntTotaleRichiesta}</strong>
+                               </p>`);
+/*
     $.get({
         url: "./ws/GetMagazziniAlternativi.php",
         dataType: 'json',
@@ -203,15 +221,7 @@ function openRow(idDoc, idRiga) {
                 return false;
             }
             
-            datiStampati += "<select onchange='onChangeMagazzino();' onclick='timerOn = false' id='magazzinoOrigine' onfocusout='timerOn = true' class='form-control'>";    
-            datiStampati += "<option value='-1'> Seleziona magazzino partenza </option>";                            
-            for (let i = 0; i < dati.length; i++) {
-                // FIXME di default mettere quello che arriva dalla riga del documento
-                datiStampati += "<option value='"+dati[i]+"'>" + dati[i] + "</option>";                    
-            } 
-            datiStampati+= "</select>";
-            $("#divSingolaRiga").append(datiStampati);
-
+*/
             $.get({
                 url: `./ws/Interrogazione.php?codArticolo=${x.R_ARTICOLO}`,
                 dataType: 'json',
@@ -220,6 +230,16 @@ function openRow(idDoc, idRiga) {
                 },
                 success: function(data, status) { 
                     let dati = data["data"];
+                    datiUbicazione = dati.filter((value, index, self) =>
+                        index === self.findIndex((t) => (
+                            t.ID_UBICAZIONE === value.ID_UBICAZIONE
+                        ))
+                    );
+                    datiMagazzino = dati.filter((value, index, self) =>
+                        index === self.findIndex((t) => (
+                            t.ID_MAGAZZINO === value.ID_MAGAZZINO
+                        ))
+                    );
                     let datiStampati = "";
                     arrUbicazioniDest = dati;
                     if(dati[0] == null || dati.length === 0) {
@@ -227,60 +247,94 @@ function openRow(idDoc, idRiga) {
                         $("#qrcode").val('');
                         return false;
                     }
+
+                    datiStampati += "<label>Magazzino Prelievo</label>";
+                    datiStampati += "<select onchange='onChangeMagazzino();' onclick='timerOn = false' id='magazzinoOrigine' onfocusout='timerOn = true' class='form-control'>";    
+                    datiStampati += "<option value='-1'> Seleziona magazzino partenza </option>";                            
+                    for (let i = 0; i < datiMagazzino.length; i++) {
+                        let selected = "";
+                        if(magazzinoCorrente == datiMagazzino[i].ID_MAGAZZINO){
+                            selected = "selected='selected'";
+                        }
+                        datiStampati += "<option "+selected+" value='"+datiMagazzino[i].ID_MAGAZZINO+"'>" + datiMagazzino[i].ID_MAGAZZINO + "</option>";                    
+                    } 
+                    datiStampati+= "</select>";
+
+                    let magazzinoDestinazioneHtml = "";
+                    magazzinoDestinazioneHtml += "<label>Magazzino di Destinazione</label>";
+                    magazzinoDestinazioneHtml += "<select onchange='onChangeMagazzinoDest();' onclick='timerOn = false' id='magazzinoDest' onfocusout='timerOn = true' class='form-control'>";    
+                    magazzinoDestinazioneHtml += "<option value='-1'> Seleziona magazzino destinazione </option>";                            
+                    for (let i = 0; i < datiMagazzino.length; i++) {
+                        let selected = "";
+                        if(magazzinoDest == datiMagazzino[i].ID_MAGAZZINO){
+                            selected = "selected='selected'";
+                        }
+                        magazzinoDestinazioneHtml += "<option "+selected+" value='"+datiMagazzino[i].ID_MAGAZZINO+"'>" + datiMagazzino[i].ID_MAGAZZINO + "</option>";                    
+                    } 
+                    magazzinoDestinazioneHtml+= "</select>";
                     
-                    datiStampati += "<select onchange='onChangeUbicazione();' onclick='timerOn = false' id='ubicazioneOrigine' onfocusout='timerOn = true' class='form-control'>";    
+                    datiStampati += "<label>Ubicazione di Prelievo</label>";
+                    datiStampati += "<select onclick='timerOn = false' id='ubicazioneOrigine' onfocusout='timerOn = true' class='form-control'>";    
                     datiStampati += "<option value='-1'> Seleziona ubicazione partenza </option>";                            
-                    for (let i = 0; i < dati.length; i++) {
-                        datiStampati += "<option value='"+dati[i].ID_UBICAZIONE+"'>" + dati[i].ID_UBICAZIONE + "</option>";                    
+                    for (let i = 0; i < datiUbicazione.length; i++) {
+                        let selected = "";
+                        console.log("arr Interrogazione.php?codArticolo=-> "+dati[i]);
+                        if(ubicazioneCorrente === datiUbicazione[i].ID_UBICAZIONE){
+                            selected = "selected='selected'";
+                        }
+                        datiStampati += "<option "+selected+" value='"+datiUbicazione[i].ID_UBICAZIONE+"' data-qta='"+datiUbicazione[i].QTA_GIAC_PRM+"'>" + datiUbicazione[i].ID_UBICAZIONE + " </option>";                    
+                    } 
+                    datiStampati += "</select>";
+                    datiStampati += magazzinoDestinazioneHtml;
+                    datiStampati += "<label>Ubicazione di Destinazione</label>";
+                    datiStampati += "<select onchange='onChangeUbicazioneDest();' onclick='timerOn = false' id='ubicazioneDest' onfocusout='timerOn = true' class='form-control'>";    
+                    datiStampati += "<option value='-1'> Seleziona ubicazione arrivo </option>";                            
+                    for (let i = 0; i < datiUbicazione.length; i++) {
+                        let selected = "";
+                        if(ubicazioneDest === datiUbicazione[i].ID_UBICAZIONE){
+                            selected = "selected='selected'";
+                        }
+                        datiStampati += "<option "+selected+" value='"+datiUbicazione[i].ID_UBICAZIONE+"' data-qta='"+datiUbicazione[i].QTA_GIAC_PRM+"'>" + datiUbicazione[i].ID_UBICAZIONE + " </option>";                    
                     } 
                     datiStampati+= "</select>";
                     $("#divSingolaRiga").append(datiStampati);
+
+                    
+                    $("#ubicazioneOrigine").trigger("change");
+                    // TODO qui devo fare apparire un menu a tendina con tutti i magazzini, con preselezionato il magazzinoCorrente,
+                    // e poi un altro con tutte le ubicazioni del magazzino selezionato che contengano l'articolo x.R_ARTICOLO
+
+                    
                     
                 }, error: function(data, status) {
                     console.log('ERRORE -> Interrogazione', data);
                     showError(data);
                 }
             });
+/*
         }, error: function(data, status) {
             console.log('ERRORE -> getMagazziniAlternativi', data);
             showError(data);
         }
     });
+        */
 
-    // TODO qui devo fare apparire un menu a tendina con tutti i magazzini, con preselezionato il magazzinoCorrente,
-    // e poi un altro con tutte le ubicazioni del magazzino selezionato che contengano l'articolo x.R_ARTICOLO
-
-    /*if (ubicazioneCorrente) {
-        interrogaUbicazione(ubicazioneCorrente, x.R_ARTICOLO, (documentiGiacenze) => {
-            let datiStampati = `Ubicazione ${ubicazioneCorrente}.<br/>
-            Seleziona quantità oppure cambia ubicazione.
-            <select id='selectCommessa' class='form-control' onchange='setGiacenzaCommessaSelezionata()'>`;
-            documentiGiacenze.forEach(x => {
-                let commessa = x.ID_COMMESSA || '-';
-                let selected = (commessa == x.R_COMMESSA) ? " selected " : "";
-                datiStampati += `<option value='${x.QTA_GIAC_PRM}' data-prm='${x.R_UM_PRM_MAG}' ${selected}>${commessa}</option>`
-            });
-            datiStampati += `</select>
-            <input type='number' class='form-control inputOsai' disabled id='qty' class='inputOsai' value='1' min='0.001' placeholder='Quantità da prelevare' aria-label='Quantità da prelevare' aria-describedby='basic-addon2' onchange='checkQty()'>
-            `;
-            $("#divSingolaRiga").append(datiStampati);
-            setGiacenzaCommessaSelezionata();
-        })
-    } else {
-        $("#divSingolaRiga").append("Scegliere una ubicazione:");
-    }*/
+    
 }
 
 function setGiacenzaCommessaSelezionata() {
     let giacenzaSelezionata = $("#selectCommessa").val(); // spero che funzioni
     console.log("giacenzaSelezionata=", giacenzaSelezionata);
+    if(giacenzaSelezionata > qntTotaleRichiesta){
+        giacenzaSelezionata = qntTotaleRichiesta;
+    }
     $("#qty").val(giacenzaSelezionata);
     checkQty();
 }
 
 function checkQty() {
     let qty = $("#qty").val();
-    $("#btnPreleva button").attr('disabled', qty > 0 ? false : true);
+    $("#btnPreleva button").attr('disabled', qty > 0 && qty <= qntTotaleRichiesta ? false : true);
 }
 
 function preleva() {
@@ -303,6 +357,19 @@ function preleva() {
     }
 }
 
+function plus(maxQty) {
+    if($("#qty").val() <= maxQty - 1) {
+        $("#qty").val((parseFloat($("#qty").val())+1).toFixed(3));    
+    }
+}
+
+function minus(minimum = 1) {
+    if($("#qty").val() >= minimum + 1) {
+        $("#qty").val((parseFloat($("#qty").val())-1).toFixed(3));
+    }
+}
+
+
 function interrogaUbicazione(ubicazione, articolo, callback) {
     $.get({
         url: "./ws/Interrogazione.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo,
@@ -320,3 +387,41 @@ function interrogaUbicazione(ubicazione, articolo, callback) {
         }
     });
 }
+
+$(document).on("change","#ubicazioneOrigine",function(){
+    console.log($(this).val());
+    ubicazioneCorrente = $(this).val();
+    if (ubicazioneCorrente) {
+        interrogaUbicazione(ubicazioneCorrente, articoloMovimentazione, (documentiGiacenze) => {
+            console.log("----");
+            console.log(documentiGiacenze);
+            console.log("----");
+            let datiStampati = `<div class='commessaBox'>
+                                    <p style='margin:30px; 0px;text-align:center'>Ubicazione ${ubicazioneCorrente}.<br/> Seleziona quantità oppure cambia ubicazione. </p>
+                                    <label>Commesse disponibili</label>
+                                    <select id='selectCommessa' class='form-control' onchange='setGiacenzaCommessaSelezionata()'>
+                                        <option value='0'>Seleziona una commessa </option>`;
+                        documentiGiacenze.forEach(x => {
+                            let commessa = x.ID_COMMESSA || '-';
+                            let selected = (commessa == commessaDest) ? " selected " : "";
+                            datiStampati += `<option value='${x.QTA_GIAC_PRM}' data-prm='${x.R_UM_PRM_MAG}' ${selected}>${commessa}</option>`
+                        });
+                datiStampati +=     `</select>`;
+                datiStampati +=     `<div class='input-group inputDiv'>  
+                                        <div class='input-group-prepend'>
+                                            <button class='btn btnInputForm btnMinus' type='button' onClick='minus(1)'>-</button>
+                                        </div>`;
+                    datiStampati += `   <input type='number' class='form-control inputOsai' disabled id='qty' class='inputOsai' value='${qntTotaleRichiesta}' min='0.001' onchange='checkQty()' placeholder='Quantità da prelevare' aria-label='Quantità da prelevare' aria-describedby='basic-addon2'>`;
+                    datiStampati += `   <div class='input-group-append'>
+                                            <button class='btn btnInputForm btnPlus' type='button' onClick='plus("${qntTotaleRichiesta}")'>+</button>
+                                        </div>
+                                    </div>
+                                </div>`;
+            $(".commessaBox").remove();
+            $("#divSingolaRiga").append(datiStampati);
+            setGiacenzaCommessaSelezionata();
+        })
+    } else {
+        $("#divSingolaRiga").append("Scegliere una ubicazione:");
+    }
+});
