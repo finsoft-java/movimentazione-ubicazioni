@@ -96,7 +96,13 @@ class CaricamentiMassaManager {
         // CM_DOC_TRA_RIG
         $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty, 0, $commessa);
 
+        $sql = "SELECT COUNT(*) FROM THIP.CM_DOC_TRA_RIG WHERE RUN_ID='$id' AND ID_NUMERO_DOC='$id' AND STATO = 'V'";
+        $countRigheInserite = $panthera->select_single_value($sql);
         $this->loop_job_panthera($id);
+
+        if($countRigheInserite < 0) {
+          return;
+        }
     }
 
     /**
@@ -495,8 +501,7 @@ class CaricamentiMassaManager {
         null
       FROM THIP.SALDI_UBICAZIONE S
       JOIN THIP.ARTICOLI A ON A.ID_AZIENDA=S.ID_AZIENDA AND A.ID_ARTICOLO=S.ID_ARTICOLO
-      WHERE S.ID_AZIENDA='$ID_AZIENDA' AND S.ID_UBICAZIONE='$codUbicazioneSrc' AND S.QTA_GIAC_PRM > 0
-      ";
+      WHERE S.ID_AZIENDA='$ID_AZIENDA' AND S.ID_UBICAZIONE='$codUbicazioneSrc' AND S.QTA_GIAC_PRM > 0";
 
       if (!empty($articolo)) {
         $sql .= " AND S.ID_ARTICOLO='$articolo' ";
@@ -508,11 +513,12 @@ class CaricamentiMassaManager {
       }
 
       $panthera->execute_update($sql);
-
+      
       $sql = "SELECT MAX(ROW_ID)
               FROM THIP.CM_DOC_TRA_RIG
               WHERE DATA_ORIGIN='$DATA_ORIGIN'AND RUN_ID='$id'";
       return $panthera->select_single_value($sql);
+        
     }
 
     function aggiorna_scheduled_job($id) {

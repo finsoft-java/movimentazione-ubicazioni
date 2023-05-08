@@ -16,9 +16,21 @@
             <p class="navTitle">Torna al menù</p>
             <button class="btn btn-outline-light btnLogout" onclick="logout()" type="button"><i class="fa-solid fa-arrow-right-from-bracket logout"> </i> </button>
         </nav>
-        <h3 class="titleOsai">Richieste movimentazione</h3>
+        <h3 class="titleOsai" style="margin-bottom:30px;">Richieste movimentazione</h3>
+        <input type="text" class="form-control focus" id="search" placeholder="Cerca tramite N. Documento" aria-describedby="basic-addon2" style="margin: 0px auto;display: block;margin-bottom:30px;"> 
+        <nav>
+            <ul class="pagination justify-content-center" id="navigateRichieste">
+                <li class="page-item">
+                    <a class='page-link' href='javascript:void(0);' id='btn_prev' onclick='prevPage()' style=''>Precedente</a>
+                </li>
+                <li class="page-item">
+                    <a class='page-link' href='javascript:void(0);' id='btn_next' onclick='nextPage()' style=''>Successiva</a>
+                </li>
+            </ul>
+        </nav>
         <div class="qrcode" style="display:none">
             <input type="text" class="form-control focus" id="qrcode" placeholder="UBICAZIONE ARRIVO" aria-describedby="basic-addon2">
+            <input type="hidden" id="ubi_arrivo">            
         </div>
         <div id="divElencoDocumentiContainer" style="margin-top:30px;">
             <div id="divElencoDocumenti"></div>

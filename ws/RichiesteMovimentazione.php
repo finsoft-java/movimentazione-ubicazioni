@@ -17,7 +17,12 @@ $top = isset($_GET['top']) ? $panthera->escape_string($_GET['top']) : null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (!empty($idNumeroDoc)) {
-        $righe = $richiesteMovimentazioneManager->getRichiesta($idAnnoDoc, $idNumeroDoc);
+        if($idAnnoDoc == null){
+            $righe = $richiesteMovimentazioneManager->getRichiestaByNumeroDoc($idNumeroDoc);
+        } else {
+            $righe = $richiesteMovimentazioneManager->getRichiesta($idAnnoDoc, $idNumeroDoc);
+        }
+        
         header('Content-Type: application/json');
         echo json_encode(['data' => $righe]);
     } else {

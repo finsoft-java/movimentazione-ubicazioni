@@ -1,6 +1,6 @@
-var loaded = 0;
 var maxItems = 1000;
 var documenti = [];
+var magazziniDisponibili = null;
 var documentoSelezionato = null;
 var rigaSelezionata = null;
 var magazzinoCorrente = null;
@@ -11,7 +11,9 @@ var commessaDest = null;
 var ubicazioneDest = null;
 var articoloMovimentazione = null;
 var statoCorrente = 0;
-
+var current_page = 0;
+var loaded = 0;
+var records_per_page = 10;
 /**
  * Inizializza l'interfaccia per un certo stato i
  */
@@ -29,23 +31,30 @@ function initStato(i) {
         $('#btnConfirm').hide();
         $('#btnPreleva').hide();
         $('#btnBack').hide();
+        $("#navigateRichieste").show();
+        $(".qrcode").hide();
+        $("#search").show();
     } else if (statoCorrente == 1) {
         // griglia delle righe del documento
         // deve anche mostrare l'ubicazione 
+        $("#navigateRichieste").hide();
         rigaSelezionata = null;
         $("#divElencoDocumentiContainer").hide();
+        $("#search").hide();
         $("#divElencoRigheDocumentiContainer").show();
         $("#divSingolaRigaContainer").hide();
         $('#btnConfirm').hide();
         $('#btnPreleva').hide();
+        $(".qrcode").hide();
         $('#btnBack').show();
     } else if (statoCorrente == 2) {
         // maschera di scelta dell'ubicazione
-        $(".qrcode").show();
+        $("#navigateRichieste").hide();
         $("#divElencoDocumentiContainer").hide();
         $("#divElencoRigheDocumentiContainer").hide();
         $("#divSingolaRigaContainer").show();
-        $('#btnPreleva').show().attr('disabled', true);
+        $(".qrcode").hide();
+        $('#btnPreleva').show().prop('disabled', true);
         $('#btnConfirm').hide();
         $('#btnBack').show();
     }
@@ -71,8 +80,9 @@ function indietro() {
 /**
  * Infinity scroll
  */
-function loadMore() {
+function loadMore(loadedPage, operazione) {
     initStato(0);
+    loaded = loaded != 0 ? loadedPage*10 : 0;
     if (loaded >= maxItems) return; // no more items
     $.get({
         url: "./ws/RichiesteMovimentazione.php?skip=" + loaded + "&top=10",
@@ -85,11 +95,12 @@ function loadMore() {
             maxItems = data.count;
             let elementiCaricati = data.data;
             documenti = documenti.concat(elementiCaricati);
-            console.log("----------------",elementiCaricati);
-            elementiCaricati.forEach(x => {
-                $("#divElencoDocumenti").append(getHtmlGrigliaDocumenti(loaded++, x));
+            if(operazione == "prev"){
+                loaded = loaded != 0 ? (loadedPage-1)*10 : 0;
+            } 
+            elementiCaricati.forEach(x => {                
+                $("#divElencoDocumenti").append(getHtmlGrigliaDocumenti(loaded++, x));                
             });
-
         },
         error: function(data, status) {
             console.log('ERRORE nel caricare la griglia', data);
@@ -97,27 +108,6 @@ function loadMore() {
         }
     });    
 }
-
-// cfr. https://dev.to/trex777/infinite-scrolling-using-intersection-observer-api-118l
-document.addEventListener("DOMContentLoaded", () => {
-    let options = {
-      root: null,
-      rootMargin: "0px",
-      threshold: 0.25
-    };
-  
-    function handleIntersect(entries, observer) {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          loadMore();
-        }
-      });
-    }
-  
-  let observer = new IntersectionObserver(handleIntersect, options);
-  const loader = document.getElementById("loading");
-  observer.observe(loader);
-});
 
 function showError(data) {
     const err = typeof data === 'string' ? data :
@@ -200,11 +190,15 @@ function openRow(idDoc, idRiga) {
     qntTotaleRichiesta = x.QTA_UM_PRM;
     articoloMovimentazione = x.R_ARTICOLO;
 
-    $("#divSingolaRiga").html(`<p style="margin:30px; 0px;text-align:center">
-                                    Articolo: <strong>  ${x.R_ARTICOLO} </strong> Commessa: <strong>${x.R_COMMESSA}</strong> </br>
+    $("#divSingolaRiga").html(`<p style="margin:30px;text-align:center">
+                                    Dati Riga:</br></br>
+                                    Articolo: <strong>  ${x.R_ARTICOLO} </strong> </br>
+                                    Commessa Partenza: <strong>${commessaCorrente}</strong> | Commessa Arrivo: <strong>${commessaDest}</strong> </br>
+                                    Ubicazione Partenza: <strong>${ubicazioneCorrente}</strong> | Ubicazione Arrivo: <strong>${ubicazioneDest}</strong> </br>
+                                    Magazzino Partenza: <strong>${magazzinoCorrente}</strong> | Magazzino Arrivo: <strong>${magazzinoDest}</strong> </br></br>
                                     Richiesta quantità: <strong>${qntTotaleRichiesta}</strong>
                                </p>`);
-/*
+
     $.get({
         url: "./ws/GetMagazziniAlternativi.php",
         dataType: 'json',
@@ -212,16 +206,8 @@ function openRow(idDoc, idRiga) {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
         },
         success: function(data, status) { 
-            let dati = data["data"];
-            let datiStampati = "";
-            arrUbicazioniDest = dati;
-            if(dati[0] == null || dati.length === 0) {
-                showError("Errore interno nel reperire i magazzini");
-                $("#qrcode").val('');
-                return false;
-            }
+            magazziniDisponibili = data["data"];
             
-*/
             $.get({
                 url: `./ws/Interrogazione.php?codArticolo=${x.R_ARTICOLO}`,
                 dataType: 'json',
@@ -261,15 +247,16 @@ function openRow(idDoc, idRiga) {
                     datiStampati+= "</select>";
 
                     let magazzinoDestinazioneHtml = "";
-                    magazzinoDestinazioneHtml += "<label>Magazzino di Destinazione</label>";
+                    magazzinoDestinazioneHtml += "<label>Magazzino di Arrivo</label>";
                     magazzinoDestinazioneHtml += "<select onchange='onChangeMagazzinoDest();' onclick='timerOn = false' id='magazzinoDest' onfocusout='timerOn = true' class='form-control'>";    
                     magazzinoDestinazioneHtml += "<option value='-1'> Seleziona magazzino destinazione </option>";                            
-                    for (let i = 0; i < datiMagazzino.length; i++) {
+                    for (let i = 0; i < magazziniDisponibili.length; i++) {
                         let selected = "";
-                        if(magazzinoDest == datiMagazzino[i].ID_MAGAZZINO){
+                        if(magazzinoDest == magazziniDisponibili[i]){
                             selected = "selected='selected'";
+
                         }
-                        magazzinoDestinazioneHtml += "<option "+selected+" value='"+datiMagazzino[i].ID_MAGAZZINO+"'>" + datiMagazzino[i].ID_MAGAZZINO + "</option>";                    
+                        magazzinoDestinazioneHtml += "<option "+selected+" value='"+magazziniDisponibili[i]+"'>" + magazziniDisponibili[i] + "</option>";                    
                     } 
                     magazzinoDestinazioneHtml+= "</select>";
                     
@@ -285,41 +272,23 @@ function openRow(idDoc, idRiga) {
                         datiStampati += "<option "+selected+" value='"+datiUbicazione[i].ID_UBICAZIONE+"' data-qta='"+datiUbicazione[i].QTA_GIAC_PRM+"'>" + datiUbicazione[i].ID_UBICAZIONE + " </option>";                    
                     } 
                     datiStampati += "</select>";
-                    datiStampati += magazzinoDestinazioneHtml;
-                    datiStampati += "<label>Ubicazione di Destinazione</label>";
-                    datiStampati += "<select onchange='onChangeUbicazioneDest();' onclick='timerOn = false' id='ubicazioneDest' onfocusout='timerOn = true' class='form-control'>";    
-                    datiStampati += "<option value='-1'> Seleziona ubicazione arrivo </option>";                            
-                    for (let i = 0; i < datiUbicazione.length; i++) {
-                        let selected = "";
-                        if(ubicazioneDest === datiUbicazione[i].ID_UBICAZIONE){
-                            selected = "selected='selected'";
-                        }
-                        datiStampati += "<option "+selected+" value='"+datiUbicazione[i].ID_UBICAZIONE+"' data-qta='"+datiUbicazione[i].QTA_GIAC_PRM+"'>" + datiUbicazione[i].ID_UBICAZIONE + " </option>";                    
-                    } 
-                    datiStampati+= "</select>";
-                    $("#divSingolaRiga").append(datiStampati);
-
-                    
-                    $("#ubicazioneOrigine").trigger("change");
-                    // TODO qui devo fare apparire un menu a tendina con tutti i magazzini, con preselezionato il magazzinoCorrente,
-                    // e poi un altro con tutte le ubicazioni del magazzino selezionato che contengano l'articolo x.R_ARTICOLO
-
-                    
-                    
+                    datiStampati += magazzinoDestinazioneHtml;                    
+                    $("#divSingolaRiga").append(datiStampati);                    
+                    $("#ubicazioneOrigine").trigger("change");     
+                    $("#magazzinoOrigine").trigger("change");              
+                    $("#magazzinoDest").trigger("change");                   
                 }, error: function(data, status) {
                     console.log('ERRORE -> Interrogazione', data);
                     showError(data);
                 }
             });
-/*
+
         }, error: function(data, status) {
             console.log('ERRORE -> getMagazziniAlternativi', data);
             showError(data);
         }
     });
-        */
-
-    
+            
 }
 
 function setGiacenzaCommessaSelezionata() {
@@ -334,7 +303,18 @@ function setGiacenzaCommessaSelezionata() {
 
 function checkQty() {
     let qty = $("#qty").val();
-    $("#btnPreleva button").attr('disabled', qty > 0 && qty <= qntTotaleRichiesta ? false : true);
+
+    if($("#ubi_arrivo").val() != null && $("#ubi_arrivo").val() != ""){
+        if(qty == qntTotaleRichiesta){
+            $("#btnConfirm").show();
+            $("#btnConfirm button").attr('disabled',false)
+            $("#btnPreleva button").attr('disabled',true);
+        } else {
+            $("#btnPreleva button").attr('disabled', qty > 0 && qty <= qntTotaleRichiesta ? false : true);
+            $("#btnConfirm button").attr('disabled',true);
+        }        
+    }
+    
 }
 
 function preleva() {
@@ -389,22 +369,23 @@ function interrogaUbicazione(ubicazione, articolo, callback) {
 }
 
 $(document).on("change","#ubicazioneOrigine",function(){
-    console.log($(this).val());
-    ubicazioneCorrente = $(this).val();
+    ubicazioneCorrente = $("#ubicazioneOrigine option:selected").val();
     if (ubicazioneCorrente) {
         interrogaUbicazione(ubicazioneCorrente, articoloMovimentazione, (documentiGiacenze) => {
             console.log("----");
             console.log(documentiGiacenze);
             console.log("----");
             let datiStampati = `<div class='commessaBox'>
-                                    <p style='margin:30px; 0px;text-align:center'>Ubicazione ${ubicazioneCorrente}.<br/> Seleziona quantità oppure cambia ubicazione. </p>
+                                    <p style='margin:30px; 0px;text-align:center'>Ubicazione ${ubicazioneCorrente}.<br/> Seleziona la commessa oppure cambia ubicazione. </p>
                                     <label>Commesse disponibili</label>
                                     <select id='selectCommessa' class='form-control' onchange='setGiacenzaCommessaSelezionata()'>
                                         <option value='0'>Seleziona una commessa </option>`;
                         documentiGiacenze.forEach(x => {
                             let commessa = x.ID_COMMESSA || '-';
                             let selected = (commessa == commessaDest) ? " selected " : "";
-                            datiStampati += `<option value='${x.QTA_GIAC_PRM}' data-prm='${x.R_UM_PRM_MAG}' ${selected}>${commessa}</option>`
+                            if(x.QTA_GIAC_PRM > 0){
+                                datiStampati += `<option value='${x.QTA_GIAC_PRM}' data-prm='${x.R_UM_PRM_MAG}' ${selected}>${commessa}</option>`
+                            }
                         });
                 datiStampati +=     `</select>`;
                 datiStampati +=     `<div class='input-group inputDiv'>  
@@ -419,9 +400,173 @@ $(document).on("change","#ubicazioneOrigine",function(){
                                 </div>`;
             $(".commessaBox").remove();
             $("#divSingolaRiga").append(datiStampati);
+            $("#selectCommessa").trigger("change");
             setGiacenzaCommessaSelezionata();
         })
     } else {
         $("#divSingolaRiga").append("Scegliere una ubicazione:");
     }
 });
+function onChangeMagazzino() {
+    console.log(datiUbicazione);
+    let datiUbicazioneFiltrati ;
+    if($("#magazzinoOrigine").val() != -1){
+        datiUbicazioneFiltrati = datiUbicazione.filter((value, index, self) =>
+                            index === self.findIndex((t) => (
+                                t.ID_MAGAZZINO === $("#magazzinoOrigine").val()
+                            ))
+                        );
+    } else {
+        datiUbicazioneFiltrati = datiUbicazione;
+    }
+    let datiStampati = "";
+    for (let i = 0; i < datiUbicazioneFiltrati.length; i++) {
+        let selected = "";
+        if(ubicazioneCorrente === datiUbicazioneFiltrati[i].ID_UBICAZIONE){
+            selected = "selected='selected'";
+        }
+        datiStampati += "<option "+selected+" value='"+datiUbicazioneFiltrati[i].ID_UBICAZIONE+"' data-qta='"+datiUbicazioneFiltrati[i].QTA_GIAC_PRM+"'>" + datiUbicazioneFiltrati[i].ID_UBICAZIONE + " </option>";                    
+    }      
+    $("#ubicazioneOrigine").html(datiStampati);
+                    
+    $("#ubicazioneOrigine").trigger("change");     
+    console.log(datiUbicazione);
+}
+function onChangeMagazzinoDest() {
+    if($("#magazzinoDest").val() != -1){
+        $(".qrcode").show();
+    } else {
+        $(".qrcode").hide();
+    }
+}
+document.getElementById("search").addEventListener("keyup", function(event) {
+    this.value = this.value.toUpperCase();
+    console.log("listening to keyup");
+    if (event.keyCode === 13) {
+        $.get({
+            url: "./ws/RichiesteMovimentazione.php?idNumeroDoc=" + this.value,
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+            },
+            success: function(data, status) {
+                console.log(data);
+                $("#divElencoDocumenti").html("");
+                maxItems = data.count;
+                let elementiCaricati = data.data;
+                documenti = documenti.concat(elementiCaricati);
+                console.log("----------------",elementiCaricati);
+                elementiCaricati.forEach(x => {
+                    $("#divElencoDocumenti").append(getHtmlGrigliaDocumenti(loaded++, x));
+                });
+            },
+            error: function(data, status) {
+                console.log('ERRORE nel caricare la documenti delle righe', data);
+                showError(data);
+            }
+        }); 
+    }
+    return false;
+});
+
+document.getElementById("qrcode").addEventListener("keyup", function(event) {
+    this.value = this.value.toUpperCase();
+    console.log("listening to keyup")
+    if (event.keyCode === 13) {
+        $("#ubi_arrivo").val($("#qrcode").val());
+        checkQty();
+        /*
+        $.get({
+            url: "./ws/Interrogazione.php?codUbicazione=" + value,
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+            },
+            success: function(data, status) {
+                let dati = data["data"];
+                if(dati[0] == null || dati.length === 0) {   
+                    showError("Ubicazione vuota");
+                    $("#qrcode").val('');
+                    return false;
+                }
+                console.log("dati ", dati)
+                let datiStampati = getHtmlTestata(dati[0]);
+                for(let i = 0; i < Object.keys(dati).length;i++){
+                    datiStampati += getHtmlArticolo(dati[i]);
+                }
+                $(".listaOsai").html(datiStampati);
+                timerOn = false;
+                $("#qrcode").hide();
+                $("#btnInterroga").show();
+
+            },
+            error: function(data, status){
+                showError(data);
+                $("#qrcode").val('');
+                $(".listaOsai").html("");
+            }
+        });
+        $("#qrcode").val("");
+        $("#searchAll").css("display","block");
+        */
+    }
+});
+
+
+/* PAGINAZIONE */ 
+
+
+function prevPage()
+{
+    if (current_page > 0) {
+        current_page--;
+        changePage("prev");
+    }
+}
+
+function nextPage()
+{
+    if (current_page < numPages()) {
+        current_page++;
+        changePage("next");
+    }
+}
+
+changePage(current_page);
+
+function changePage(operazione)
+{
+    var btn_next = document.getElementById("btn_next");
+    var btn_prev = document.getElementById("btn_prev");
+    var listing_table = document.getElementById("divElencoDocumenti");
+
+    // Validate page
+    if (current_page < 1) current_page = 0;
+    if (current_page > numPages()) current_page = numPages();
+
+    listing_table.innerHTML = "";
+    loadMore(current_page, operazione);
+/*
+    for (var i = (page-1) * records_per_page; i < (page * records_per_page) && i < maxItems; i++){
+        listing_table.innerHTML += objJson[i].adName + "<br>";
+    }
+    page_span.innerHTML = page;
+
+*/
+    if (current_page == 0) {
+        btn_prev.style.visibility = "hidden";
+    } else {
+        btn_prev.style.visibility = "visible";
+    }
+
+    if (current_page == numPages()) {
+        btn_next.style.visibility = "hidden";
+    } else {
+        btn_next.style.visibility = "visible";
+    }
+}
+
+function numPages()
+{
+    return Math.ceil(maxItems / records_per_page);
+}

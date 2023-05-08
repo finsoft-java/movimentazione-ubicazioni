@@ -66,10 +66,10 @@ R_CAU_DOC_TRA
                 AND T.STATO_AVANZAMENTO='1'
                 AND T.R_CAU_DOC_TRA IN ('" . implode("','", $CAUSALI_RICHIESTE_MOV) . "')
                 AND EXISTS( SELECT 1 FROM THIP.DOC_TRA_RIG R
-                WHERE R.ID_AZIENDA=T.ID_AZIENDA AND R.ID_ANNO_DOC=T.ID_ANNO_DOC AND R.ID_NUMERO_DOC=T.ID_NUMERO_DOC)";
+                WHERE R.ID_AZIENDA=T.ID_AZIENDA AND R.ID_ANNO_DOC=T.ID_ANNO_DOC AND R.ID_NUMERO_DOC=T.ID_NUMERO_DOC AND R.STATO= 'V' AND R.STATO_AVANZAMENTO='1')";
         $count = $panthera->select_single_value($sql0 . $sql);
 
-        $sql .= " ORDER BY ID_ANNO_DOC DESC, ID_NUMERO_DOC DESC";
+        $sql .= " ORDER BY T.ID_ANNO_DOC DESC, T.ID_NUMERO_DOC DESC";
         
         if ($top != null) {
           if ($skip != null) {
@@ -145,6 +145,40 @@ R_CAU_DOC_TRA
                 AND STATO= 'V' AND STATO_AVANZAMENTO='1'
                 ORDER BY ID_RIGA_DOC";
         $data = $panthera->select_list($sql);
+      }
+      
+      return $data;
+    }
+
+    function getRichiestaByNumeroDoc($idNumeroDoc) {
+      global $panthera, $ID_AZIENDA;
+
+      if ($panthera->mock) {
+          $data = [ [
+                      'ID_ANNO_DOC' => '2022',
+                      'ID_NUMERO_DOC' => 'BL 007106',
+                      'ID_RIGA_DOC' => '1',
+                      'DATA_DOC' => '2022-10-07 00:00:00.000',
+                      'R_CAU_DOC_TRA' => 'T01',
+                      'NUMERO_DOC_FMT' => '2022/BL/ 007106',
+                      'R_MAGAZZINO' => '001',
+                      'R_MAGAZZINO_ARR' => '002',
+                      'STATO' => 'V',
+                      'R_UTENTE_CRZ' => 'mfalosai_001',
+                      'R_ARTICOLO' => '00000000',
+                      'R_COMMESSA' => null,
+                      'R_UM_PRM_MAG' => 'NR',
+                      'QTA_UM_PRM' => '10'
+                    ]
+                  ];
+      } else {
+
+        $sql = "SELECT DISTINCT * FROM THIP.DOC_TRA_TES
+                WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_NUMERO_DOC LIKE '%$idNumeroDoc%'
+                AND STATO= 'V' AND STATO_AVANZAMENTO='1'";
+        
+        $data = $panthera->select_list($sql);
+
       }
       
       return $data;

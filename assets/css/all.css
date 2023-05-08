@@ -21,6 +21,9 @@ label{
   width: calc(50% - 15px);
   margin: 10px 7px;
 }
+.page-link{
+  color: #000;
+}
 
 .fa,
 .fas,
