@@ -15,6 +15,8 @@ $idNumeroDoc = isset($_GET['idNumeroDoc']) ? $panthera->escape_string($_GET['idN
 $skip = isset($_GET['skip']) ? $panthera->escape_string($_GET['skip']) : null;
 $top = isset($_GET['top']) ? $panthera->escape_string($_GET['top']) : null;
 
+$riga = isset($_POST['riga']) ? $_POST['riga'] : null;
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (!empty($idNumeroDoc)) {
         if($idAnnoDoc == null){
@@ -30,6 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         header('Content-Type: application/json');
         echo json_encode(['data' => $lista, 'count' => $cnt]);
     }
+} else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    
+    $caricamentiMassaManager->richiestaMovimentazione($riga);
+    
+    header('Content-Type: application/json');
+    echo '{"msg":"OK"}';
 } else {
     //==========================================================
     print_error(405, "Unsupported method in request: " . $_SERVER['REQUEST_METHOD']);

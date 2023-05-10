@@ -99,11 +99,186 @@ class CaricamentiMassaManager {
         $sql = "SELECT COUNT(*) FROM THIP.CM_DOC_TRA_RIG WHERE RUN_ID='$id' AND ID_NUMERO_DOC='$id' AND STATO = 'V'";
         $countRigheInserite = $panthera->select_single_value($sql);
         $this->loop_job_panthera($id);
-
+        
         if($countRigheInserite < 0) {
-          return;
+          print_error(500, 'Inserita Testata senza righe');
         }
     }
+
+/**
+     * FUNZIONE "Richieste Movimentazione"
+     */
+    function richiestaMovimentazione($riga) {
+      global $panthera, $ubicazioniManager, $CAU_TESTATA_SVUOTA, $CAU_RIGA_SVUOTA, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA, $DATA_ORIGIN;
+
+      $idAnnoDoc = $riga["ID_ANNO_DOC"];
+      $idRigaDoc = $riga["ID_RIGA_DOC"];
+      $idNumeroDoc = $riga["ID_NUMERO_DOC"];
+
+      
+      $sqlDelete =" DELETE FROM THIP.DOC_TRA_RIG  
+                      WHERE ID_AZIENDA='001' 
+                      AND ID_ANNO_DOC='$idAnnoDoc' 
+                      AND ID_NUMERO_DOC='$idNumeroDoc'  
+                      AND ID_RIGA_DOC='$idRigaDoc' 
+                      AND STATO= 'V' 
+                      AND STATO_AVANZAMENTO='1'";
+      $panthera->execute_update($sqlDelete);
+
+
+      $sql_select =  "select max(ID_RIGA_DOC) FROM THIP.DOC_TRA_RIG
+                  WHERE ID_AZIENDA='001' 
+                  AND ID_ANNO_DOC='$idAnnoDoc' 
+                  AND ID_NUMERO_DOC='$idNumeroDoc'  
+                  AND ID_RIGA_DOC='$idRigaDoc'" ;
+      $maxNumeroDoc = $panthera->select_single_value($sql_select);
+      
+      for($i = 0 ; $i < count($riga["PRELIEVI"]); $i++){
+          $maxNumeroDoc = $maxNumeroDoc++;
+          $prelievi = $riga["PRELIEVI"][$i];
+          $timestamp = strtotime("now");   
+          $data = date('Y-m-d H:i:s', $timestamp);
+  
+          $magazzinoPartenza = $prelievi["MAGAZZINO"];
+          $ubicazionePartenza = $prelievi["UBICAZIONE"];
+          $commessaPartenza = $prelievi["COMMESSA"];
+          $qtyRichiesta = $prelievi["QUANTITA"];
+          $magazzinoArrivo = $prelievi["MAGAZZINO_ARRIVO"];
+          $ubicazioneArrivo = $prelievi["UBICAZIONE_ARRIVO"];
+          $commessaArrivo = $prelievi["COMMESSA_ARRIVO"];
+          $nota = $prelievi["NOTA"];
+          $id = $panthera->get_numeratore('MOVUBI');
+
+          $sql = "INSERT INTO THIP.DOC_TRA_RIG (
+              DATA_ORIGIN,              -- 1
+              RUN_ID,
+              ROW_ID,
+              RUN_ACTION,
+              TRASF_STATUS,
+              STATO_AVANZAMENTO,
+              ID_AZIENDA,
+              ID_ANNO_DOC,
+              ID_NUMERO_DOC,
+              ID_ORIGINALE,                 -- 10
+              ID_RIGA_DOC,
+              ID_DET_RIGA_DOC,
+              SPL_RIGA,
+              SEQUENZA_RIGA,
+              R_CAU_RIG_DOCTRA,
+              DATA_REGISTRAZIONE,
+              R_MAGAZZINO,
+              R_MAGAZZINO_ARR,
+              R_ARTICOLO,
+              R_VERSIONE,                     -- 20
+              R_CONFIGURAZIONE,
+              R_OPERAZIONE,
+              R_COMMESSA,
+              DES_ARTICOLO,
+              RIFER_DOC,
+              DTA_RIFER_DOC,
+              NOTA,
+              R_GES_COMMENTI,
+              R_DOCUMENTO_MM,
+              R_UM_PRM,               -- 30
+              QTA_UM_PRM,
+              R_UM_SEC,
+              QTA_UM_SEC,
+              FTT_CONVER_UM,
+              OPER_CONVER_UM,
+              R_CENTRO_COSTO,
+              R_CENTRO_RICAVO,
+              R_GRP_CNT_CA,
+              FLAG_RIS_UTE_1,
+              FLAG_RIS_UTE_2,               -- 40
+              FLAG_RIS_UTE_3,
+              FLAG_RIS_UTE_4,
+              FLAG_RIS_UTE_5,
+              STRINGA_RIS_UTE_1,
+              STRINGA_RIS_UTE_2,
+              NUM_RIS_UTE_1,
+              NUM_RIS_UTE_2,
+              STATO,
+              R_UTENTE_CRZ,
+              R_UTENTE_AGG,                 -- 50
+              TIMESTAMP_CRZ,
+              TIMESTAMP_AGG,
+              COSTO,
+              R_COMMESSA_ARR,
+              NUM_RIGA_DOC_RIF,
+              DET_RIGA_DOC_RIF,
+              R_UBI_PAR,
+              R_UBI_ARR,
+              R_CLIENTE,
+              R_CLIENTE_ARR,                    -- 60
+              R_FORNITORE,
+              R_FORNITORE_ARR)
+              VALUES 
+              (
+              '$DATA_ORIGIN',              -- 1
+              '".$id."',
+              1,
+              '".$riga["RUN_ACTION"]."',
+              '".$riga["TRASF_STATUS"]."',
+              '2',
+              '001',
+              '$idAnnoDoc',
+              '$idNumeroDoc',
+              '".$riga["ID_ORIGINALE"]."',                
+              '$maxNumeroDoc',
+              '".$riga["ID_DET_RIGA_DOC"]."',
+              '".$riga["SPL_RIGA"]."',
+              '".$riga["SEQUENZA_RIGA"]."',
+              '".$riga["R_CAU_RIG_DOCTRA"]."',
+              '$data',
+              '$magazzinoPartenza',
+              '$magazzinoArrivo',
+              '".$riga["R_ARTICOLO"]."',
+              '".$riga["R_VERSIONE"]."',                     
+              '".$riga["R_CONFIGURAZIONE"]."',
+              '".$riga["R_OPERAZIONE"]."',
+              '$commessaPartenza',
+              '".$riga["DES_ARTICOLO"]."',
+              '".$riga["RIFER_DOC"]."',
+              '".$riga["DTA_RIFER_DOC"]."',
+              '".$nota."',
+              '".$riga["R_GES_COMMENTI"]."',
+              '".$riga["R_DOCUMENTO_MM"]."',
+              '".$riga["R_UM_PRM"]."',          
+              '$qtyRichiesta',
+              '".$riga["R_UM_SEC"]."',
+              '".$riga["QTA_UM_SEC"]."',
+              '".$riga["FTT_CONVER_UM"]."',
+              '".$riga["OPER_CONVER_UM"]."',
+              '".$riga["R_CENTRO_COSTO"]."',
+              '".$riga["R_CENTRO_RICAVO"]."',
+              '".$riga["R_GRP_CNT_CA"]."',
+              '".$riga["FLAG_RIS_UTE_1"]."',
+              '".$riga["FLAG_RIS_UTE_2"]."',               
+              '".$riga["FLAG_RIS_UTE_3"]."',
+              '".$riga["FLAG_RIS_UTE_4"]."',
+              '".$riga["FLAG_RIS_UTE_5"]."',
+              '".$riga["STRINGA_RIS_UTE_1"]."',
+              '".$riga["STRINGA_RIS_UTE_2"]."',
+              '".$riga["NUM_RIS_UTE_1"]."',
+              '".$riga["NUM_RIS_UTE_2"]."',
+              '".$riga["STATO"]."',
+              '".$riga["R_UTENTE_CRZ"]."',
+              '".$riga["R_UTENTE_AGG"]."',                 
+              '".$data."',
+              '".$data."',
+              '".$riga["COSTO"]."',
+              '$commessaArrivo',
+              '".$riga["NUM_RIGA_DOC_RIF"]."',
+              '".$riga["DET_RIGA_DOC_RIF"]."',
+              '$ubicazionePartenza',
+              '$ubicazioneArrivo',
+              '".$riga["R_CLIENTE"]."',
+              '".$riga["R_CLIENTE_ARR"]."',                    
+              '".$riga["R_FORNITORE"]."',
+              '".$riga["R_FORNITORE_ARR"]."')";
+      }                  
+      $panthera->execute_update($sql);
+  } 
 
     /**
      * FUNZIONE "Svuota ubicazione"

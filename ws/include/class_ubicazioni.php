@@ -52,6 +52,42 @@ class UbicazioniManager {
       return [$data, $count];
     }
 
+/**
+     * Restituisce tutti gli articoli contenuti in una certa ubicazione
+     */
+    function getUbicazioneByMagazzino($idMagazzino,$codUbicazione) {
+      global $panthera, $ID_AZIENDA;
+
+      if ($panthera->mock) {
+          $data = [ [ 'ID_ARTICOLO' => '00000000                 ','ID_COMMESSA' => 'COMMESSA1', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 10, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ],
+                    [ 'ID_ARTICOLO' => '00000564                 ', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 100, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ],
+                    [ 'ID_ARTICOLO' => '00003289                 ', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'LT', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ],
+                    [ 'ID_ARTICOLO' => 'DDDD', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 100, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ],
+                    [ 'ID_ARTICOLO' => 'EEEE', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ],
+                    [ 'ID_ARTICOLO' => 'FFFF', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 100, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ],
+                    [ 'ID_ARTICOLO' => 'GGGG', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'MMT', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ],
+                    [ 'ID_ARTICOLO' => 'HHHH', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 100, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ],
+                    [ 'ID_ARTICOLO' => 'IIII', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'FFF', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 0, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ]
+                   ]; 
+          $count = 9;
+      } else {
+
+          $sql0 = "SELECT COUNT(*) AS cnt ";
+          $sql1 = "SELECT U.* ";
+          $sql2 = "FROM THIP.UBICAZIONI_LL U
+                  JOIN THIPPERS.YUBICAZIONI_LL YU
+                    ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
+                  WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND U.ID_MAGAZZINO='$idMagazzino' AND U.STATO='V' ";
+          $sql3 = " ";
+          $count = $panthera->select_single_value($sql0 . $sql2);
+          $data = $panthera->select_list($sql1 . $sql2 . $sql3);
+      }
+      
+      // se l'ubicazione e' vuota non do' errori
+      return [$data, $count];
+  }
+
+
     /**
      * Restituisce tutti gli articoli contenuti in una certa ubicazione
      */
