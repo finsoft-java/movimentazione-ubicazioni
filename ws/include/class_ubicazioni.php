@@ -115,6 +115,7 @@ class UbicazioniManager {
           $count = 1;
           
       } else {
+
           $this->check_articolo($codArticolo);
 
           $sql0 = "SELECT COUNT(*) AS cnt ";
@@ -131,7 +132,7 @@ class UbicazioniManager {
                   GROUP BY U.ID_UBICAZIONE, U.ID_MAGAZZINO, U.R_UTENTE_AGG, U.TIMESTAMP_AGG, S.ID_ARTICOLO, A.DESCRIZIONE, A.DISEGNO, A.R_UM_PRM_MAG, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
           
           $sql3 = " ORDER BY U.ID_UBICAZIONE, S.ID_ARTICOLO";
-         $count = $panthera->select_single_value($sql0 . $sql2);
+          $count = $panthera->select_single_value($sql0 . $sql2);
           $data = $panthera->select_list($sql1 . $sql2 . $sql3);
       }
       
@@ -143,6 +144,7 @@ class UbicazioniManager {
       global $panthera, $ID_AZIENDA;
      
       if ($panthera->mock) {
+
           $data = [ [ 'ID_ARTICOLO' => '00000564                 ',
                       'ID_MAGAZZINO' => 'E01',
                       'ID_COMMESSA' => 'COMMESSA1',
@@ -169,8 +171,8 @@ class UbicazioniManager {
           $count = 1;
           
       } else {
-          $this->check_articolo($codArticolo);
 
+          $this->check_articolo($codArticolo);
           $sql0 = "SELECT COUNT(*) AS cnt ";
           $sql1 = "SELECT U.ID_UBICAZIONE, U.ID_MAGAZZINO, U.R_UTENTE_AGG, U.TIMESTAMP_AGG, S.ID_ARTICOLO, A.DESCRIZIONE, A.DISEGNO, A.R_UM_PRM_MAG, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
           
