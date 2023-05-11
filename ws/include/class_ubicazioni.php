@@ -141,7 +141,7 @@ class UbicazioniManager {
 
     function getUbicazioniPerArticoloCommessa($codArticolo,$codCommessa) {
       global $panthera, $ID_AZIENDA;
-
+     
       if ($panthera->mock) {
           $data = [ [ 'ID_ARTICOLO' => '00000564                 ',
                       'ID_MAGAZZINO' => 'E01',
@@ -174,6 +174,18 @@ class UbicazioniManager {
           $sql0 = "SELECT COUNT(*) AS cnt ";
           $sql1 = "SELECT U.ID_UBICAZIONE, U.ID_MAGAZZINO, U.R_UTENTE_AGG, U.TIMESTAMP_AGG, S.ID_ARTICOLO, A.DESCRIZIONE, A.DISEGNO, A.R_UM_PRM_MAG, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
           
+          switch ($codCommessa) {
+            case 'mg':
+                $commessa = "AND S.ID_COMMESSA='MG";
+                break;
+            case 'notmg':
+                $commessa = "AND S.ID_COMMESSA!='MG'";
+                break;
+            default:
+                $commessa = "";
+                break;
+          }
+
           $sql2 = "FROM THIP.UBICAZIONI_LL U
                   JOIN THIPPERS.YUBICAZIONI_LL YU
                     ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
@@ -181,7 +193,7 @@ class UbicazioniManager {
                     ON U.ID_AZIENDA=S.ID_AZIENDA AND U.ID_UBICAZIONE=S.ID_UBICAZIONE AND U.ID_MAGAZZINO=S.ID_MAGAZZINO
                   JOIN THIP.ARTICOLI A
                     ON S.ID_AZIENDA=A.ID_AZIENDA AND S.ID_ARTICOLO=A.ID_ARTICOLO
-                  WHERE U.ID_AZIENDA='$ID_AZIENDA' AND S.ID_ARTICOLO='$codArticolo' AND S.ID_COMMESSA='$codCommessa' AND U.STATO='V' AND S.QTA_GIAC_PRM>0
+                  WHERE U.ID_AZIENDA='$ID_AZIENDA' AND S.ID_ARTICOLO='$codArticolo' '$commessa' AND U.STATO='V' AND S.QTA_GIAC_PRM>0
                   GROUP BY U.ID_UBICAZIONE, U.ID_MAGAZZINO, U.R_UTENTE_AGG, U.TIMESTAMP_AGG, S.ID_ARTICOLO, A.DESCRIZIONE, A.DISEGNO, A.R_UM_PRM_MAG, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
           
           $sql3 = " ORDER BY U.ID_UBICAZIONE, S.ID_ARTICOLO";
