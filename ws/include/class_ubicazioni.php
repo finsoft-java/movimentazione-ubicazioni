@@ -111,8 +111,20 @@ class UbicazioniManager {
                       'TRASFERIBILE' => 'Y',
                       'R_UTENTE_AGG' => '001_finsoft         ',
                       'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410'
-                   ]]; 
-          $count = 1;
+                    ],
+                    [ 'ID_ARTICOLO' => '00000564                 ',
+                    'ID_MAGAZZINO' => 'E01',
+                    'ID_COMMESSA' => 'COMMESSA1',
+                    'ID_UBICAZIONE' => 'EEE2',
+                    'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
+                    'DISEGNO' => 'ABC',
+                    'R_UM_PRM_MAG' => 'NR',
+                    'QTA_GIAC_PRM' => 10,
+                    'TRASFERIBILE' => 'Y',
+                    'R_UTENTE_AGG' => '001_finsoft         ',
+                    'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410'
+                ]]; 
+          $count = 2;
           
       } else {
 
