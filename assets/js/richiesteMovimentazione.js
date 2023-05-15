@@ -17,6 +17,7 @@ var records_per_page = 10;
 var qntSelezionata;
 var noteRichiesta = "";
 var riga =null;
+var testata =null;
 /**
  * Inizializza l'interfaccia per un certo stato i
  */
@@ -147,6 +148,8 @@ function openDoc(idDoc) {
                 riga.PRELIEVI = [];
                 riga.QTA_RESIDUA = parseFloat(riga.QTA_UM_PRM);
             });
+            console.log("item (da doc testata)",item);
+            console.log("documenti[documentoSelezionato]",documenti[documentoSelezionato]);
             ridisegnaElencoRigheDocumenti();
         },
         error: function(data, status) {
@@ -364,12 +367,12 @@ function conferma() {
                                                 t.NOTA === value.NOTA)
                                         ));
     item.QTA_RESIDUA -= qty;
-
     $.post({
         url: "./ws/RichiesteMovimentazione.php",
         dataType: 'json',
         data: {
-            riga: item
+            riga: item,
+            testata : documenti[documentoSelezionato]
         },
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')

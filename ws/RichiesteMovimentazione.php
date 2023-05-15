@@ -16,6 +16,7 @@ $skip = isset($_GET['skip']) ? $panthera->escape_string($_GET['skip']) : null;
 $top = isset($_GET['top']) ? $panthera->escape_string($_GET['top']) : null;
 
 $riga = isset($_POST['riga']) ? $_POST['riga'] : null;
+$testata = isset($_POST['testata']) ? $_POST['testata'] : null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (!empty($idNumeroDoc)) {
@@ -34,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
-    $caricamentiMassaManager->richiestaMovimentazione($riga);
+    $caricamentiMassaManager->richiestaMovimentazione($riga, $testata);
     
     header('Content-Type: application/json');
     echo '{"msg":"OK"}';
