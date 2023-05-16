@@ -13,6 +13,8 @@ require_logged_user_JWT();
 $codUbicazione = isset($_GET['codUbicazione']) ? $panthera->escape_string($_GET['codUbicazione']) : null;
 $codArticolo = isset($_GET['codArticolo']) ? $panthera->escape_string($_GET['codArticolo']) : null;
 $idMagazzino = isset($_GET['idMagazzino']) ? $panthera->escape_string($_GET['idMagazzino']) : null;
+$codCommessa = isset($_GET['codCommessa']) ? $panthera->escape_string($_GET['codCommessa']) : null;
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     //if (empty($codUbicazione)) {
@@ -22,10 +24,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         [$data, $count] = $ubicazioniManager->getUbicazioneByMagazzino($idMagazzino, $codUbicazione);
     } else {
         if (!empty($codArticolo)){
-            if (!empty($codArticolo) && !empty($codUbicazione)) {
-                [$data, $count] = $ubicazioniManager->getContenutoUbicazioneArticolo($codUbicazione, $codArticolo);
+            if(!empty($codCommessa)){
+                [$data, $count] = $ubicazioniManager->getUbicazioniPerArticoloCommessa($codArticolo, $codCommessa);
             } else {
-                [$data, $count] = $ubicazioniManager->getUbicazioniPerArticolo($codArticolo);
+                if (!empty($codArticolo) && !empty($codUbicazione)) {
+                    [$data, $count] = $ubicazioniManager->getContenutoUbicazioneArticolo($codUbicazione, $codArticolo);
+                } else {
+                    [$data, $count] = $ubicazioniManager->getUbicazioniPerArticolo($codArticolo);
+                }
             }
         } else {
             [$data, $count] = $ubicazioniManager->getContenutoUbicazione($codUbicazione);

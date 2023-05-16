@@ -105,9 +105,9 @@ class CaricamentiMassaManager {
         }
     }
 
-/**
-     * FUNZIONE "Richieste Movimentazione"
-     */
+    /**
+    * FUNZIONE "Richieste Movimentazione"
+    */
     function richiestaMovimentazione($riga,$testata) {
       global $panthera, $ubicazioniManager, $CAU_TESTATA_SVUOTA, $CAU_RIGA_SVUOTA, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA, $DATA_ORIGIN;
 
@@ -117,14 +117,10 @@ class CaricamentiMassaManager {
 
       $id = $panthera->get_numeratore('MOVUBI');
       // BATCH_LOAD_HDR
-      echo '1';
       $this->creaTestataCaricamento($id);
-      echo '2';
       // CM_DOC_TRA_TES
       $this->creaTestataDocumentoMovimentazione($id, $testata);
-      echo '3';
       $this->rimuoviRigaVecchia($id, $riga);
-      echo '4';
       $contatoreRiga = 0;
       for($i = 0 ; $i < count($riga["PRELIEVI"]); $i++) {
 
@@ -542,7 +538,6 @@ class CaricamentiMassaManager {
 
     function rimuoviRigaVecchia($id, $riga) {
       global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $SERIE, $logged_user;
-      print_r($riga);
       $sql = "INSERT INTO THIP.CM_DOC_TRA_RIG (
           DATA_ORIGIN,              
           RUN_ID,
@@ -612,7 +607,7 @@ class CaricamentiMassaManager {
           '$id',
           0,
           'D',
-          '0',
+          '3',
           '3',
           '$ID_AZIENDA',
           '".$riga["ID_ANNO_DOC"]."',

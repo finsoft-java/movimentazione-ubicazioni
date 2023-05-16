@@ -226,10 +226,10 @@ class UbicazioniManager {
           
           switch ($codCommessa) {
             case 'mg':
-                $commessa = "AND S.ID_COMMESSA='MG";
+                $commessa = "RTrim(S.ID_COMMESSA) = 'MG' AND ";
                 break;
             case 'notmg':
-                $commessa = "AND S.ID_COMMESSA!='MG'";
+                $commessa = "RTrim(S.ID_COMMESSA) != 'MG' AND ";
                 break;
             default:
                 $commessa = "";
@@ -243,10 +243,11 @@ class UbicazioniManager {
                     ON U.ID_AZIENDA=S.ID_AZIENDA AND U.ID_UBICAZIONE=S.ID_UBICAZIONE AND U.ID_MAGAZZINO=S.ID_MAGAZZINO
                   JOIN THIP.ARTICOLI A
                     ON S.ID_AZIENDA=A.ID_AZIENDA AND S.ID_ARTICOLO=A.ID_ARTICOLO
-                  WHERE U.ID_AZIENDA='$ID_AZIENDA' AND S.ID_ARTICOLO='$codArticolo' '$commessa' AND U.STATO='V' AND S.QTA_GIAC_PRM>0
+                  WHERE $commessa U.ID_AZIENDA='$ID_AZIENDA' AND S.ID_ARTICOLO='$codArticolo' AND U.STATO='V' AND S.QTA_GIAC_PRM>0
                   GROUP BY U.ID_UBICAZIONE, U.ID_MAGAZZINO, U.R_UTENTE_AGG, U.TIMESTAMP_AGG, S.ID_ARTICOLO, A.DESCRIZIONE, A.DISEGNO, A.R_UM_PRM_MAG, S.ID_COMMESSA, S.QTA_GIAC_PRM ";
           
           $sql3 = " ORDER BY U.ID_UBICAZIONE, S.ID_ARTICOLO";
+          //echo $sql1 . $sql2 . $sql3;
           $count = $panthera->select_single_value($sql0 . $sql2);
           $data = $panthera->select_list($sql1 . $sql2 . $sql3);
       }
