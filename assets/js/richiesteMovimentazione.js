@@ -209,7 +209,7 @@ function openRow(idDoc, idRiga) {
                                     Magazzino Partenza: <strong>${magazzinoCorrente}</strong> | Magazzino Arrivo: <strong>${magazzinoDest}</strong> </br></br>
                                     Quantità richiesta : <strong>${qntTotaleRichiesta}</strong>
                                </p>`);
-
+    $("#ubi_arrivo").val(ubicazioneDest);
     $.get({
         url: "./ws/GetMagazziniAlternativi.php",
         dataType: 'json',
@@ -331,6 +331,10 @@ function checkQty() {
             $("#btnConfirm button").attr('disabled',true);
         }        
     } else {
+        $("#btnPreleva button").attr('disabled', true);
+        $("#btnConfirm button").attr('disabled', true);
+    }
+    if($("#magazzinoOrigine").val() == -1 || $("#ubicazioneOrigine").val() == -1 || $("#magazzinoDest").val() == -1){
         $("#btnPreleva button").attr('disabled', true);
         $("#btnConfirm button").attr('disabled', true);
     }
@@ -512,14 +516,24 @@ function onChangeMagazzino() {
     }      
     $("#ubicazioneOrigine").html(datiStampati);
     $("#ubicazioneOrigine").trigger("change");
+    if($("#magazzinoOrigine").val() == -1 || $("#ubicazioneOrigine").val() == -1 || $("#magazzinoDest").val() == -1){
+        $("#btnPreleva button").attr('disabled', true);
+        $("#btnConfirm button").attr('disabled', true);
+    }
 }
+
 function onChangeMagazzinoDest() {
     if($("#magazzinoDest").val() != -1){
         $(".qrcode").show();
     } else {
+        if($("#magazzinoOrigine").val() == -1 || $("#ubicazioneOrigine").val() == -1 || $("#magazzinoDest").val() == -1){
+            $("#btnPreleva button").attr('disabled', true);
+            $("#btnConfirm button").attr('disabled', true);
+        }
         $(".qrcode").hide();
     }
 }
+
 document.getElementById("search").addEventListener("keyup", function(event) {
     this.value = this.value.toUpperCase();
     console.log("listening to keyup");
