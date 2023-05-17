@@ -689,7 +689,7 @@ function create_div(dleft, dtop, dwidth, dheight)
 	var cursor = (find_window_fixed) ? "default" : "move"; // Version 5.4h
 	// This part creates a visible button on the HTML page to
 	// where the script is pasted in the HTML code
-	document.write('<input type="button" style="display:none;margin: 0px auto;margin-top: 0px;padding: 0.8rem 1rem;width: 90%; margin-top: 15px;" id="searchAll" value="Ricerca Codice Articolo"'
+	document.write('<input type="button" style="display:none;margin: 0px auto;margin-top: 0px;padding: 0.8rem 1rem;width: 90%; margin-top: 30px;" id="searchAll" value="Ricerca Codice Articolo"'
 	+ ' data-info="'+info+'"' // Version 5.4e - Added info // Version 5.4e - Moved out of global into create_div()
 	+ ' onclick="show();">');
 	
@@ -718,6 +718,7 @@ function create_div(dleft, dtop, dwidth, dheight)
     findwindow.style.backgroundColor = find_window_background;
     findwindow.style.border = '2px solid ' + find_window_border;
 	findwindow.style.borderRadius = "6px";
+	findwindow.style.boxShadow = "rgba(89, 130, 147, 0.44) 0px 0px 10px 4px";
     findwindow.style.color = find_text_color;
 	findwindow.style.width = 'calc(100% - 60px)';
 	//findwindow.style.height = + find_window_height + 'px'; // Version 5.3f - No longer using
@@ -737,29 +738,39 @@ function create_div(dleft, dtop, dwidth, dheight)
 	+ ';background-color: ' + find_window_border
 	//+ ';float: left' // Version 5.4e
 	+ ';" onmouseover="over=1;" onmouseout="over=0;">'
-	+ '<span style="font-size: large;">Ricerca</span></div>'; // Version 5.4h - Added span with font-size: large
+	+ '<span style="font-size: large;">RICERCA</span></div>'; // Version 5.4h - Added span with font-size: large
 	// This part creates the closing X
-	string += '<div onclick="hide();" class="close" style="text-align: center'
-	+ ';width: ' + (20) + 'px' // Version5.4h - From 16 to 20
+	string += '<div onclick="hide();" class="closeBtn" style="text-align: center'
+	+ ';width: ' + (1.4) + 'rem' // Version5.4h - From 16 to 20
+	+ ';height: ' + (1.4) + 'rem' // Version5.4h - From 16 to 20
 	+ ';cursor: pointer' // make mouse arrow stay an arrow instead of turning to text arrow // version 5.4h - From default to pointer
 	+ ';font-weight: bold'
-	+ ';background-color: red'
-	+ ';border: 1px solid ' + find_text_color
+	+ ';background-color: #bb6363'
+	+ ';border: 1px solid #483939;'
 	+ ';position: absolute' // + ';float: right' // Version 5.4e 
-	+ '; top: 0px; right: 0px ' // Version 5.4e
-	+ '; font-size: large ' // Version 5.4h
+	+ ';top: 0px; right: 0px ' // Version 5.4e
+	+ ';font-size: large ' // Version 5.4h
+	+ ';border-radius: 4px'
+	+ ';line-height: 1.2rem'
+	+ ';color: #242424'
 	+ ';">'
 	+ 'X' // write the letter X
 	+ '</div>\n'; // Version 5.4h - Removed <br />
 // This part creates the instructions and the "find" button
 	string += '<div id="window_body" style="padding: 20px;" data-info="'+info+'">'
 	+ '<form style="margin:0px;" onsubmit="return false;">'
-	+ '<input type="button" value=" < " onclick="this.blur(); findit(2);" title="Previous" style="padding: 10px 10px;margin: 0px 8px;height: 42px;">' // Ver 5.4f - Changed Find Next and Find Prev to just < and > - // Version 5.4f Changed findprev() to findit(0) // Version 5.4g - Added title attribute and this.blur()
+	+ '<div class="container"><div class="row no-gutters"><div class="col-2">'
+	+ '<input type="button" value=" < " onclick="this.blur(); findit(2);" title="Previous" style="padding: 10px;margin:0px;">' // Ver 5.4f - Changed Find Next and Find Prev to just < and > - // Version 5.4f Changed findprev() to findit(0) // Version 5.4g - Added title attribute and this.blur()
+	+ '</div>'
+	+ '<div class="col-8">'
 	+ '<input type="search" id="fwtext"' // Version 5.4h - Added form style="margin:0px;"
-	+ ' style="border:1px solid #e9e9ed!important;height: 42px;border-radius: 5px 5px 5px 5px;padding: 15px 32px;width: calc(100% - 115px);background-color: #f6f6f6;color: #0d0d0d;text-align: center; text-decoration: none; font-size:16px;"' // Version 5.4e - // Version 5.4g - Added font-size:16px to prevent iphone from zooming in on focus
+	+ ' style="border:1px solid #e9e9ed!important;border-radius: 5px 5px 5px 5px;background-color: #f6f6f6;height: 2.6rem;width:100%"' // Version 5.4e - // Version 5.4g - Added font-size:16px to prevent iphone from zooming in on focus
 	+ ' onchange="resettext();" placeholder="Trova Articolo">'
-	+ '<input type="button" value=" > " onclick="this.blur(); findit();" title="Next" style="padding: 10px 10px;margin: 0px 8px;height: 42px;">' // ver 5.3 - 5/15/2015 - added this.blur(); // Version 5.4g - Added title attribute
-	+ ' <span id="find_msg" style="text-align: center; width: 100%; display: inline-block; margin-top: 15px;"> </span>'; // From <br /> to space
+	+ '</div>'
+	+ '<div class="col-2 text-right">'
+	+ '<input type="button" value=" > " onclick="this.blur(); findit();" title="Next" style="padding: 10px;margin:0px;">' // ver 5.3 - 5/15/2015 - added this.blur(); // Version 5.4g - Added title attribute
+	+ '</div></div></div>'
+	+ ' <span id="find_msg" style="text-align: center; width: 100%; display: inline-block;margin-top:1.4rem;"> </span>'; // From <br /> to space
 	if (enable_site_search) { // Version 5.4
 		string += ' <label><input type="radio" name="search_type" value="page" checked>Page</label>'+ // Version 5.4h - Removed <br /> at beginning
 		'<label><input type="radio" name="search_type" value="site" id="find_site_search">Site</label>';	
@@ -768,6 +779,7 @@ function create_div(dleft, dtop, dwidth, dheight)
 	// ^ ver 5.1 - 10/17/2014
 	
 	findwindow.innerHTML = string;
+	
 	
 	// Check to see if css rules exist for highlight and find_selected.
 	var sheets = document.styleSheets;
