@@ -307,8 +307,7 @@ function confermaAssociazione() {
                 'Authorization': 'Bearer ' + sessionStorage.getItem('token')
             },
             success: function(data, status) {
-                showSuccessMsg("Ubicazione " + ub + " associata con successo al carrello "+codCarrello);
-                
+                showSuccessMsg("Ubicazione " + ub + " associata con successo al carrello "+codCarrello, false);
                 
                 $("#appendData").html("");
                 ubicazioni = [];
@@ -372,8 +371,7 @@ function confermaTrasferimento() {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
         },
         success: function(data, status) {
-            showSuccessMsg("Trasferimento carrello " + codCarrello + " avvenuto con successo al magazzino "+magazzinoDest);
-            location.reload(true);
+            showSuccessMsg("Trasferimento carrello " + codCarrello + " avvenuto con successo al magazzino "+magazzinoDest, true);
         },
         error: function(data, status){            
             $("#qrcode").val("");
@@ -396,7 +394,7 @@ function confermaDisassociazione() {
                 'Authorization': 'Bearer ' + sessionStorage.getItem('token')
             },
             success: function(data, status) {
-                showSuccessMsg("Ubicazione " + ub + " disassociata con successo dal carrello "+codCarrello);
+                showSuccessMsg("Ubicazione " + ub + " disassociata con successo dal carrello "+codCarrello, false);
                 $("#appendData").html("");
                 ubicazioni = [];
                 $.get({
@@ -450,11 +448,14 @@ function confermaDisassociazione() {
     }
 }
 
-function showSuccessMsg(msg) {
-    alert(msg);
+function showSuccessMsg(msg, reloadPage) {
+    $('#success_message').text(msg);
+    $('#success_message').show();
+    setTimeout(() => {
+        $('#success_message').hide();
+        if(reloadPage) location.reload();
+    }, "1000");
 }
-
-
 
 function showError(data) {
     const err = typeof data === 'string' ? data :

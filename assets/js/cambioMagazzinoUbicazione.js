@@ -159,7 +159,6 @@ function cambioMagazzinoUbicazione() {
         },
         success: function(data, status) {
             showSuccessMsg("Ubicazione spostata correttamente nel magazzino " + magazzinoDest);
-            location.href="./index.html";
         },
         error: function(data, status){
             console.log('ERRORE -> cambioMagazzinoUbicazione', data);
@@ -193,5 +192,10 @@ function showError(data) {
 }
 
 function showSuccessMsg(msg) {
-    alert(msg);
+    $('#success_message').text(msg);
+    $('#success_message').show();
+    setTimeout(() => {
+        $('#success_message').hide();
+        location.href="./index.html";
+      }, "1000");
 }
