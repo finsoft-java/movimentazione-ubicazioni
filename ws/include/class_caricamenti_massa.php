@@ -68,7 +68,7 @@ class CaricamentiMassaManager {
      * FUNZIONE "Trasferisci articolo da una ubicazione a un'altra"
      */
 
-    function trasferisciArticolo($codUbicazioneSrc, $codUbicazioneDest, $articolo, $qty, $commessa) {
+    function trasferisciArticolo($codUbicazioneSrc, $codUbicazioneDest, $articolo, $qty, $commessa, $whitelist) {
         global $panthera, $ubicazioniManager, $CAU_TESTATA, $CAU_RIGA;
 
         if ($panthera->mock) {
@@ -94,7 +94,7 @@ class CaricamentiMassaManager {
         $this->creaTestataDocumento($id, $CAU_TESTATA, $codMagazzinoSrc, $codMagazzinoDest);
 
         // CM_DOC_TRA_RIG
-        $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty, 0, $commessa);
+        $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty, 0, $commessa, $whitelist);
 
         $sql = "SELECT COUNT(*) FROM THIP.CM_DOC_TRA_RIG WHERE RUN_ID='$id' AND ID_NUMERO_DOC='$id' AND STATO = 'V'";
         $countRigheInserite = $panthera->select_single_value($sql);
@@ -114,12 +114,14 @@ class CaricamentiMassaManager {
       $idAnnoDoc = $riga["ID_ANNO_DOC"];
       $idRigaDoc = $riga["ID_RIGA_DOC"];
       $idNumeroDoc = $riga["ID_NUMERO_DOC"];
-
-      $id = $panthera->get_numeratore('MOVUBI');
+      $id = "";
+      //$id = $panthera->get_numeratore('MOVUBI');
       // BATCH_LOAD_HDR
-      $this->creaTestataCaricamento($id);
+      //$this->creaTestataCaricamento($id);
+
       // CM_DOC_TRA_TES
       $this->creaTestataDocumentoMovimentazione($id, $testata);
+
       $this->rimuoviRigaVecchia($id, $riga);
       $contatoreRiga = 0;
       for($i = 0 ; $i < count($riga["PRELIEVI"]); $i++) {
@@ -128,7 +130,7 @@ class CaricamentiMassaManager {
                   WHERE ID_AZIENDA='001' 
                   AND ID_ANNO_DOC='$idAnnoDoc' 
                   AND ID_NUMERO_DOC='$idNumeroDoc'  
-                  AND ID_RIGA_DOC='$idRigaDoc'" ;
+                  AND ID_RIGA_DOC='$idRigaDoc'";
 
           $maxNumeroDoc = $panthera->select_single_value($sql_select);
           $maxNumeroDoc = $maxNumeroDoc++;          
@@ -216,12 +218,12 @@ class CaricamentiMassaManager {
               '".$id."',
               '".$contatoreRiga."',
               'I',
-              '".$riga["TRASF_STATUS"]."',
+              '0',
               '2',
               '001',
               '$idAnnoDoc',
               '$idNumeroDoc',
-              '".$riga["ID_RIGA_DOC"]."',                
+              '".$contatoreRiga."',                
               '$maxNumeroDoc',
               '".$riga["ID_DET_RIGA_DOC"]."',
               '".$riga["SPL_RIGA"]."',
@@ -275,9 +277,12 @@ class CaricamentiMassaManager {
               '".$riga["R_FORNITORE"]."',
               '".$riga["R_FORNITORE_ARR"]."')";
               $contatoreRiga++;
-              echo '5-'.$contatoreRiga;
-              $panthera->execute_update($sql);
-      }                
+              echo '5-'.$contatoreRiga.'</br>';
+              echo "Inserimento nuova riga ".$sql."</br>";
+              
+              //$panthera->execute_update($sql);
+      }       
+      return false;         
       $this->loop_job_panthera($id);  
     } 
 
@@ -605,13 +610,13 @@ class CaricamentiMassaManager {
           (
           '$DATA_ORIGIN',              
           '$id',
-          0,
+          1,
           'D',
-          '3',
-          '3',
+          ".$riga["TRASF_STATUS"].",
+          ".$riga["STATO_AVANZAMENTO"].",
           '$ID_AZIENDA',
           '".$riga["ID_ANNO_DOC"]."',
-          '$id',
+          '".$riga["ID_NUMERO_DOC"]."',
           '".$riga["ID_ORIGINALE"]."',                
           '".$riga["ID_RIGA_DOC"]."',
           '".$riga["ID_DET_RIGA_DOC"]."',
@@ -668,7 +673,6 @@ class CaricamentiMassaManager {
 
           echo "RIMOZIONE RIGA</br>";
           echo $sql."</br>";
-          return false;
           //$panthera->execute_update($sql);
 
     }
@@ -684,7 +688,7 @@ class CaricamentiMassaManager {
     //2 = ERRORE
     //3 = OK
     //1 = SIMULAZIONE OK (NON HA FATTO NIENTE IN VERITA)
-    
+    //ROW_ID = PROGRESSIVO
       $sql = "INSERT INTO THIP.CM_DOC_TRA_TES (
         DATA_ORIGIN,            -- 1
         RUN_ID,
@@ -751,7 +755,7 @@ class CaricamentiMassaManager {
         '$DATA_ORIGIN',                     -- 1
         '$id',
         '1',
-        'I',
+        'U',
         '3',
         '2',
         '$ID_AZIENDA',
@@ -810,14 +814,13 @@ class CaricamentiMassaManager {
         '{$testata["R_FORNITORE"]}',           
         '{$testata["R_FORNITORE_ARR"]}'
       )";
-      //echo "TESTATA</br>";
-      //echo $sql."</br>";
-      $panthera->execute_update($sql);
+      
+      //$panthera->execute_update($sql);
   }
 
     //aggiungere commessa 
     function creaRigheDocumento($id, $cauRiga, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest,
-                                                              $codUbicazioneDest, $articolo=null, $qty=null, $baseRow=0, $commessa=null) {
+                                                              $codUbicazioneDest, $articolo=null, $qty=null, $baseRow=0, $commessa=null, $inWhitelist=null) {
       global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $logged_user;
       
       if (empty($articolo) || empty($qty)) {
@@ -956,8 +959,11 @@ class CaricamentiMassaManager {
         null
       FROM THIP.SALDI_UBICAZIONE S
       JOIN THIP.ARTICOLI A ON A.ID_AZIENDA=S.ID_AZIENDA AND A.ID_ARTICOLO=S.ID_ARTICOLO
-      WHERE S.ID_AZIENDA='$ID_AZIENDA' AND S.ID_UBICAZIONE='$codUbicazioneSrc' AND S.QTA_GIAC_PRM > 0";
+      WHERE S.ID_AZIENDA='$ID_AZIENDA' AND S.ID_UBICAZIONE='$codUbicazioneSrc' ";
 
+      if ($inWhitelist!=null) {        
+        $sql .= " AND S.QTA_GIAC_PRM > 0 ";
+      }
       if (!empty($articolo)) {
         $sql .= " AND S.ID_ARTICOLO='$articolo' ";
         if (!empty($commessa)) {

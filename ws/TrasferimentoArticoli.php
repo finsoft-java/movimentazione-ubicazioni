@@ -15,6 +15,7 @@ $codArticolo = isset($_REQUEST['codArticolo']) ? $panthera->escape_string($_REQU
 $commessa = isset($_REQUEST['commessa']) ? $panthera->escape_string($_REQUEST['commessa']) : null;
 $qty = isset($_REQUEST['qty']) ? $panthera->escape_string($_REQUEST['qty']) : null;
 $codUbicazioneDest = isset($_REQUEST['codUbicazioneDest']) ? $panthera->escape_string($_REQUEST['codUbicazioneDest']) : null;
+$whitelist = isset($_REQUEST['whitelist']) ? $panthera->escape_string($_REQUEST['whitelist']) : null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($codUbicazione)) {
@@ -33,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         print_error(400, "Missing argument commessa");
     }
     //da aggiungere anche la commessa
-    $caricamentiMassaManager->trasferisciArticolo($codUbicazione, $codUbicazioneDest, $codArticolo, $qty, $commessa);
+    $caricamentiMassaManager->trasferisciArticolo($codUbicazione, $codUbicazioneDest, $codArticolo, $qty, $commessa, $whitelist);
     
     header('Content-Type: application/json');
     echo '{"msg":"OK"}';

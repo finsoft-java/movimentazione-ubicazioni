@@ -21,6 +21,9 @@ let articolo;
 let ubicazioneDest;
 let maxQty;
 let arrayCommessa = [];
+let ubicazioneInWhitelist = null;
+let magazzinoPartenza;
+let magazzinoArrivo;
 
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     this.value = this.value.toUpperCase();
@@ -40,8 +43,10 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     success: function(data, status) {
                         const dati = data.value;
                         let datiStampati = ""; 
+                        ubicazione = dati.ID_UBICAZIONE.trim();
                         datiStampati += "<p class='pOsai'> Ubicazione di partenza: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
                         datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati.ID_MAGAZZINO+"</strong></p>";
+                        magazzinoPartenza = dati.ID_MAGAZZINO;
                         $("#appendData").html(datiStampati);
                         $("#qrcode").val("").attr('placeholder','UBICAZIONE DESTINAZIONE');
                     },
@@ -51,6 +56,9 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         showError(data);
                         $("#qrcode").val('');
                         ubicazione = null;
+                        
+                        magazzinoPartenza = null;
+                        magazzinoArrivo = null;
                         i = 0;
                         return false;
                     }
@@ -75,6 +83,10 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         let datiStampati = ""; 
                         datiStampati += "<p class='pOsai'> Ubicazione dest.: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
                         datiStampati += "<p class='pOsai'> Magazzino destinazione: <strong>"+dati.ID_MAGAZZINO+"</strong></p>";
+                        let magazzinoArrivo = dati.ID_MAGAZZINO;
+                        if(magazzinoPartenza != magazzinoArrivo) {
+                            $("body").attr("style","background-color: #eded6e");
+                        }
                         $("#appendData").append(datiStampati);
                         $("#qrcode").val("").attr('placeholder','ARTICOLO');
                     },
@@ -84,6 +96,8 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                         showError(data);
                         $("#qrcode").val('');
                         ubicazioneDest = null;
+                        magazzinoPartenza = null;
+                        magazzinoArrivo = null;
                         i = 1;
                         return false;
                     }
@@ -151,16 +165,16 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     datiStampati += "<p class='pOsai'> Disegno: <strong>"+dati[0].DISEGNO+"</strong> </p>";
                     datiStampati += "<p class='pOsai'> Descrizione: <strong>"+dati[0].DESCRIZIONE+"</strong> </p>";
                     datiStampati += "<p class='pOsai'> Commessa:  </p>"+optCommessa;
-                    datiStampati += "<div class='input-group inputDiv'>  <div class='input-group-prepend'><button class='btn btnInputForm btnMinus' type='button' onClick='minus(1,\""+ubicazione+"\")'>-</button></div>";
-                    if(whiteList.includes(ubicazioneDest)){
-                        datiStampati += "<input type='number' class='form-control inputOsai' disabled onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='' max='"+giacenzaIniziale+"' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
+                    datiStampati += "<div class='input-group inputDiv'>  <div class='input-group-prepend'><button class='btn btnInputForm btnMinus' type='button' onClick='minus(1)'>-</button></div>";
+                    if(whiteList.includes(ubicazione)){
+                        datiStampati += "<input type='number' class='form-control inputOsai' disabled onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='' max='' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
                     } else {
                         datiStampati += "<input type='number' class='form-control inputOsai' disabled onclick='timerOn = false' onblur='timerOn = true'  id='qty' class='inputOsai' value='1' min='0.001' max='"+giacenzaIniziale+"' placeholder='Quantità da trasferire' aria-label='Quantità da trasferire' aria-describedby='basic-addon2'>";
                     }
                     
-                    datiStampati += "<div class='input-group-append'><button class='btn btnInputForm btnPlus' type='button' onClick='plus("+giacenzaIniziale+",\""+ubicazioneDest+"\")'>+</button></div>";
+                    datiStampati += "<div class='input-group-append'><button class='btn btnInputForm btnPlus' type='button' onClick='plus("+giacenzaIniziale+")'>+</button></div>";
                     datiStampati += "<button class='btn btnInputForm btnAll' type='button' onClick='selezionaTutti("+giacenzaIniziale+")'> Tutti </button></div>";
-                    datiStampati += "<p class='pOsai'> Quantita Totale: <strong id='commessaQty'>"+giacenzaIniziale+" "+um+"</strong></p>";
+                    datiStampati += "<p class='pOsai'> Quantita Totale: <strong id='commessaQty'></strong></p>";
 
                     $.get({
                         url: "./ws/Interrogazione.php?codUbicazione=" + ubicazioneDest + "&codArticolo=" +articolo,
@@ -234,9 +248,15 @@ $(document).on("change", "#selectCommessa", function(){
     if($(this).val() != 0){
         maxQty = $(this).find('option:selected').data("maxqty");
         $("#commessaQty").html(maxQty+" "+$(this).find('option:selected').data('prm'));
-        $("#qty").attr("max",maxQty).attr("disabled",false);
-        $(".btnPlus").attr('onClick','plus('+maxQty+')');
-        $(".btnAll").attr('onClick','selezionaTutti('+maxQty+')');
+        if(!whiteList.includes(ubicazione.trim())){
+            $("#qty").attr("max",maxQty).attr("disabled",false);
+            $(".btnPlus").attr('onClick','plus('+maxQty+')');
+            $(".btnAll").attr('onClick','selezionaTutti('+maxQty+')');
+        } else {
+            $("#qty").prop("disabled",false);
+            $(".btnAll").attr('onClick','selezionaTutti(10)');
+        }
+        
         $("#qrcode").val('').attr('disabled',true);
         timerOn = false;
     } else {
@@ -250,7 +270,7 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
     const qrcode = $("#qrcode");
     
     //fixme devo controllare se è in whitelist
-    if(!whiteList.includes(ubicazioneDest)){
+    if(!whiteList.includes(ubicazione)){
         if((!qtyInput.match(/^\d+(,\d+|\.\d+)?$/)) || !qtyInput || (parseFloat(qtyInput) < 0.001 || parseFloat(qtyInput) > maxQty)) { 
             showError("Inserire una quantità valida tra uno e " + maxQty + " (numeri decimali con il punto)");
             i=3;
@@ -258,7 +278,9 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
             $("#btnRipeti").attr('disabled',false);
             return;
         }
-    }    
+    } else {
+        ubicazioneInWhitelist = "Y";
+    }
     const qty = parseFloat(qtyInput).toFixed(3);
     const codCommessa = $("#selectCommessa option:selected").text();
     if(codCommessa == "Seleziona Commessa"){
@@ -281,7 +303,7 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
     $("#btnRipeti").attr('disabled',true);
 
     $.post({
-        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + qty  + "&codUbicazioneDest=" +ubicazioneDest+ "&commessa=" + codCommessa,
+        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + qty  + "&codUbicazioneDest=" +ubicazioneDest+ "&commessa=" + codCommessa+ "&whitelist="+ubicazioneInWhitelist,
         dataType: 'json',
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
@@ -311,9 +333,9 @@ function showSuccessMsg(msg) {
     }, 1000);
 }
 
-function plus(maxQty, ubicazione) {
+function plus(maxQty) {
     //devo fare il controllo in whitelist non c'è max quindi se ci sono 10 pz ne posso prelevare anche 12 e va in negativo
-    if(whiteList.includes(ubicazioneDest)) {
+    if(whiteList.includes(ubicazione)) {
         $("#qty").val((parseFloat($("#qty").val())+1).toFixed(3));    
     } else {
         if($("#qty").val() <= maxQty - 1) {
@@ -322,15 +344,11 @@ function plus(maxQty, ubicazione) {
     }
 }
 
-function minus(minimum = 1, ubicazione) {
+function minus(minimum = 1) {
     //controllo se è in whitelist l'ubicazione di partenza 
-    //if(whiteList.includes(ubicazione)) {
-    //     $("#qty").val((parseFloat($("#qty").val())-1).toFixed(3));
-    //} else {
-        if($("#qty").val() >= minimum + 1) {
-            $("#qty").val((parseFloat($("#qty").val())-1).toFixed(3));
-        }
-    //}   
+    if($("#qty").val() >= minimum + 1) {
+        $("#qty").val((parseFloat($("#qty").val())-1).toFixed(3));
+    }
 }
 
 function selezionaTutti(maxQty) {
