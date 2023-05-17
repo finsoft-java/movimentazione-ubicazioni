@@ -720,9 +720,9 @@ function create_div(dleft, dtop, dwidth, dheight)
 	findwindow.style.borderRadius = "6px";
 	findwindow.style.boxShadow = "rgba(89, 130, 147, 0.44) 0px 0px 10px 4px";
     findwindow.style.color = find_text_color;
-	findwindow.style.width = 'calc(100% - 60px)';
+	findwindow.style.width = 'calc(100% - 40px)';
 	//findwindow.style.height = + find_window_height + 'px'; // Version 5.3f - No longer using
-    findwindow.style.top = '20px';
+    findwindow.style.top = '75px';
 	findwindow.style.left = '20px';
 	findwindow.style.padding = '0px'; 
 	findwindow.style.zIndex = 2147483647; // Version 5.4e
@@ -764,7 +764,7 @@ function create_div(dleft, dtop, dwidth, dheight)
 	+ '</div>'
 	+ '<div class="col-8">'
 	+ '<input type="search" id="fwtext"' // Version 5.4h - Added form style="margin:0px;"
-	+ ' style="border:1px solid #e9e9ed!important;border-radius: 5px 5px 5px 5px;background-color: #f6f6f6;height: 2.6rem;width:100%"' // Version 5.4e - // Version 5.4g - Added font-size:16px to prevent iphone from zooming in on focus
+	+ ' style="border:1px solid #e9e9ed!important;border-radius: 5px 5px 5px 5px;background-color: #f6f6f6;text-align:center;height: 2.6rem;width:100%"' // Version 5.4e - // Version 5.4g - Added font-size:16px to prevent iphone from zooming in on focus
 	+ ' onchange="resettext();" placeholder="Trova Articolo">'
 	+ '</div>'
 	+ '<div class="col-2 text-right">'

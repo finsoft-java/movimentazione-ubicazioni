@@ -705,3 +705,11 @@ div.area-messaggi.esaurimento {
 div.rigaDocumenti:hover {
 	background-color: #eee;
 }
+
+#success_message {
+	margin: 0px;
+	width: 100%;
+	height: 150px;
+	line-height: 120px;
+	text-align: center;
+}
