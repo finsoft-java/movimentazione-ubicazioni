@@ -689,7 +689,7 @@ function create_div(dleft, dtop, dwidth, dheight)
 	var cursor = (find_window_fixed) ? "default" : "move"; // Version 5.4h
 	// This part creates a visible button on the HTML page to
 	// where the script is pasted in the HTML code
-	document.write('<input type="button" style="display:none;margin: 0px auto;margin-top: 0px;width: 90%; margin-top: 15px;" id="searchAll" value="Ricerca Codice Articolo"'
+	document.write('<input type="button" style="display:none;margin: 0px auto;margin-top: 0px;padding: 0.8rem 1rem;width: 90%; margin-top: 15px;" id="searchAll" value="Ricerca Codice Articolo"'
 	+ ' data-info="'+info+'"' // Version 5.4e - Added info // Version 5.4e - Moved out of global into create_div()
 	+ ' onclick="show();">');
 	
@@ -717,6 +717,7 @@ function create_div(dleft, dtop, dwidth, dheight)
     
     findwindow.style.backgroundColor = find_window_background;
     findwindow.style.border = '2px solid ' + find_window_border;
+	findwindow.style.borderRadius = "6px";
     findwindow.style.color = find_text_color;
 	findwindow.style.width = 'calc(100% - 60px)';
 	//findwindow.style.height = + find_window_height + 'px'; // Version 5.3f - No longer using
@@ -733,7 +734,6 @@ function create_div(dleft, dtop, dwidth, dheight)
 	+ ';width: 100%' // Version 5.4e Was: // + ';width: ' + (find_window_width-20) + 'px'
 	+ ';cursor: ' + cursor  // Version 5.4h - Turn mouse arrow to default or move icon 
 	+ ';padding:10px 0px;color: ' + find_title_color
-	+ ';border: 1px solid ' + find_text_color
 	+ ';background-color: ' + find_window_border
 	//+ ';float: left' // Version 5.4e
 	+ ';" onmouseover="over=1;" onmouseout="over=0;">'
