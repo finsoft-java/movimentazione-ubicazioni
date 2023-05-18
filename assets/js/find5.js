@@ -363,7 +363,8 @@ function checkkey(e)
 function show()
 {
 	if (!find_window_fixed) // Version 5.4i - Put find window at current scrollTop
-		findwindow.style.top = (document.body.scrollTop || document.documentElement.scrollTop || 0) + "px"; // Version 5.4i
+		findwindow.style.top = "75px";
+		// findwindow.style.top = (document.body.scrollTop || document.documentElement.scrollTop || 0) + "px"; // Version 5.4i
 	// Object to hold textbox so we can focus on it
 	// so user can just start typing after "find" button
 	// is clicked
