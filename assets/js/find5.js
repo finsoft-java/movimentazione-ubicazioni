@@ -742,17 +742,17 @@ function create_div(dleft, dtop, dwidth, dheight)
 	+ '<span style="font-size: large;">RICERCA</span></div>'; // Version 5.4h - Added span with font-size: large
 	// This part creates the closing X
 	string += '<div onclick="hide();" class="closeBtn" style="text-align: center'
-	+ ';width: ' + (1.4) + 'rem' // Version5.4h - From 16 to 20
-	+ ';height: ' + (1.4) + 'rem' // Version5.4h - From 16 to 20
+	+ ';width: ' + (2.4) + 'rem' // Version5.4h - From 16 to 20
+	+ ';height: ' + (2.4) + 'rem' // Version5.4h - From 16 to 20
 	+ ';cursor: pointer' // make mouse arrow stay an arrow instead of turning to text arrow // version 5.4h - From default to pointer
 	+ ';font-weight: bold'
 	+ ';background-color: #bb6363'
-	+ ';border: 1px solid #483939;'
+	+ ';border: 1px solid #242424;'
 	+ ';position: absolute' // + ';float: right' // Version 5.4e 
-	+ ';top: 0px; right: 0px ' // Version 5.4e
-	+ ';font-size: large ' // Version 5.4h
+	+ ';top: 0.2rem; right: 0.2rem' // Version 5.4e
+	+ ';font-size: 1.6rem ' // Version 5.4h
 	+ ';border-radius: 4px'
-	+ ';line-height: 1.2rem'
+	+ ';line-height: 2.2rem'
 	+ ';color: #242424'
 	+ ';">'
 	+ 'X' // write the letter X
