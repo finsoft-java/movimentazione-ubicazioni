@@ -81,11 +81,14 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     success: function(data, status) {
                         const dati = data.value;
                         let datiStampati = ""; 
-                        datiStampati += "<p class='pOsai'> Ubicazione dest.: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
+                        datiStampati += "<p class='pOsai'> Ubicazione destinazione: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
                         datiStampati += "<p class='pOsai'> Magazzino destinazione: <strong>"+dati.ID_MAGAZZINO+"</strong></p>";
-                        let magazzinoArrivo = dati.ID_MAGAZZINO;
+                        magazzinoArrivo = dati.ID_MAGAZZINO;
+                        console.log(magazzinoPartenza+" != "+magazzinoArrivo);
                         if(magazzinoPartenza != magazzinoArrivo) {
                             $("body").attr("style","background-color: #eded6e");
+                        } else {
+                            $("body").attr("style","");
                         }
                         $("#appendData").append(datiStampati);
                         $("#qrcode").val("").attr('placeholder','ARTICOLO');
@@ -160,7 +163,8 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
                     optCommessa += "</select>";
                     datiStampati += "<p class='pOsai'> Ubicazione di partenza: <strong>"+dati[0].ID_UBICAZIONE+"</strong></p>";
                     datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati[0].ID_MAGAZZINO+"</strong></p>";
-                    datiStampati += "<p class='pOsai'> Ubicazione dest.: <strong>" + ubicazioneDest + " </strong> </p>";
+                    datiStampati += "<p class='pOsai'> Ubicazione destinazione: <strong>" + ubicazioneDest + " </strong> </p>";
+                    datiStampati += "<p class='pOsai'> Magazzino destinazione: <strong>"+magazzinoArrivo+"</strong></p>";
                     datiStampati += "<p class='pOsai'> Articolo: <strong>"+dati[0].ID_ARTICOLO+"</strong></p>";
                     datiStampati += "<p class='pOsai'> Disegno: <strong>"+dati[0].DISEGNO+"</strong> </p>";
                     datiStampati += "<p class='pOsai'> Descrizione: <strong>"+dati[0].DESCRIZIONE+"</strong> </p>";
@@ -309,7 +313,7 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
         },
         success: function(data, status) {
-            showSuccessMsg("Trasferimento avvenuto con successo \n (ubicazione di partenza: " + ubicazione + ", ubicazione dest.: " + ubicazioneDest + ", articolo: " + articolo + ", quantità: " + qty + ")");
+            showSuccessMsg("Trasferimento avvenuto con successo \n (ubicazione di partenza: " + ubicazione + ", ubicazione destinazione: " + ubicazioneDest + ", articolo: " + articolo + ", quantità: " + qty + ")");
         },
         error: function(data, status){
             console.log("ERRORE in trasferimentoArticoli", data);

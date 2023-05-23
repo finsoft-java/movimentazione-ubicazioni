@@ -94,7 +94,8 @@ class CaricamentiMassaManager {
         $this->creaTestataDocumento($id, $CAU_TESTATA, $codMagazzinoSrc, $codMagazzinoDest);
 
         // CM_DOC_TRA_RIG
-        $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty, 0, $commessa, $whitelist);
+        //$this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty, 0, $commessa, $whitelist);
+        $this->creaRigheDocumentoNoSaldi($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty, 0, $commessa, $whitelist);
 
         $sql = "SELECT COUNT(*) FROM THIP.CM_DOC_TRA_RIG WHERE RUN_ID='$id' AND ID_NUMERO_DOC='$id' AND STATO = 'V'";
         $countRigheInserite = $panthera->select_single_value($sql);
@@ -818,7 +819,6 @@ class CaricamentiMassaManager {
       //$panthera->execute_update($sql);
   }
 
-    //aggiungere commessa 
     function creaRigheDocumento($id, $cauRiga, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest,
                                                               $codUbicazioneDest, $articolo=null, $qty=null, $baseRow=0, $commessa=null, $inWhitelist=null) {
       global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $logged_user;
@@ -972,6 +972,151 @@ class CaricamentiMassaManager {
           $sql .= " AND S.ID_COMMESSA IS NULL ";
         }
       }
+
+      $panthera->execute_update($sql);
+      
+      $sql = "SELECT MAX(ROW_ID)
+              FROM THIP.CM_DOC_TRA_RIG
+              WHERE DATA_ORIGIN='$DATA_ORIGIN'AND RUN_ID='$id'";
+      return $panthera->select_single_value($sql);
+        
+    }
+
+
+    function creaRigheDocumentoNoSaldi($id, $cauRiga, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest,
+                                                              $codUbicazioneDest, $articolo=null, $qty=null, $baseRow=0, $commessa=null, $inWhitelist=null) {
+      global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $logged_user, $ubicazioniManager;
+      
+      if(!empty($articolo))
+        $datiArticolo = $ubicazioniManager->get_articolo($articolo);
+
+      $unitaMisura = $datiArticolo['R_UM_PRM_MAG'];
+      $sql = "INSERT INTO THIP.CM_DOC_TRA_RIG (
+        DATA_ORIGIN,              -- 1
+        RUN_ID,
+        ROW_ID,
+        RUN_ACTION,
+        TRASF_STATUS,
+        STATO_AVANZAMENTO,
+        ID_AZIENDA,
+        ID_ANNO_DOC,
+        ID_NUMERO_DOC,
+        ID_ORIGINALE,                 -- 10
+        ID_RIGA_DOC,
+        ID_DET_RIGA_DOC,
+        SPL_RIGA,
+        SEQUENZA_RIGA,
+        R_CAU_RIG_DOCTRA,
+        DATA_REGISTRAZIONE,
+        R_MAGAZZINO,
+        R_MAGAZZINO_ARR,
+        R_ARTICOLO,
+        R_VERSIONE,                     -- 20
+        R_CONFIGURAZIONE,
+        R_OPERAZIONE,
+        R_COMMESSA,
+        DES_ARTICOLO,
+        RIFER_DOC,
+        DTA_RIFER_DOC,
+        NOTA,
+        R_GES_COMMENTI,
+        R_DOCUMENTO_MM,
+        R_UM_PRM,               -- 30
+        QTA_UM_PRM,
+        R_UM_SEC,
+        QTA_UM_SEC,
+        FTT_CONVER_UM,
+        OPER_CONVER_UM,
+        R_CENTRO_COSTO,
+        R_CENTRO_RICAVO,
+        R_GRP_CNT_CA,
+        FLAG_RIS_UTE_1,
+        FLAG_RIS_UTE_2,               -- 40
+        FLAG_RIS_UTE_3,
+        FLAG_RIS_UTE_4,
+        FLAG_RIS_UTE_5,
+        STRINGA_RIS_UTE_1,
+        STRINGA_RIS_UTE_2,
+        NUM_RIS_UTE_1,
+        NUM_RIS_UTE_2,
+        STATO,
+        R_UTENTE_CRZ,
+        R_UTENTE_AGG,                 -- 50
+        TIMESTAMP_CRZ,
+        TIMESTAMP_AGG,
+        COSTO,
+        R_COMMESSA_ARR,
+        NUM_RIGA_DOC_RIF,
+        DET_RIGA_DOC_RIF,
+        R_UBI_PAR,
+        R_UBI_ARR,
+        R_CLIENTE,
+        R_CLIENTE_ARR,                    -- 60
+        R_FORNITORE,
+        R_FORNITORE_ARR)
+      VALUES (
+        '$DATA_ORIGIN',                     -- 1
+        '$id',
+        1,
+        'I',
+        '0',
+        '2',
+        '$ID_AZIENDA',
+        '$YEAR',
+        '$id',
+        1,             -- 10 
+        1,
+        1,
+        1,
+        1,
+        '$cauRiga',
+        '$DATE',
+        '$codMagazzinoSrc',
+        '$codMagazzinoDest',
+        '$articolo',
+        1,              -- 20
+        null,
+        null,
+        '$commessa',
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        '$unitaMisura',              -- 30
+        $qty,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        '-',
+        '-',              -- 40
+        '-',
+        '-',
+        '-',
+        null,
+        null,
+        null,
+        null,
+        'V',
+        '{$logged_user->nome_utente}_$ID_AZIENDA',
+        '{$logged_user->nome_utente}_$ID_AZIENDA',              -- 50
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP,
+        null,
+        '$commessa', 
+        null,
+        null,
+        '$codUbicazioneSrc',
+        '$codUbicazioneDest',
+        null,
+        null,              -- 60
+        null,
+        null)";
 
       $panthera->execute_update($sql);
       

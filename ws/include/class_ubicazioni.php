@@ -318,6 +318,19 @@ class UbicazioniManager {
       }
     }
 
+    function get_articolo($codArticolo) {
+      global $panthera, $ID_AZIENDA;
+      $data = null;
+      $sql = "SELECT DISTINCT *
+              FROM THIP.ARTICOLI A
+              WHERE A.ID_AZIENDA='$ID_AZIENDA' AND A.ID_ARTICOLO='$codArticolo' ";
+      $data = $panthera->select_single_value($sql);
+      if ($data == null) {
+        print_error(404, "Articolo inesistente");
+      }
+      return $data;
+    }
+
     /**
      * Restituisce l'unica ubicazione TRASFERIBILE con un certo codice
      */
