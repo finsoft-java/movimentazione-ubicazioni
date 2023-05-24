@@ -21,7 +21,7 @@ let articolo;
 let ubicazioneDest;
 let maxQty;
 let arrayCommessa = [];
-let ubicazioneInWhitelist = null;
+let ubicazioneInWhitelist = "N";
 let magazzinoPartenza;
 let magazzinoArrivo;
 

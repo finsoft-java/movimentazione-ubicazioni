@@ -94,8 +94,11 @@ class CaricamentiMassaManager {
         $this->creaTestataDocumento($id, $CAU_TESTATA, $codMagazzinoSrc, $codMagazzinoDest);
 
         // CM_DOC_TRA_RIG
-        //$this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty, 0, $commessa, $whitelist);
-        $this->creaRigheDocumentoNoSaldi($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty, 0, $commessa, $whitelist);
+        if($whitelist == "Y"){
+          $this->creaRigheDocumentoNoSaldi($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty, 0, $commessa);
+        } else {
+          $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty, 0, $commessa);
+        }       
 
         $sql = "SELECT COUNT(*) FROM THIP.CM_DOC_TRA_RIG WHERE RUN_ID='$id' AND ID_NUMERO_DOC='$id' AND STATO = 'V'";
         $countRigheInserite = $panthera->select_single_value($sql);
@@ -820,7 +823,7 @@ class CaricamentiMassaManager {
   }
 
     function creaRigheDocumento($id, $cauRiga, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest,
-                                                              $codUbicazioneDest, $articolo=null, $qty=null, $baseRow=0, $commessa=null, $inWhitelist=null) {
+                                                              $codUbicazioneDest, $articolo=null, $qty=null, $baseRow=0, $commessa=null) {
       global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $logged_user;
       
       if (empty($articolo) || empty($qty)) {
@@ -959,11 +962,8 @@ class CaricamentiMassaManager {
         null
       FROM THIP.SALDI_UBICAZIONE S
       JOIN THIP.ARTICOLI A ON A.ID_AZIENDA=S.ID_AZIENDA AND A.ID_ARTICOLO=S.ID_ARTICOLO
-      WHERE S.ID_AZIENDA='$ID_AZIENDA' AND S.ID_UBICAZIONE='$codUbicazioneSrc' ";
+      WHERE S.ID_AZIENDA='$ID_AZIENDA' AND S.ID_UBICAZIONE='$codUbicazioneSrc' AND S.QTA_GIAC_PRM > 0";
 
-      if ($inWhitelist!=null) {        
-        $sql .= " AND S.QTA_GIAC_PRM > 0 ";
-      }
       if (!empty($articolo)) {
         $sql .= " AND S.ID_ARTICOLO='$articolo' ";
         if (!empty($commessa)) {
@@ -984,7 +984,7 @@ class CaricamentiMassaManager {
 
 
     function creaRigheDocumentoNoSaldi($id, $cauRiga, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest,
-                                                              $codUbicazioneDest, $articolo=null, $qty=null, $baseRow=0, $commessa=null, $inWhitelist=null) {
+                                                              $codUbicazioneDest, $articolo=null, $qty=null, $baseRow=0, $commessa=null) {
       global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $logged_user, $ubicazioniManager;
       
       if(!empty($articolo))
