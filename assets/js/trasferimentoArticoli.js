@@ -220,29 +220,41 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
         }
         
         if(i == 4) {
+            barCode = $("#qrcode").val();
             $("#qrcode").val('').attr('disabled',false);
-            if(barCode.trim() != ""){
-                magazzinoDest = barCode; 
-            } else {
+            if(barCode.trim() == ""){
                 $("#qrcode").attr('placeholder','COMMESSA');
                 showError("Commessa inesistente si prega di riprovare");
                 $("#qrcode").val('');
                 i=3;
                 return false;
             }
-            if(!arrayCommessa.includes(barCode)) {         
-                $("#qrcode").attr('placeholder','COMMESSA');
-                showError("COMMESSA non valida");
-                $("#qrcode").val('');
-                magazzinoDest= null;
-                i=3;
-                return false;
+            if(whiteList.includes(ubicazione)){
+                if(!arrayCommessa.includes(barCode)) {         
+                    let prm = $("#selectCommessa option:last").attr("data-prm") == null ? "NR " : $("#selectCommessa option:last").attr("data-prm");
+                    $("#selectCommessa").append("<option value='"+barCode+"' data-maxqty='0' data-prm='"+prm+"' selected>"+barCode+"</option>");
+                    $("#selectCommessa").trigger("change");
+                } else {
+                    $("#qrcode").val('').attr('disabled',true);
+                    $("#selectCommessa").val(barCode);
+                    $("#selectCommessa").trigger("change");
+                    timerOn = false;
+                }
             } else {
-                $("#qrcode").val('').attr('disabled',true);
-                console.log("selectCommessa "+barCode);
-                $("#selectCommessa").val(barCode);
-                $("#selectCommessa").trigger("change");
-                timerOn = false;
+                if(!arrayCommessa.includes(barCode)) {         
+                    $("#qrcode").attr('placeholder','COMMESSA');
+                    showError("COMMESSA non valida");
+                    $("#qrcode").val('');
+                    magazzinoDest= null;
+                    i=3;
+                    return false;
+                } else {
+                    $("#qrcode").val('').attr('disabled',true);
+                    console.log("selectCommessa "+barCode);
+                    $("#selectCommessa").val(barCode);
+                    $("#selectCommessa").trigger("change");
+                    timerOn = false;
+                }
             }
         }
     }
@@ -307,7 +319,7 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
     $("#btnRipeti").attr('disabled',true);
 
     $.post({
-        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + qty  + "&codUbicazioneDest=" +ubicazioneDest+ "&commessa=" + codCommessa+ "&whitelist="+ubicazioneInWhitelist,
+        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + qty  + "&codUbicazioneDest=" +ubicazioneDest+ "&commessa=" + encodeURIComponent(codCommessa)+ "&whitelist="+ubicazioneInWhitelist,
         dataType: 'json',
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
