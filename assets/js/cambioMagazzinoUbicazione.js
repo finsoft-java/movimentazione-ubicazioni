@@ -19,6 +19,8 @@ let arrUbicazioniDest = [];
 let ubicazione;
 let magazzinoDest;
 let idMagazzino;
+
+//TODO controllare se ci sono articoli in negativo bloccare.
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
     this.value = this.value.toUpperCase();
 

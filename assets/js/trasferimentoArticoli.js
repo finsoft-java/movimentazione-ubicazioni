@@ -113,6 +113,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
             }
        }
         if(i == 3) {
+            //devo controllare il campo STATO che sia a V se no blocco con errore Articolo non in stato valido
             if(barCode.trim() === ""){       
                 showError("Inserire un articolo!");
                 $("#qrcode").val("").attr('placeholder','ARTICOLO');
@@ -319,7 +320,7 @@ function trasferimentoArticoli(repeatFlag) { //flag a true -> ripete, false -> c
     $("#btnRipeti").attr('disabled',true);
 
     $.post({
-        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo+ "&qty=" + qty  + "&codUbicazioneDest=" +ubicazioneDest+ "&commessa=" + encodeURIComponent(codCommessa)+ "&whitelist="+ubicazioneInWhitelist,
+        url: "./ws/TrasferimentoArticoli.php?codUbicazione=" + encodeURIComponent(ubicazione) + "&codArticolo=" + encodeURIComponent(articolo)+ "&qty=" + encodeURIComponent(qty)  + "&codUbicazioneDest=" +encodeURIComponent(ubicazioneDest)+ "&commessa=" + encodeURIComponent(codCommessa)+ "&whitelist="+ubicazioneInWhitelist,
         dataType: 'json',
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')

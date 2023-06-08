@@ -47,7 +47,13 @@ class CaricamentiMassaManager {
         $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazione, $codMagazzinoDest, $codUbicazione);
         //echo ">4< ";
 
-        // SCHEDULED_JOB + webservice
+
+        $sql = "SELECT COUNT(*) FROM THIP.CM_DOC_TRA_RIG WHERE RUN_ID='$id' AND ID_NUMERO_DOC='$id' AND STATO = 'V'";
+        $countRigheInserite = $panthera->select_single_value($sql);
+
+        if($countRigheInserite <= 0) {
+          print_error(500, 'Nessuna riga da inserire, Caricamento interrotto');
+        }
         $this->loop_job_panthera($id);
     }
 
@@ -86,13 +92,10 @@ class CaricamentiMassaManager {
         $ubicazioniManager->check_articolo($articolo);
 
         $id = $panthera->get_numeratore('MOVUBI');
-
         // BATCH_LOAD_HDR
         $this->creaTestataCaricamento($id);
-
         // CM_DOC_TRA_TES
         $this->creaTestataDocumento($id, $CAU_TESTATA, $codMagazzinoSrc, $codMagazzinoDest);
-
         // CM_DOC_TRA_RIG
         if($whitelist == "Y"){
           $this->creaRigheDocumentoNoSaldi($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest, $codUbicazioneDest, $articolo, $qty, 0, $commessa);
@@ -102,11 +105,12 @@ class CaricamentiMassaManager {
 
         $sql = "SELECT COUNT(*) FROM THIP.CM_DOC_TRA_RIG WHERE RUN_ID='$id' AND ID_NUMERO_DOC='$id' AND STATO = 'V'";
         $countRigheInserite = $panthera->select_single_value($sql);
+
+        if($countRigheInserite <= 0) {
+          print_error(500, 'Nessuna riga da inserire, Caricamento interrotto');
+        }
         $this->loop_job_panthera($id);
         
-        if($countRigheInserite < 0) {
-          print_error(500, 'Inserita Testata senza righe');
-        }
     }
 
     /**
@@ -987,10 +991,9 @@ class CaricamentiMassaManager {
                                                               $codUbicazioneDest, $articolo=null, $qty=null, $baseRow=0, $commessa=null) {
       global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $logged_user, $ubicazioniManager;
       
-      if(!empty($articolo))
-        $datiArticolo = $ubicazioniManager->get_articolo($articolo);
-
-      $unitaMisura = $datiArticolo['R_UM_PRM_MAG'];
+      if(!empty($articolo)){
+        $unitaMisura = $ubicazioniManager->get_articoloUM($articolo);
+      }     
       $sql = "INSERT INTO THIP.CM_DOC_TRA_RIG (
         DATA_ORIGIN,              -- 1
         RUN_ID,
@@ -1053,7 +1056,8 @@ class CaricamentiMassaManager {
         R_CLIENTE,
         R_CLIENTE_ARR,                    -- 60
         R_FORNITORE,
-        R_FORNITORE_ARR)
+        R_FORNITORE_ARR
+      )
       VALUES (
         '$DATA_ORIGIN',                     -- 1
         '$id',
@@ -1075,7 +1079,7 @@ class CaricamentiMassaManager {
         '$codMagazzinoDest',
         '$articolo',
         1,              -- 20
-        null,
+        0,
         null,
         '$commessa',
         null,
@@ -1089,7 +1093,7 @@ class CaricamentiMassaManager {
         null,
         null,
         null,
-        null,
+        '-',
         null,
         null,
         null,
