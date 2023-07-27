@@ -4,6 +4,31 @@ $ubicazioniManager = new UbicazioniManager();
 
 class UbicazioniManager {
 
+/**
+     * Restituisce tutti i dati dell'articolo 
+     */
+    function getArticoloByCod($codArticolo) {
+      global $panthera, $ID_AZIENDA;
+
+      if ($panthera->mock) {
+          $data = []; 
+          $count = 1;
+          
+      } else {
+
+          $sql0 = "SELECT COUNT(*) AS cnt ";
+          $sql1 = "SELECT ID_ARTICOLO, DESCRIZIONE, DISEGNO, R_UM_PRM_MAG ";
+          
+          $sql2 = "FROM THIP.ARTICOLI 
+                   WHERE ID_AZIENDA='$ID_AZIENDA' and ID_ARTICOLO='$codArticolo'";          
+          $sql3 = " ORDER BY ID_ARTICOLO";
+          $count = $panthera->select_single_value($sql0 . $sql2);
+          $data = $panthera->select_list($sql1 . $sql2 . $sql3);
+      }
+      
+      return [$data, $count];
+    }
+
     /**
      * Restituisce tutti i saldi (per commessa) di un certo articolo in una certa ubicazione
      */
