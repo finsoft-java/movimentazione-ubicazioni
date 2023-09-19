@@ -34,9 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         echo json_encode(['data' => $lista, 'count' => $cnt]);
     }
 } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
-    $caricamentiMassaManager->richiestaMovimentazione($riga, $testata);
-    
+    $testata = $richiesteMovimentazioneManager->getTestataRichiesta($riga["ID_ANNO_DOC"],$riga["ID_NUMERO_DOC"]);
+    $caricamentiMassaManager->richiestaMovimentazione($riga, $testata);    
     header('Content-Type: application/json');
     echo '{"msg":"OK"}';
 } else {

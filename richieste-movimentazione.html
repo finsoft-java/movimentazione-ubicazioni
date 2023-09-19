@@ -10,6 +10,43 @@
         <link rel="stylesheet" href="assets/css/all.css">
         <link rel="stylesheet" href="assets/css/fontawesome.css">
         <link rel="stylesheet" href="assets/css/v4-font-face.css">
+        <style>
+            div.qrcode {
+                float:left;
+                width: 80%;
+                text-align: center;
+                margin: 0px 0px 30px 0px;
+            }
+            div.settings {
+                float: left;
+                width: 13%;
+                margin: 0px 0px 30px 0px;
+            }
+            .settings a {                
+                min-width: auto;
+                text-align: center;
+                display: block;
+                margin: 0px auto;
+                width: 100%;
+                border: 1px solid;
+                color: #000;
+            }
+            .activebtn {
+                color: #049ddd !important;
+            }
+            a.btn:focus {
+                box-shadow: initial !important;
+            }
+            .panel {
+                padding:15px;
+            }
+            .ubiPrelievoDiv {
+                margin-top: 30px;
+            }
+            #magazPrelievo {
+                margin-top: 30px;
+            }
+        </style>
     </head>
     <body>
         <nav class="navbar blue" onclick="window.location='./index.html'">
@@ -21,17 +58,23 @@
         <nav>
             <ul class="pagination justify-content-center" id="navigateRichieste">
                 <li class="page-item">
-                    <a class='page-link' href='javascript:void(0);' id='btn_prev' onclick='prevPage()' style=''>Precedente</a>
+                    <a class='page-link' href='javascript:void(0);' id='btn_prev' onclick='prevPage()'>Precedente</a>
                 </li>
                 <li class="page-item">
-                    <a class='page-link' href='javascript:void(0);' id='btn_next' onclick='nextPage()' style=''>Successiva</a>
+                    <a class='page-link' href='javascript:void(0);' id='btn_next' onclick='nextPage()'>Successiva</a>
                 </li>
             </ul>
         </nav>
-        <div class="qrcode" style="display:none">
-            <input type="text" class="form-control focus" id="qrcode" placeholder="UBICAZIONE ARRIVO" aria-describedby="basic-addon2">
-            <input type="hidden" id="ubi_arrivo">            
+        <div style="float: left;width: 100%;">
+            <div class="qrcode" style="display:none">
+                <input type="text" class="form-control focus" id="qrcode" placeholder="UBICAZIONE ARRIVO" aria-describedby="basic-addon2">
+                <input type="hidden" id="ubi_arrivo">            
+            </div>
+            <div class="settings"  style="display:none">
+                <a class="btn btn_setting" href="javascript:void(0);" data-open="false"><i class="fa-solid fa-gear"></i></a>
+            </div>
         </div>
+        
         <div id="divElencoDocumentiContainer" style="margin-top:30px;">
             <div id="divElencoDocumenti"></div>
             <div id="loading"><!-- Used by infinite scroll--></div>
@@ -47,11 +90,14 @@
             <div style="float: left;width: 100%;border-top: 1px solid rgba(0,0,0,.1);padding: 30px 0px;" id="btnConfirm">
                 <button onclick="conferma()" type="button"  class="btn btnOsai" disabled="true"> Conferma </button>
             </div>
+            <div style="float: left;width: 100%;border-top: 1px solid rgba(0,0,0,.1);padding: 30px 0px;" id="btnConfirmPart">
+                <button onclick="confermaParziale()" type="button"  class="btn btnOsai" disabled="true"> Conferma Parziale </button>
+            </div>
             <div style="float: left;width: 100%;border-top: 1px solid rgba(0,0,0,.1);padding: 30px 0px;" id="btnPreleva">
                 <button onclick="preleva()" type="button"  class="btn btnOsai" disabled="true"> Preleva </button>
             </div>
             <div style="float: left;width: 100%;border-top: 1px solid rgba(0,0,0,.1);padding: 30px 0px;" id="btnBack">
-                <button onclick="indietro()" type="button"  class="btn btnOsai"> Indietro </button>
+                <button onclick="indietro()" type="button"  class="btn btnOsai"> Annulla </button>
             </div>
         </div>
         <div id="error_message"></div>
@@ -62,14 +108,31 @@
                 if(sessionStorage.getItem( "token") == null){
                     location.href="./login.html";
                 }
+
+                var acc = document.getElementsByClassName("accordion");
+                var i;
+                
+
+                
             });
             function logout() {
                 sessionStorage.removeItem("token");
                 location.href="./login.html";
             }
+
+            $(document).on("click", ".accordion",function(){
+                this.classList.toggle("active");
+                var panel = this.nextElementSibling;
+                if (panel.style.display === "block") {
+                    panel.style.display = "none";
+                } else {
+                    panel.style.display = "block";
+                }
+            });            
+            
         </script>
         <script src="assets/js/popper.min.js"></script>
         <script src="assets/js/bootstrap.min.js"></script>
-        <script src="assets/js/richiesteMovimentazione.js"></script>
+        <script src="assets/js/richiesteMovimentazione.js?v1"></script>
     </body>
 </html>

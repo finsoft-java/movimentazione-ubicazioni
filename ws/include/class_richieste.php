@@ -150,6 +150,70 @@ R_CAU_DOC_TRA
       return $data;
     }
 
+    function getTestataRichiesta($idAnnoDoc, $idNumeroDoc) {
+      global $panthera, $ID_AZIENDA;
+
+      if ($panthera->mock) {
+          $data = [ [
+                      'ID_ANNO_DOC' => '2022',
+                      'ID_NUMERO_DOC' => 'BL 007106',
+                      'ID_RIGA_DOC' => '1',
+                      'DATA_DOC' => '2022-10-07 00:00:00.000',
+                      'R_CAU_DOC_TRA' => 'T01',
+                      'NUMERO_DOC_FMT' => '2022/BL/ 007106',
+                      'R_MAGAZZINO' => '001',
+                      'R_MAGAZZINO_ARR' => '002',
+                      'STATO' => 'V',
+                      'R_UTENTE_CRZ' => 'mfalosai_001',
+                      'R_ARTICOLO' => '00000000',
+                      'R_COMMESSA' => null,
+                      'R_UM_PRM_MAG' => 'NR',
+                      'QTA_UM_PRM' => '10'
+                    ],
+                    [
+                      'ID_ANNO_DOC' => '2022',
+                      'ID_NUMERO_DOC' => 'BL 007106',
+                      'ID_RIGA_DOC' => '2',
+                      'DATA_DOC' => '2022-10-07 00:00:00.000',
+                      'R_CAU_DOC_TRA' => 'T01',
+                      'NUMERO_DOC_FMT' => '2022/BL/ 007106',
+                      'R_MAGAZZINO' => '001',
+                      'R_MAGAZZINO_ARR' => '002',
+                      'STATO' => 'V',
+                      'R_UTENTE_CRZ' => 'mfalosai_001',
+                      'R_ARTICOLO' => '11111111',
+                      'R_COMMESSA' => null,
+                      'R_UM_PRM_MAG' => 'NR',
+                      'QTA_UM_PRM' => '100'
+                    ],
+                    [
+                      'ID_ANNO_DOC' => '2022',
+                      'ID_NUMERO_DOC' => 'BL 007106',
+                      'ID_RIGA_DOC' => '3',
+                      'DATA_DOC' => '2022-10-07 00:00:00.000',
+                      'R_CAU_DOC_TRA' => 'T01',
+                      'NUMERO_DOC_FMT' => '2022/BL/ 007106',
+                      'R_MAGAZZINO' => '001',
+                      'R_MAGAZZINO_ARR' => '002',
+                      'STATO' => 'V',
+                      'R_UTENTE_CRZ' => 'mfalosai_001',
+                      'R_ARTICOLO' => '22222222',
+                      'R_COMMESSA' => 'C0001',
+                      'R_UM_PRM_MAG' => 'LT',
+                      'QTA_UM_PRM' => '1000'
+                    ]
+                  ];
+      } else {
+
+        $sql = "SELECT * FROM THIP.DOC_TRA_TES
+                WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_ANNO_DOC='$idAnnoDoc' AND ID_NUMERO_DOC='$idNumeroDoc'
+                AND STATO= 'V' AND STATO_AVANZAMENTO='1'";
+        $data = $panthera->select_list($sql);
+      }
+      
+      return $data;
+    }
+
     function getRichiestaByNumeroDoc($idNumeroDoc) {
       global $panthera, $ID_AZIENDA;
 
