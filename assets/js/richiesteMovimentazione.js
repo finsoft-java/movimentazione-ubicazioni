@@ -68,7 +68,9 @@ function initStato(i) {
         $(".settings").hide();
         $('#btnPreleva').show().prop('disabled', true);
         $('#btnConfirm').hide();
-        $('#btnConfirmPart').show().prop('disabled', true);
+        if($("#selectCommessa").val() != '0'){
+            $('#btnConfirmPart').show().prop('disabled', true);
+        }
         $('#btnBack').show();
     }
     console.log("fine statoCorrente",statoCorrente);
@@ -211,9 +213,10 @@ function openRow(idDoc, idRiga) {
     risUte1 = x.STRINGA_RIS_UTE_1;
     risUte2 = x.STRINGA_RIS_UTE_2;
     noteRichiesta = x.NOTA == null ? "" : x.NOTA;
+    $("#qrcode").val(ubicazioneDest);
     let rigaPrelieviEffettuati="";
     if (x.PRELIEVI.length > 0) {
-      rigaPrelieviEffettuati = `<button class="accordion">Prelievi</button>
+      rigaPrelieviEffettuati = `<div class="prelievoAccordion"><button class="accordion">Prelievi</button>
                                <div class="panel">`;
       for (let i = 0; i < x.PRELIEVI.length; i++) {
         let item = x.PRELIEVI[i];
@@ -223,12 +226,10 @@ function openRow(idDoc, idRiga) {
                                         Quantità richiesta Documento : <strong>${item.QUANTITA}</strong>
                                     </p>`;
       }
-      rigaPrelieviEffettuati += `</div>`;
+      rigaPrelieviEffettuati += `</div></div>`;
     }
-    $("#divSingolaRiga").html(`
-                               
-                               <button class="accordion">Dati Riga</button>
-                                <div class="panel">
+    $("#divSingolaRiga").html(`<button class="accordion">Dati Riga</button>
+                               <div class="panel">
                                     <p id="qntComm" style="text-align:center"></p>
                                     <p style="text-align:center">
                                         Articolo: <strong>  ${x.R_ARTICOLO} </strong> </br>
@@ -238,11 +239,14 @@ function openRow(idDoc, idRiga) {
                                         Ubicazione Arrivo: <strong>${ubicazioneDest}</strong> </br>
                                         Magazzino Partenza: <strong>${magazzinoCorrente}</strong> <br/>
                                         Magazzino Arrivo: <strong>${magazzinoDest}</strong> </br>
-                                        Sottocommessa: <strong>${risUte1} ${risUte2}</strong></br>
+                                        Sottocommessa Partenza: <strong>${risUte1}</strong></br>
+                                        Sottocommessa Arrivo: <strong>${risUte2}</strong></br>
                                         Quantità richiesta Documento : <strong>${qntTotaleRichiesta}</strong>
                                     </p>
-                                </div>
-                                ${rigaPrelieviEffettuati}`);
+                                </div>`);
+    
+    $(".prelievoAccordion").remove();
+    $(".btnDiv").prepend(rigaPrelieviEffettuati);
     $("#ubi_arrivo").val(ubicazioneDest);
     $.get({
         url: "./ws/GetMagazziniAlternativi.php",
@@ -369,7 +373,10 @@ function checkQty() {
         } else {
             $("#btnPreleva button").attr('disabled', qty > 0 && qty <= qntTotaleRichiesta ? false : true);
             $("#btnConfirm button").attr('disabled',true);
-            $("#btnConfirmPart button").attr('disabled',false);            
+            
+            if($("#selectCommessa").val() != '0'){
+                $("#btnConfirmPart button").attr('disabled',false);            
+            }
         }        
     } else {
         $("#btnPreleva button").attr('disabled', true);
@@ -380,7 +387,7 @@ function checkQty() {
         $("#btnPreleva button").attr('disabled', true);
         $("#btnConfirm button").attr('disabled', true);
     }
-    if(Object.keys(prelievi).length > 0 && $("#selectCommessa option").length == 1){
+    if(Object.keys(prelievi).length > 0 && $("#selectCommessa option").length == 1 && $("#selectCommessa").val() != '0'){
         $("#btnConfirm").show();
         $("#btnConfirmPart").show();
         $("#btnConfirm button").attr('disabled',false);
@@ -388,6 +395,7 @@ function checkQty() {
         $("#btnPreleva button").attr('disabled',true);
     }    
 }
+
 function conferma() {
 
     let item = documenti[documentoSelezionato].RIGHE[rigaSelezionata];
@@ -421,18 +429,26 @@ function conferma() {
                                         ));
     item.QTA_RESIDUA -= qty;
     console.log(item.PRELIEVI);
+    let isCompleta = false;
+    if(item.QTA_RESIDUA == 0){
+        isCompleta = true;
+    }
     $.post({
         url: "./ws/RichiesteMovimentazione.php",
         dataType: 'json',
         data: {
             riga: item,
-            testata : documenti[documentoSelezionato]
+            testata : documenti[documentoSelezionato],
+            isCompleta : isCompleta
         },
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
         },
         success: function(data, status) {
             showSuccessMsg("Riga confermata con successo");
+
+            openDoc(documentoSelezionato);
+            alert();
             initStato(1);
         },
         error: function(data, status){
@@ -475,13 +491,18 @@ function confermaParziale() {
                                                 t.NOTA === value.NOTA)
                                         ));
     item.QTA_RESIDUA -= qty;
-    console.log(item.PRELIEVI);
+    let isCompleta = false;
+    if(item.QTA_RESIDUA == 0){
+        isCompleta = true;
+    }
+    
     $.post({
         url: "./ws/RichiesteMovimentazione.php",
         dataType: 'json',
         data: {
             riga: item,
-            testata : documenti[documentoSelezionato]
+            testata : documenti[documentoSelezionato],
+            isCompleta : isCompleta
         },
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
@@ -571,9 +592,12 @@ $(document).on("change","#ubicazioneOrigine",function(){
                                     <select id='selectCommessa' class='form-control' onchange='setGiacenzaCommessaSelezionata()'>
                                         <option value='0'>Seleziona una commessa </option>`;
                        
+                                        let opt = "";
                         documentiGiacenze.forEach(x => {
                             let stampoOpt = false;
+                            console.log("1",Object.keys(prelievi).length);
                             if(Object.keys(prelievi).length != 0){
+                                console.log("1a");
                                 prelievi.forEach(y => {
 
                                     if(y.COMMESSA == x.ID_COMMESSA && y.QUANTITA <= x.QTA_GIAC_PRM){
@@ -587,19 +611,20 @@ $(document).on("change","#ubicazioneOrigine",function(){
                                     let commessa = x.ID_COMMESSA || '-';
                                     let selected = (commessa == commessaCorrente) ? " selected " : "";
                                     if(x.QTA_GIAC_PRM > 0){
-                                        datiStampati += `<option value='${x.QTA_GIAC_PRM}' data-prm='${x.R_UM_PRM_MAG}' ${selected}>${commessa}</option>`
+                                        opt += `<option value='${x.QTA_GIAC_PRM}' data-prm='${x.R_UM_PRM_MAG}' ${selected}>${commessa}</option>`
                                     }
                                 });
                             } else {
+                                console.log("1b");
                                 let commessa = x.ID_COMMESSA || '-';
                                 let selected = (commessa == commessaCorrente) ? " selected " : "";
                                 if(x.QTA_GIAC_PRM > 0){
-                                    datiStampati += `<option value='${x.QTA_GIAC_PRM}' data-prm='${x.R_UM_PRM_MAG}' ${selected}>${commessa}</option>`
+                                    opt += `<option value='${x.QTA_GIAC_PRM}' data-prm='${x.R_UM_PRM_MAG}' ${selected}>${commessa}</option>`
                                 }
                             }               
                             
                         });
-                datiStampati += `</select>
+                datiStampati += `${opt}</select>
                              </div>`;
             datiStampati += `<div class='input-group inputDiv qntBox'>  
                                 <div class='input-group-prepend'>
@@ -613,8 +638,9 @@ $(document).on("change","#ubicazioneOrigine",function(){
             $(".commessaBox").remove();
             $(".qntBox").remove();
             $("#divSingolaRiga").append(datiStampati);
+            
             $("#selectCommessa").trigger("change");
-            if($(".btn_setting").hasClass("activebtn")){
+            if($(".btn_setting").hasClass("activebtn") || $("#selectCommessa").val() == 0){
                 $(".commessaBox").show();
             }
         })

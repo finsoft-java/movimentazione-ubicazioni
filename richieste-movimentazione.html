@@ -88,13 +88,13 @@
         </div>
         <div class="btnDiv">
             <div style="float: left;width: 100%;border-top: 1px solid rgba(0,0,0,.1);padding: 30px 0px;" id="btnConfirm">
-                <button onclick="conferma()" type="button"  class="btn btnOsai" disabled="true"> Conferma </button>
+                <button onclick="conferma()" type="button"  class="btn btnOsai" disabled="true"> Concludi Totale </button>
             </div>
             <div style="float: left;width: 100%;border-top: 1px solid rgba(0,0,0,.1);padding: 30px 0px;" id="btnConfirmPart">
-                <button onclick="confermaParziale()" type="button"  class="btn btnOsai" disabled="true"> Conferma Parziale </button>
+                <button onclick="confermaParziale()" type="button"  class="btn btnOsai" disabled="true"> Concludi Parziale </button>
             </div>
             <div style="float: left;width: 100%;border-top: 1px solid rgba(0,0,0,.1);padding: 30px 0px;" id="btnPreleva">
-                <button onclick="preleva()" type="button"  class="btn btnOsai" disabled="true"> Preleva </button>
+                <button onclick="preleva()" type="button"  class="btn btnOsai" disabled="true"> Continua a Prelevare </button>
             </div>
             <div style="float: left;width: 100%;border-top: 1px solid rgba(0,0,0,.1);padding: 30px 0px;" id="btnBack">
                 <button onclick="indietro()" type="button"  class="btn btnOsai"> Annulla </button>
@@ -111,9 +111,6 @@
 
                 var acc = document.getElementsByClassName("accordion");
                 var i;
-                
-
-                
             });
             function logout() {
                 sessionStorage.removeItem("token");

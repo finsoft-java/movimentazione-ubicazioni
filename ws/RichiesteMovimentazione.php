@@ -17,6 +17,7 @@ $top = isset($_GET['top']) ? $panthera->escape_string($_GET['top']) : null;
 
 $riga = isset($_POST['riga']) ? $_POST['riga'] : null;
 $testata = isset($_POST['testata']) ? $_POST['testata'] : null;
+$isCompleta = isset($_POST['isCompleta']) ? $_POST['isCompleta'] : null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (!empty($idNumeroDoc)) {
@@ -35,9 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $testata = $richiesteMovimentazioneManager->getTestataRichiesta($riga["ID_ANNO_DOC"],$riga["ID_NUMERO_DOC"]);
-    $caricamentiMassaManager->richiestaMovimentazione($riga, $testata);    
+    $caricamentiMassaManager->richiestaMovimentazione($riga, $testata, $isCompleta);    
     header('Content-Type: application/json');
-    echo '{"msg":"OK"}';
+    echo '{"msg":"OK", "annoDoc":"'.$riga["ID_ANNO_DOC"].'", "numeroDoc":"'.$riga["ID_NUMERO_DOC"].'"}';
 } else {
     //==========================================================
     print_error(405, "Unsupported method in request: " . $_SERVER['REQUEST_METHOD']);

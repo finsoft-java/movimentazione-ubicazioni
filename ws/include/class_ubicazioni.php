@@ -217,7 +217,7 @@ class UbicazioniManager {
                     ON S.ID_AZIENDA=A.ID_AZIENDA AND S.ID_ARTICOLO=A.ID_ARTICOLO
                   WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_UBICAZIONE='$codUbicazione' AND S.QTA_GIAC_PRM <= 0";
           $sql3 = " ORDER BY S.ID_ARTICOLO";
-          echo $sql1 . $sql2 . $sql3;
+          //echo $sql1 . $sql2 . $sql3;
           $count = $panthera->select_single_value($sql0 . $sql2);
           $data = $panthera->select_list($sql1 . $sql2 . $sql3);
       }
