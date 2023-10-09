@@ -248,4 +248,10 @@ R_CAU_DOC_TRA
       return $data;
     }
 
+    function checkStatusBatch(){
+      global $panthera;
+      $sql = "SELECT count(*) FROM THERA.BATCH_JOB WHERE STATUS = 'A' AND SCHEDULED_JOB_ID = 'CMDocTrasf'";
+      $count = $panthera->select_single_value($sql);
+      return $count;
+    }
 }

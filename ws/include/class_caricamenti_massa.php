@@ -1587,11 +1587,7 @@ class CaricamentiMassaManager {
       $panthera->execute_update($sql);
     }
     //se ritorno 0 carica la lista
-//function check(){
-//  SELECT * FROM THERA.BATCH_JOB WHERE STATUS = 'A' AND SCHEDULED_JOB_ID = 'CMDocTrasf'
-//}
-    
-
+     
     function chiama_ws_panthera() {
       global $URL_CM;
 

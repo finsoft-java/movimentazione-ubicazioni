@@ -2,15 +2,8 @@
 
 include("include/all.php");
 
-
-/*define('DB_PTH_HOST', '172.18.0.15\\PANTH01');
-define('DB_PTH_USER', 'finsoft');
-define('DB_PTH_PASS', 'Th3R4$0FtTh!p');
-define('DB_PTH_PASS', 't3st-f1N$');
-define('DB_PTH_NAME', 'PANTH01');
-*/
-
 $panthera->connect();
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     //do nothing, HTTP 200
@@ -19,67 +12,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     
 // DO NOT require_logged_user_JWT();
 
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
-$panthera->execute_update("SET ANSI_WARNINGS OFF");
+$panthera->execute_update("SET ANSI_WARNINGS  OFF");
 
-$query = "
---SELECT * from INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'THERA' ORDER BY TABLE_TYPE, TABLE_NAME
---SELECT * from INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'THIP' and TABLE_NAME='DOC_TRA_TES'
---SELECT MAX(PROGRESSIVO) FROM THIPPERS.YUBICAZIONI_CARRELLO WHERE ID_CARRELLO='A01'
---SELECT count(*) FROM THIPPERS.YUBICAZIONI_CARRELLO WHERE R_UBICAZIONE='PL-0001' AND ID_CARRELLO='A01'
---SELECT * FROM THERA.NUMERATOR WHERE NUMERATOR_ID='MOVUBI'
---SELECT TOP 10 * FROM THERA.BATCH_LOAD_HDR WHERE DATA_ORIGIN='CM-MOV-UBI' ORDER BY RUN_ID DESC
---SELECT * FROM THERA.SCHEDULED_JOB;
---SELECT TOP 100 * FROM THIP.SALDI_UBICAZIONE
---SELECT * FROM THIPPERS.YUBICAZIONI_CARRELLO; --WHERE R_UBICAZIONE='PL-0001' AND ID_CARRELLO='A01' AND ID_AZIENDA='001';
---SELECT TOP 10 * from THIP.CM_DOC_TRA_TES WHERE RUN_ID >= 193 ORDER BY RUN_ID DESC
-SELECT TOP 10 * from THIP.CM_DOC_TRA_RIG WHERE ID_NUMERO_DOC='DT  000173' --RUN_ID >= 193 ORDER BY RUN_ID DESC
---SELECT * FROM THIPPERS.YCARRELLO 
---SELECT * FROM THIPPERS.YUBICAZIONI_CARRELLO C 
---WHERE C.ID_AZIENDA='001' AND C.ID_CARRELLO='A01'
---SELECT TOP 10 * FROM THIP.DOC_TRA_RIG  WHERE ID_ANNO_DOC='2022'  AND ID_NUMERO_DOC='DT  000173'   --
---SELECT TOP 10 * from THIP.CM_DOC_TRA_TES  WHERE RUN_ID=217  --ID_ANNO_DOC='2022'  AND ID_NUMERO_DOC='DT  000173'
---update THIP.CM_DOC_TRA_RIG set RUN_ID=217 where RUN_ID=0 AND DATA_ORIGIN='CM-MOV-UBI';
-";
+/*
+$query = "SELECT U.ID_UBICAZIONE,
+U.ID_MAGAZZINO,
+U.R_UTENTE_AGG,
+U.TIMESTAMP_AGG,
+S.ID_ARTICOLO,
+A.DESCRIZIONE,
+A.DISEGNO,
+A.R_UM_PRM_MAG,
+S.ID_COMMESSA,
+S.QTA_GIAC_PRM FROM THIP.UBICAZIONI_LL U JOIN 
+THIPPERS.YUBICAZIONI_LL YU ON U.ID_AZIENDA=YU.ID_AZIENDA 
+AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE 
+AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO JOIN THIP.SALDI_UBICAZIONE_V01 S ON U.ID_AZIENDA=S.ID_AZIENDA 
+AND U.ID_UBICAZIONE=S.ID_UBICAZIONE AND 
+U.ID_MAGAZZINO=S.ID_MAGAZZINO JOIN THIP.ARTICOLI A ON S.ID_AZIENDA=A.ID_AZIENDA AND 
+S.ID_ARTICOLO=A.ID_ARTICOLO WHERE  
+S.QTA_GIAC_PRM < 0 
+ORDER BY S.ID_ARTICOLO";
 
-if (!empty($_REQUEST['query'])) {
-    $query = $_REQUEST['query'];
+$query="select COUNT(*) FROM THIP.DOC_TRA_TES T
+          WHERE T.ID_AZIENDA='001'
+          AND T.STATO = 'V' AND T.STATO_AVANZAMENTO='1'
+          AND T.R_CAU_DOC_TRA IN ('T01','T02')
+          AND EXISTS( SELECT 1 FROM THIP.DOC_TRA_RIG R
+          WHERE R.ID_AZIENDA=T.ID_AZIENDA AND R.ID_ANNO_DOC=T.ID_ANNO_DOC AND R.ID_NUMERO_DOC=T.ID_NUMERO_DOC)       
+          ";
+$query="SELECT * FROM THIP.CM_DOC_TRA_TES T
+                WHERE T.ID_AZIENDA='001'
+                AND T.STATO = 'V' 
+                AND T.STATO_AVANZAMENTO='1'
+                AND T.R_CAU_DOC_TRA IN ('T01','T02')
+                AND EXISTS( SELECT 1 FROM THIP.CM_DOC_TRA_RIG R
+                WHERE R.ID_AZIENDA=T.ID_AZIENDA AND R.ID_ANNO_DOC=T.ID_ANNO_DOC AND R.ID_NUMERO_DOC=T.ID_NUMERO_DOC AND R.STATO= 'V' AND R.STATO_AVANZAMENTO='1')";
+                AND S.ID_ARTICOLO='ASD' AND S.ID_COMMESSA='all'
+*/
+$query = "SELECT * FROM THERA.BATCH_JOB WHERE STATUS = 'A' AND SCHEDULED_JOB_ID = 'CMDocTrasf'";
+
+                
+$result = $panthera->select_list($query);
+
+/* 
+UBICAZIONE QUERY
+$query = "SELECT TOP 10 U.* FROM THIP.UBICAZIONI_LL U JOIN THIPPERS.YUBICAZIONI_LL YU ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO where U.ID_AZIENDA = '001'";
+*/	
+  //header('Content-Type: application/json');
+  //echo json_encode(['data' => $result]);
+	echo "<html>" . print_query_html($result) . "</html>";
+
+} else {
+    //==========================================================
+    print_error(400, "Unsupported method in request: " . $_SERVER['REQUEST_METHOD']);
 }
 
 ?>
-
-<html>
-<body>
-<div style="margin:5px">
-	<form id="mainForm" action="./TestPanthera.php" method="POST">
-	<textarea style="width:100%;height:4cm" name="query">
-<?php echo $query; ?>
-
-
-    </textarea>
-	<input type="hidden" value="0" id="update" name="update"/>
-	</form>
-	<button type="button" onclick="document.getElementById('update').value='0';document.getElementById('mainForm').submit();">Execute SELECT</button>
-	<button type="button" onclick="document.getElementById('update').value='1';document.getElementById('mainForm').submit();">Execute UPDATE</button>
-</div>
-
-<?php
-
-if (!empty($_REQUEST['query'])) {
-
-    if ($_REQUEST['update'] == '1') {
-        $panthera->execute_update($query);
-        echo "OK."; // se ci sono eccezioni SQL invece si spacca di brutto
-    } else {
-        $result = $panthera->select_list($query);
-        //header('Content-Type: application/json');
-        //echo json_encode(['data' => $result]);
-        //die();
-        echo "<html>" . print_query_html($result) . "</html>";
-    }
-}
-
-?>
-
-</body>
-</html>
