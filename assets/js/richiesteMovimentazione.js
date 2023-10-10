@@ -455,8 +455,7 @@ function conferma() {
         },
         success: function(data, status) {
             showSuccessMsg("Riga confermata con successo");
-            openDoc(documentoSelezionato);
-            initStato(1);
+            checkStatoTrasferimento();
         },
         error: function(data, status){
             console.log('ERRORE -> cambioMagazzinoUbicazione', data);
@@ -514,13 +513,9 @@ function confermaParziale() {
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
         },
-        success: function(data, status) {
+        success:function(data, status) {
             showSuccessMsg("Riga confermata con successo");
-            if(checkStatoTrasferimento()) {
-                alert("dentro checkStatoTrasferimento")
-                openDoc(documentoSelezionato);
-                initStato(1);
-            }
+            checkStatoTrasferimento();
         },
         error: function(data, status){
             console.log('ERRORE -> cambioMagazzinoUbicazione', data);
@@ -534,26 +529,28 @@ function confermaParziale() {
 function checkStatoTrasferimento() {
     console.log("begin checkStatoTrasferimento");
     let i = 1;
+    let item = documenti[documentoSelezionato].RIGHE[rigaSelezionata];
 
     $.get({
         url: "./ws/CheckStatusRichiesta.php",
         dataType: 'json',
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+        },data: {
+            riga: item
         },
-        success: function(data, status) {
-            console.log(data);
-            if(data == 0 ){
-                return true;
-            } else {
+        success:function(data, status) {
+            if(data.data != 0 ){
                 i++;
                 if(i < 5){
                     checkStatoTrasferimento();   
                 } else {
                     showError("Problemi di load Batch di caricamento. Un caricamento è rimasto appeso o ci sta mettendo più tempo del previsto.");
                 }
-                
             }
+            openDoc(documentoSelezionato);
+            initStato(1);
+            window.scrollTo(0,0);
         },
         error: function(data, status) {
             console.log('ERRORE nel caricare i saldi', data);
@@ -630,7 +627,7 @@ $(document).on("change","#ubicazioneOrigine",function(){
     if (ubicazioneCorrente != -1) {
         interrogaUbicazione(ubicazioneCorrente, articoloMovimentazione, (documentiGiacenze) => {
             
-            let datiStampati = `<div class='commessaBox' style='display:none'>
+            let datiStampati = `<div class='commessaBox'>
                                     <label>Commesse disponibili</label>
                                     <select id='selectCommessa' class='form-control' onchange='setGiacenzaCommessaSelezionata()'>
                                         <option value='0'>Seleziona una commessa </option>`;
@@ -640,20 +637,12 @@ $(document).on("change","#ubicazioneOrigine",function(){
                             let stampoOpt = false;
                             let selected = false;
                             let commessa = x.ID_COMMESSA || '-';
-                            console.log("1",Object.keys(prelievi).length);
                             if(Object.keys(prelievi).length != 0){
-                                console.log("1a");
                                 let qntResiduaOpt = x.QTA_GIAC_PRM;
                                 prelievi.forEach(y => {
-                                    
-                                    console.log(y);
-                                    console.log(x);
-
                                     if((y.COMMESSA == x.ID_COMMESSA && x.ID_UBICAZIONE == y.UBICAZIONE) && parseInt(y.QUANTITA) <= parseInt(x.QTA_GIAC_PRM)){
                                         let oldQnt = x.QTA_GIAC_PRM;
                                         qntResiduaOpt = qntResiduaOpt - y.QUANTITA;
-                                        console.log("QNT PRESA ",y.QUANTITA);
-                                        console.log("GIACENZA RIMANENTE NELLA COMMESSA CON "+oldQnt,x.QTA_GIAC_PRM);
                                         if(qntResiduaOpt > 0){
                                             stampoOpt = true;
                                         }
@@ -669,7 +658,6 @@ $(document).on("change","#ubicazioneOrigine",function(){
                                 }
 
                             } else {
-                                console.log("1b");
                                 let commessa = x.ID_COMMESSA || '-';
                                 let selected = (commessa == commessaCorrente) ? " selected " : "";
                                 if(x.QTA_GIAC_PRM > 0){
@@ -694,8 +682,10 @@ $(document).on("change","#ubicazioneOrigine",function(){
             $("#divSingolaRiga").append(datiStampati);
             
             $("#selectCommessa").trigger("change");
-            if($(".btn_setting").hasClass("activebtn") || $("#selectCommessa").val() == 0){
-                $(".commessaBox").show();
+            if(($("#selectCommessa").val() == 0 || $("#magazzinoOrigine").val() == -1 || $("#ubicazioneOrigine").val() == -1 || $("#magazzinoDest").val() == -1) 
+                && !$(".btn_setting").hasClass("activebtn")){
+                alert();
+                $(".btn_setting").trigger("click");
             }
         })
     } else {
