@@ -317,7 +317,7 @@ function openRow(idDoc, idRiga) {
                         magazzinoDestinazioneHtml += "<option "+selected+" value='"+magazziniDisponibili[i]+"'>" + magazziniDisponibili[i] + "</option>";                    
                     } 
                     magazzinoDestinazioneHtml+= "</select></div>";
-                    datiStampati += "<p style='text-align:center;margin-top:15px;'>Magazzino Partenza: <strong>"+magazzinoCorrente+"</strong> <br/></p>";
+                    datiStampati += "<p style='text-align:center;margin-top:15px;'>Magazzino di Prelievo Documento: <strong>"+magazzinoCorrente+"</strong> <br/></p>";
                     datiStampati += "<div class='ubiPrelievoDiv'><label>Ubicazione di Prelievo</label>";
                     datiStampati += "<select onclick='timerOn = false' id='ubicazioneOrigine' onfocusout='timerOn = true' class='form-control'>";    
                     datiStampati += "<option value='-1'> Seleziona ubicazione partenza </option>";                            
@@ -455,7 +455,8 @@ function conferma() {
         },
         success: function(data, status) {
             showSuccessMsg("Riga confermata con successo");
-            checkStatoTrasferimento();
+            console.log(data);
+            checkStatoTrasferimento(data["id"]);
         },
         error: function(data, status){
             console.log('ERRORE -> cambioMagazzinoUbicazione', data);
@@ -515,6 +516,7 @@ function confermaParziale() {
         },
         success:function(data, status) {
             showSuccessMsg("Riga confermata con successo");
+            console.log(data);
             checkStatoTrasferimento();
         },
         error: function(data, status){
@@ -526,7 +528,7 @@ function confermaParziale() {
 }
 
 
-function checkStatoTrasferimento() {
+function checkStatoTrasferimento(id) {
     console.log("begin checkStatoTrasferimento");
     let i = 1;
     let item = documenti[documentoSelezionato].RIGHE[rigaSelezionata];
@@ -537,7 +539,8 @@ function checkStatoTrasferimento() {
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
         },data: {
-            riga: item
+            riga: item,
+            idDoc: id
         },
         success:function(data, status) {
             if(data.data != 0 ){
@@ -684,7 +687,6 @@ $(document).on("change","#ubicazioneOrigine",function(){
             $("#selectCommessa").trigger("change");
             if(($("#selectCommessa").val() == 0 || $("#magazzinoOrigine").val() == -1 || $("#ubicazioneOrigine").val() == -1 || $("#magazzinoDest").val() == -1) 
                 && !$(".btn_setting").hasClass("activebtn")){
-                alert();
                 $(".btn_setting").trigger("click");
             }
         })

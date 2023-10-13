@@ -116,7 +116,7 @@ class CaricamentiMassaManager {
     /**
     * FUNZIONE "Richieste Movimentazione"
     */
-    function richiestaMovimentazione($riga, $testata, $isCompleta) {
+    function richiestaMovimentazione($riga, $testata, $isCompleta, $id) {
       global $panthera, $ubicazioniManager, $richiesteMovimentazioneManager, $CAU_TESTATA_SVUOTA, $CAU_RIGA_SVUOTA, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA, $DATA_ORIGIN;
 
       $idAnnoDoc = $riga["ID_ANNO_DOC"];
@@ -125,7 +125,6 @@ class CaricamentiMassaManager {
       $timestamp = strtotime("now");
       $data = date('Ymd H:i:s', $timestamp);
       $dataReg = date('Ymd', $timestamp);
-      $id = $panthera->get_numeratore('MOVUBI');
       $this->creaTestataCaricamento($id);
       $this->creaTestataDocumentoMovimentazione($id, $testata);
 
@@ -307,20 +306,11 @@ class CaricamentiMassaManager {
               $rFornitore,
               $rFornitoreArr)";
 
-              $contatoreRiga++;
-              //echo '5-'.$contatoreRiga.'</br>';
-              //echo "Inserimento nuova riga ".$sql."</br>";
-              
+              $contatoreRiga++;              
               $panthera->execute_update($sql);
       }  
-      //controllo se ci sono ancora righe in stato non definitivo 
-      
-      //se  i prelievi sono conclusi      
       $this->loop_job_panthera($id);
-      $righeNonCompletate = $richiesteMovimentazioneManager->getRichiesta($idAnnoDoc, $idNumeroDoc);
-      if(count($righeNonCompletate) == 0) {
-        $this->modificaTestataDocumentoMovimentazione($id, $testata);
-      }
+  
     } 
 
     /**
@@ -1088,30 +1078,6 @@ class CaricamentiMassaManager {
         null)";
 
       $panthera->execute_update($sql);
-  }
-
-  function modificaTestataDocumentoMovimentazione($id, $testata) {
-    global $panthera, $DATA_ORIGIN, $YEAR, $DATE, $ID_AZIENDA, $SERIE, $logged_user;
-    //RUN ACTION
-    //I = INSERT
-    //D = DELETE
-    //U = UPDATE
-
-    //TRANSFER STATUS
-    //2 = ERRORE
-    //3 = OK
-    //1 = SIMULAZIONE OK (NON HA FATTO NIENTE IN VERITA)
-    //0 = non è stata presa in carico ( default per inserimento/update)
-    //ROW_ID = PROGRESSIVO
-
-    //DEVO ANDARE IN UPDATE SULLA DOC_TRA_TES SETTARE STATO_AVANZAMENTO CON CHIAVE DATA_ORIGIN,RUN_ID,ID_AZIENDA,ID_ANNO_DOC,ID_ORIGINALE(TUTTO DALLA TESTATA TRANNE RUN_ID)
-    $testata = $testata[0];
-    $idOriginale = $testata['ID_ORIGINALE'];
-    $dataOrigin = $testata['DATA_ORIGIN'];
-    $idAnnoDoc = $testata['ID_ANNO_DOC'];
-    $sql = "UPDATE THIP.DOC_TRA_TES SET STATO_AVANZAMENTO = '2' WHERE DATA_ORIGIN = $dataOrigin and RUN_ID = $id and ID_ORIGINALE = $idOriginale and ID_ANNO_DOC = $idAnnoDoc";
-    echo "CONCLUDO TESTATA ->".$sql;
-    $panthera->execute_update($sql);
   }
 
   function creaRigheDocumento($id, $cauRiga, $codMagazzinoSrc, $codUbicazioneSrc, $codMagazzinoDest,

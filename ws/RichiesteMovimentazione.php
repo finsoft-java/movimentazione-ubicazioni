@@ -36,9 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $testata = $richiesteMovimentazioneManager->getTestataRichiesta($riga["ID_ANNO_DOC"],$riga["ID_NUMERO_DOC"]);
-    $caricamentiMassaManager->richiestaMovimentazione($riga, $testata, $isCompleta);    
+    $id = $panthera->get_numeratore('MOVUBI');
+    $caricamentiMassaManager->richiestaMovimentazione($riga, $testata, $isCompleta, $id);    
     header('Content-Type: application/json');
-    echo '{"msg":"OK", "annoDoc":"'.$riga["ID_ANNO_DOC"].'", "numeroDoc":"'.$riga["ID_NUMERO_DOC"].'"}';
+    echo '{"msg":"OK", "annoDoc":"'.$riga["ID_ANNO_DOC"].'", "numeroDoc":"'.$riga["ID_NUMERO_DOC"].'", "id": "'.$id.'"}';
 } else {
     //==========================================================
     print_error(405, "Unsupported method in request: " . $_SERVER['REQUEST_METHOD']);
