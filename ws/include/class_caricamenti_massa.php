@@ -309,8 +309,17 @@ class CaricamentiMassaManager {
               $contatoreRiga++;              
               $panthera->execute_update($sql);
       }  
-      $this->loop_job_panthera($id);
+      
   
+
+      $righeNonCompletate = $richiesteMovimentazioneManager->getCountRichiestaUnion($riga["ID_ANNO_DOC"], $riga["ID_NUMERO_DOC"], $riga["ID_RIGA_DOC"]);
+
+      //print_r($righeNonCompletate);
+      //echo count($righeNonCompletate);
+      if($righeNonCompletate == 0) {
+          $richiesteMovimentazioneManager->modificaTestataDocumentoMovimentazione($id, $riga);
+      }  
+      $this->loop_job_panthera($id);
     } 
 
     /**

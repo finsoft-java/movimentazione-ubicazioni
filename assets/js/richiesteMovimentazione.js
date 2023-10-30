@@ -17,6 +17,7 @@ var records_per_page = 10;
 var qntSelezionata;
 var noteRichiesta = "";
 var riga =null;
+let loadedPage = 0;
 var testata =null;
 var prelievi = [];
 /**
@@ -31,6 +32,10 @@ function initStato(i) {
         rigaSelezionata = null;
         documentoSelezionato = null;
         ubicazioneCorrente = null;
+        $('.btn_setting').attr("data-open","false").removeClass("activebtn redColor");
+        $('.err_box').remove();
+        $("#boxqnt").html("");
+        $("#pagNumLabel").show();
         $("#divElencoDocumentiContainer").show();
         $("#divElencoRigheDocumentiContainer").hide();
         $("#divSingolaRigaContainer").hide();
@@ -45,6 +50,9 @@ function initStato(i) {
     } else if (statoCorrente == 1) {
         // griglia delle righe del documento
         // deve anche mostrare l'ubicazione 
+        $('.btn_setting').attr("data-open","false").removeClass("activebtn redColor");
+        $('.err_box').remove();
+        $("#pagNumLabel").hide();
         $("#navigateRichieste").hide();
         rigaSelezionata = null;
         $("#boxqnt").html("");
@@ -60,6 +68,8 @@ function initStato(i) {
         $('#btnBack').show();
     } else if (statoCorrente == 2) {
         // maschera di scelta dell'ubicazione
+        $('.err_box').remove();
+        $("#pagNumLabel").hide();
         $("#ubi_arrivo").val("");
         $("#navigateRichieste").hide();
         $("#divElencoDocumentiContainer").hide();
@@ -78,6 +88,7 @@ function initStato(i) {
 }
 
 function indietro() {
+    console.log(statoCorrente);
     if (statoCorrente == 2) {
         riga = documenti[documentoSelezionato].RIGHE[rigaSelezionata];
         if (riga.PRELIEVI.length == 0 || confirm('Stai per annullare tutti i prelievi in corso, sei sicuro?')) {
@@ -85,12 +96,15 @@ function indietro() {
             riga.QTA_RESIDUA = parseFloat(riga.QTA_UM_PRM);
             initStato(1);
             ridisegnaElencoRigheDocumenti();
+        } else {
+            initStato(0);
         }
     } else if (statoCorrente == 1) {
         initStato(0);
     } else {
         console.error("indietro() chiamata in uno stato strano: " + statoCorrente);
     }
+    $(".prelievoAccordion").remove();
 }
 
 /**
@@ -108,14 +122,22 @@ function loadMore(loadedPage, operazione) {
         },
         success: function(data, status) {
             $("#divElencoDocumenti").html("");
+            let startLoad = 1;
+            let endLoad = 10;
+            if(loaded != 0){
+                startLoad = loaded+startLoad;
+                endLoad = loaded+endLoad+1;
+            }
+            $("#pagNumLabel").html(startLoad+"-"+endLoad+" di "+data.count+" Documenti");
             maxItems = data.count;
             let elementiCaricati = data.data;
-            documenti = documenti.concat(elementiCaricati);
+            documenti = elementiCaricati;
             if(operazione == "prev"){
                 loaded = loaded != 0 ? (loadedPage-1)*10 : 0;
             } 
+            let i = 0;
             elementiCaricati.forEach(x => {                
-                $("#divElencoDocumenti").append(getHtmlGrigliaDocumenti(loaded++, x));                
+                $("#divElencoDocumenti").append(getHtmlGrigliaDocumenti(i++, x));                
             });
         },
         error: function(data, status) {
@@ -134,19 +156,23 @@ function showError(data) {
 
 function getHtmlGrigliaDocumenti(idDoc, x) {
     // qui x dovrebbe essere uguale a documenti[id]
+    loaded++;
     var myDate = x.DATA_DOC.split(' ')[0];
-    return `<div class="rigaDocumenti" onclick="openDoc(${idDoc})">
-                <p style="padding: 30px 15px; margin: 0px; text-align: center;">Documento: <strong>${x.NUMERO_DOC_FMT}</strong> del ${myDate}</p><hr style="margin:0px;"/>
+    return `<div class="rigaDocumenti" onclick="openDoc('${idDoc}','${x.ID_ANNO_DOC}','${x.ID_NUMERO_DOC}')">
+                <p style="padding: 30px 15px; margin: 0px; text-align: center;">
+                    Documento: <strong>${x.NUMERO_DOC_FMT}</strong> del ${myDate} <br/>
+                    Numero Righe: <strong>${x.CNT}</strong>
+                </p><hr style="margin:0px;"/>
             </div>`;
 }
 
-function openDoc(idDoc) {
+function openDoc(idDoc, idAnnoDoc, idNumeroDoc) {
     documentoSelezionato = idDoc;
     let item = documenti[documentoSelezionato];
     initStato(1);
     $("#divSingolaUbicazPredef").html("");
     $.get({
-        url: "./ws/RichiesteMovimentazione.php?idAnnoDoc=" + item.ID_ANNO_DOC + "&idNumeroDoc=" + item.ID_NUMERO_DOC,
+        url: "./ws/RichiesteMovimentazione.php?idAnnoDoc=" + idAnnoDoc + "&idNumeroDoc=" + idNumeroDoc,
         dataType: 'json',
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
@@ -287,14 +313,14 @@ function openRow(idDoc, idRiga) {
                     let datiStampati = "";
                     arrUbicazioniDest = dati;
                     if(dati[0] == null || dati.length === 0) {
-                        showError("Nessuna ubicazione disponibile");
+                        showError("Nessuna ubicazione disponibile per l'Articolo "+articoloMovimentazione);
                         $("#qrcode").val('');
                         return false;
                     }
 
                     datiStampati += "<div id='magazPrelievo' style='display:none'><label>Magazzino Prelievo</label>";
                     datiStampati += "<select onchange='onChangeMagazzino();' onclick='timerOn = false' id='magazzinoOrigine' onfocusout='timerOn = true' class='form-control'>";    
-                    datiStampati += "<option value='-1'> Seleziona magazzino partenza </option>";                            
+                    datiStampati += "<option value='-1'> Seleziona magazzino disponibile </option>";                            
                     for (let i = 0; i < datiMagazzino.length; i++) {
                         let selected = "";
                         if(magazzinoCorrente == datiMagazzino[i].ID_MAGAZZINO){
@@ -307,7 +333,7 @@ function openRow(idDoc, idRiga) {
                     let magazzinoDestinazioneHtml = "";
                     magazzinoDestinazioneHtml += "<div id='magazArrivo' style='display:none'><label>Magazzino di Arrivo</label>";
                     magazzinoDestinazioneHtml += "<select onchange='onChangeMagazzinoDest();' onclick='timerOn = false' id='magazzinoDest' onfocusout='timerOn = true' class='form-control'>";    
-                    magazzinoDestinazioneHtml += "<option value='-1'> Seleziona magazzino destinazione </option>";                            
+                    magazzinoDestinazioneHtml += "<option value='-1'> Seleziona magazzino disponibile </option>";                            
                     for (let i = 0; i < magazziniDisponibili.length; i++) {
                         let selected = "";
                         if(magazzinoDest == magazziniDisponibili[i]){
@@ -320,14 +346,18 @@ function openRow(idDoc, idRiga) {
                     datiStampati += "<p style='text-align:center;margin-top:15px;'>Magazzino di Prelievo Documento: <strong>"+magazzinoCorrente+"</strong> <br/></p>";
                     datiStampati += "<div class='ubiPrelievoDiv'><label>Ubicazione di Prelievo</label>";
                     datiStampati += "<select onclick='timerOn = false' id='ubicazioneOrigine' onfocusout='timerOn = true' class='form-control'>";    
-                    datiStampati += "<option value='-1'> Seleziona ubicazione partenza </option>";                            
+                    datiStampati += "<option value='-1'> Seleziona ubicazione disponibile </option>";                            
                     for (let i = 0; i < datiUbicazione.length; i++) {
                         let selected = "";
+                        let disabled = "";
                         console.log("arr Interrogazione.php?codArticolo=-> "+dati[i]);
                         if(ubicazioneCorrente === datiUbicazione[i].ID_UBICAZIONE){
                             selected = "selected='selected'";
                         }
-                        datiStampati += "<option "+selected+" value='"+datiUbicazione[i].ID_UBICAZIONE+"' data-qta='"+datiUbicazione[i].QTA_GIAC_PRM+"'>" + datiUbicazione[i].ID_UBICAZIONE + " </option>";                    
+                        if(blackListUbicazioni.includes(datiUbicazione[i].ID_UBICAZIONE)){
+                            disabled = "disabled";
+                        }
+                        datiStampati += "<option "+selected+" "+disabled+" value='"+datiUbicazione[i].ID_UBICAZIONE+"' data-qta='"+datiUbicazione[i].QTA_GIAC_PRM+"'>" + datiUbicazione[i].ID_UBICAZIONE + " </option>";                    
                     } 
                     datiStampati += "</select>";
                     datiStampati += magazzinoDestinazioneHtml;                    
@@ -455,8 +485,8 @@ function conferma() {
         },
         success: function(data, status) {
             showSuccessMsg("Riga confermata con successo");
-            console.log(data);
-            checkStatoTrasferimento(data["id"]);
+            console.log("data->",data);
+            checkStatoTrasferimento(data["id"], isCompleta);
         },
         error: function(data, status){
             console.log('ERRORE -> cambioMagazzinoUbicazione', data);
@@ -516,8 +546,8 @@ function confermaParziale() {
         },
         success:function(data, status) {
             showSuccessMsg("Riga confermata con successo");
-            console.log(data);
-            checkStatoTrasferimento();
+            console.log("data->",data);
+            checkStatoTrasferimento(data["id"], null);
         },
         error: function(data, status){
             console.log('ERRORE -> cambioMagazzinoUbicazione', data);
@@ -528,8 +558,10 @@ function confermaParziale() {
 }
 
 
-function checkStatoTrasferimento(id) {
+function checkStatoTrasferimento(id, completa) {
     console.log("begin checkStatoTrasferimento");
+    let isCompleta = completa;
+    console.log("isCompleta = "+isCompleta);
     let i = 1;
     let item = documenti[documentoSelezionato].RIGHE[rigaSelezionata];
 
@@ -546,14 +578,29 @@ function checkStatoTrasferimento(id) {
             if(data.data != 0 ){
                 i++;
                 if(i < 5){
-                    checkStatoTrasferimento();   
+                    checkStatoTrasferimento(id);   
                 } else {
                     showError("Problemi di load Batch di caricamento. Un caricamento è rimasto appeso o ci sta mettendo più tempo del previsto.");
                 }
+            } else {
+                console.log("data.nrighe = "+data.nrighe);
+                console.log("isCompleta = "+isCompleta);
+                
+                if(isCompleta != true){
+                    openDoc(documentoSelezionato, item["ID_ANNO_DOC"], item["ID_NUMERO_DOC"]);
+                    initStato(1);
+                    window.scrollTo(0,0);
+                } else {
+                    if(data.nrighe > 0){
+                        openDoc(documentoSelezionato, item["ID_ANNO_DOC"], item["ID_NUMERO_DOC"]);
+                        initStato(1);
+                        window.scrollTo(0,0);
+                    } else {
+                        loadMore(loadedPage, null);
+                        window.scrollTo(0,0);
+                    }
+                }
             }
-            openDoc(documentoSelezionato);
-            initStato(1);
-            window.scrollTo(0,0);
         },
         error: function(data, status) {
             console.log('ERRORE nel caricare i saldi', data);
@@ -624,7 +671,7 @@ function interrogaUbicazione(ubicazione, articolo, callback) {
     });
 }
 
-$(document).on("change","#ubicazioneOrigine",function(){
+$(document).on("change","#ubicazioneOrigine",function() {
     
     ubicazioneCorrente = $("#ubicazioneOrigine option:selected").val();
     if (ubicazioneCorrente != -1) {
@@ -643,27 +690,26 @@ $(document).on("change","#ubicazioneOrigine",function(){
                             if(Object.keys(prelievi).length != 0){
                                 let qntResiduaOpt = x.QTA_GIAC_PRM;
                                 prelievi.forEach(y => {
-                                    if((y.COMMESSA == x.ID_COMMESSA && x.ID_UBICAZIONE == y.UBICAZIONE) && parseInt(y.QUANTITA) <= parseInt(x.QTA_GIAC_PRM)){
-                                        let oldQnt = x.QTA_GIAC_PRM;
+                                    if((y.COMMESSA == x.ID_COMMESSA && x.ID_UBICAZIONE == y.UBICAZIONE) && parseInt(y.QUANTITA) <= parseInt(x.QTA_GIAC_PRM)) {
                                         qntResiduaOpt = qntResiduaOpt - y.QUANTITA;
-                                        if(qntResiduaOpt > 0){
+                                        if(qntResiduaOpt > 0) {
                                             stampoOpt = true;
                                         }
                                         //stampo option
-                                    } else if((y.COMMESSA == x.ID_COMMESSA && x.ID_UBICAZIONE == y.UBICAZIONE) && parseInt(y.QUANTITA) > parseInt(x.QTA_GIAC_PRM)){
+                                    } else if((y.COMMESSA == x.ID_COMMESSA && x.ID_UBICAZIONE == y.UBICAZIONE) && parseInt(y.QUANTITA) > parseInt(x.QTA_GIAC_PRM)) {
                                         stampoOpt = false;
                                     }
                                     selected = (commessa == commessaCorrente) ? " selected " : "";                              
                                 });
 
-                                if(x.QTA_GIAC_PRM > 0 && qntResiduaOpt > 0){
+                                if(x.QTA_GIAC_PRM > 0 && qntResiduaOpt > 0) {
                                     opt += `<option value='${qntResiduaOpt}' data-prm='${x.R_UM_PRM_MAG}' ${selected}>${commessa}</option>`
                                 }
 
                             } else {
                                 let commessa = x.ID_COMMESSA || '-';
                                 let selected = (commessa == commessaCorrente) ? " selected " : "";
-                                if(x.QTA_GIAC_PRM > 0){
+                                if(x.QTA_GIAC_PRM > 0) {
                                     opt += `<option value='${x.QTA_GIAC_PRM}' data-prm='${x.R_UM_PRM_MAG}' ${selected}>${commessa}</option>`
                                 }
                             }               
@@ -683,11 +729,27 @@ $(document).on("change","#ubicazioneOrigine",function(){
             $(".commessaBox").remove();
             $(".qntBox").remove();
             $("#divSingolaRiga").append(datiStampati);
+            $('.err_box').remove();
+            if($("#selectCommessa").val() == 0){
+                $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>COMMESSA MANCANTE <br></p>");
+            }
+            
+            if($("#magazzinoOrigine").val() == -1){
+                $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>MAGAZZINO PARTENZA MANCANTE <br></p>");
+            }
+            
+            if($("#ubicazioneOrigine").val() == -1){
+                $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>UBICAZIONE PARTENZA MANCANTE <br></p>");
+            }
+            if($("#magazzinoDest").val() == -1){
+                $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>MAGAZZINO DESTINAZIONE MANCANTE <br></p>");
+            }
             
             $("#selectCommessa").trigger("change");
             if(($("#selectCommessa").val() == 0 || $("#magazzinoOrigine").val() == -1 || $("#ubicazioneOrigine").val() == -1 || $("#magazzinoDest").val() == -1) 
                 && !$(".btn_setting").hasClass("activebtn")){
-                $(".btn_setting").trigger("click");
+                $(".commessaBox").hide();
+                $(".btn_setting").addClass("redColor");
             }
         })
     } else {
@@ -716,7 +778,7 @@ function onChangeMagazzino() {
     }      
     $("#ubicazioneOrigine").html(datiStampati);
     $("#ubicazioneOrigine").trigger("change");
-    if($("#magazzinoOrigine").val() == -1 || $("#ubicazioneOrigine").val() == -1 || $("#magazzinoDest").val() == -1){
+    if($("#magazzinoOrigine").val() == -1 || $("#ubicazioneOrigine").val() == -1 || $("#magazzinoDest").val() == -1  || $("#selectCommessa").val() == 0){
         $("#btnPreleva button").attr('disabled', true);
         $("#btnConfirm button").attr('disabled', true);
     }
@@ -727,7 +789,7 @@ function onChangeMagazzinoDest() {
         $(".qrcode").show();
         $(".settings").show();
     } else {
-        if($("#magazzinoOrigine").val() == -1 || $("#ubicazioneOrigine").val() == -1 || $("#magazzinoDest").val() == -1){
+        if($("#magazzinoOrigine").val() == -1 || $("#ubicazioneOrigine").val() == -1 || $("#magazzinoDest").val() == -1 || $("#selectCommessa").val() == 0){
             $("#btnPreleva button").attr('disabled', true);
             $("#btnConfirm button").attr('disabled', true);
             $("#btnConfirmPart button").attr('disabled', true);            
@@ -752,7 +814,7 @@ document.getElementById("search").addEventListener("keyup", function(event) {
                 $("#divElencoDocumenti").html("");
                 maxItems = data.count;
                 let elementiCaricati = data.data;
-                documenti = documenti.concat(elementiCaricati);
+                documenti = elementiCaricati;
                 console.log("----------------",elementiCaricati);
                 elementiCaricati.forEach(x => {
                     $("#divElencoDocumenti").append(getHtmlGrigliaDocumenti(loaded++, x));
@@ -805,6 +867,18 @@ function prevPage()
         changePage("prev");
     }
 }
+function firstPage()
+{
+    current_page = 0;
+    changePage("prev");
+    
+}
+function lastPage()
+{
+    current_page = numPages()-1;
+    changePage("next");
+    
+}
 
 function nextPage()
 {
@@ -820,22 +894,30 @@ function changePage(operazione)
 {
     var btn_next = document.getElementById("btn_next");
     var btn_prev = document.getElementById("btn_prev");
+    var btn_first = document.getElementById("btn_first");
+    var btn_last = document.getElementById("btn_last");
     
     if (current_page < 1) current_page = 0;
     if (current_page > numPages()) current_page = numPages();
 
+    loadedPage = current_page;
     loadMore(current_page, operazione);
     
     if (current_page == 0) {
         btn_prev.style.visibility = "hidden";
+        btn_first.style.visibility = "hidden";
     } else {
         btn_prev.style.visibility = "visible";
+        btn_first.style.visibility = "visible";
     }
 
-    if (current_page == numPages()) {
+    if (current_page == numPages()-1) {
         btn_next.style.visibility = "hidden";
+        btn_last.style.visibility = "hidden";
+        
     } else {
         btn_next.style.visibility = "visible";
+        btn_last.style.visibility = "visible";
     }
 }
 

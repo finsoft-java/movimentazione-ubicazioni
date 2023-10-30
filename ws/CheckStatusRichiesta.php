@@ -15,20 +15,18 @@ $idDoc = isset($_GET['idDoc']) ? $_GET['idDoc'] : null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
-      
         $count = $richiesteMovimentazioneManager->checkStatusBatch();
 
         if($count == 0) {
-            $righeNonCompletate = $richiesteMovimentazioneManager->getRichiestaUnion($riga["ID_ANNO_DOC"], $riga["ID_NUMERO_DOC"], $riga["ID_RIGA_DOC"]);
-            print_r($righeNonCompletate);
-            //echo count($righeNonCompletate);
-            if(count($righeNonCompletate) == 0) {
-                print_r($testata);
-                $richiesteMovimentazioneManager->modificaTestataDocumentoMovimentazione($idDoc, $testata);
-            }       
+            $righeNonCompletate = $richiesteMovimentazioneManager->getCountRichiestaUnion($riga["ID_ANNO_DOC"], $riga["ID_NUMERO_DOC"], $riga["ID_RIGA_DOC"]);
+            //print_r($righeNonCompletate);
+            if($righeNonCompletate == 0) {
+                $richiesteMovimentazioneManager->modificaTestataDocumentoMovimentazione($idDoc, $riga);
+            }                   
+            
         }
         header('Content-Type: application/json');
-        echo json_encode(['data' => $count]);
+        echo json_encode(['data' => $count, 'nrighe' => $righeNonCompletate]);
     
 } else {
     //==========================================================

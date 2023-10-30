@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $id = $panthera->get_numeratore('MOVUBI');
     $caricamentiMassaManager->richiestaMovimentazione($riga, $testata, $isCompleta, $id);    
     header('Content-Type: application/json');
-    echo '{"msg":"OK", "annoDoc":"'.$riga["ID_ANNO_DOC"].'", "numeroDoc":"'.$riga["ID_NUMERO_DOC"].'", "id": "'.$id.'"}';
+    echo '{"msg":"OK", "annoDoc":"'.$riga["ID_ANNO_DOC"].'", "numeroDoc":"'.$riga["ID_NUMERO_DOC"].'", "id": "'.$id.'", "isCompleta": "'.$isCompleta.'"}';
 } else {
     //==========================================================
     print_error(405, "Unsupported method in request: " . $_SERVER['REQUEST_METHOD']);

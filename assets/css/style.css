@@ -29,7 +29,9 @@ html {
 	margin-top: 0.5rem;
 	margin-bottom: 0.5rem;
 }
-
+.redColor {
+	color: red !important;
+}
 .navTitle {
 	float: left;
 	width: 100%;

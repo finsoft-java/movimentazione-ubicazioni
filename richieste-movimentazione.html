@@ -55,13 +55,20 @@
         </nav>
         <h3 class="titleOsai" style="margin-bottom:30px;">Richieste movimentazione</h3>
         <input type="text" class="form-control focus" id="search" placeholder="Cerca tramite N. Documento" aria-describedby="basic-addon2" style="margin: 0px auto;display: block;margin-bottom:30px;"> 
+        <p style="text-align: center;" id="pagNumLabel"></p>
         <nav>
             <ul class="pagination justify-content-center" id="navigateRichieste">
                 <li class="page-item">
-                    <a class='page-link' href='javascript:void(0);' id='btn_prev' onclick='prevPage()'>Precedente</a>
+                    <a class='page-link' href='javascript:void(0);' id='btn_first' onclick='firstPage()'>Inizio</a>
                 </li>
                 <li class="page-item">
-                    <a class='page-link' href='javascript:void(0);' id='btn_next' onclick='nextPage()'>Successiva</a>
+                    <a class='page-link' href='javascript:void(0);' id='btn_prev' onclick='prevPage()'>Prec.</a>
+                </li>
+                <li class="page-item">
+                    <a class='page-link' href='javascript:void(0);' id='btn_next' onclick='nextPage()'>Succ.</a>
+                </li>
+                <li class="page-item">
+                    <a class='page-link' href='javascript:void(0);' id='btn_last' onclick='lastPage()'>Fine</a>
                 </li>
             </ul>
         </nav>
@@ -132,5 +139,6 @@
         <script src="assets/js/popper.min.js"></script>
         <script src="assets/js/bootstrap.min.js"></script>
         <script src="assets/js/richiesteMovimentazione.js?v1"></script>
+        <script src="assets/js/whitelist.js?v=1"></script>  
     </body>
 </html>
