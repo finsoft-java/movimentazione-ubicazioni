@@ -166,6 +166,9 @@ function cambioMagazzinoUbicazione() {
             console.log('ERRORE -> cambioMagazzinoUbicazione', data);
             showError(data)
             $("#qrcode").val('');
+            
+            $("#qrcode").attr("disabled", false);
+            $('#btnCambio').attr("disabled", false);
         }
     });
 }

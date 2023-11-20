@@ -36,6 +36,7 @@ $CAU_RIGA = 'LL2';
 $SERIE = 'DT';
 $COD_SCHEDULED_JOB = 'CMDocTrasf';
 $URL_CM = 'http://172.18.0.15/panth01/ws?id=JOBLA&user=CAD&pwd=CADQWER&company=001&key=CMDocTrasf';
+$URL_YGEN = 'http://172.18.0.15/panth01/ws?id=JOBLA&user=CAD&pwd=CADQWER&company=001&key=YGenUbTrasf';
 $CAU_TESTATA_SVUOTA = 'SVT';
 $CAU_RIGA_SVUOTA = 'LL4';
 $COD_MAGAZ_SVUOTA = 'DIN';

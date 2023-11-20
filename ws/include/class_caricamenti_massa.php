@@ -54,7 +54,8 @@ class CaricamentiMassaManager {
         if($countRigheInserite <= 0) {
           print_error(500, 'Nessuna riga da inserire, Caricamento interrotto');
         }
-        $this->loop_job_panthera($id);
+        $esisteUbicazioneinMagazzino = $magazziniManager->getMagazziniAlternativiConUbicazione($codMagazzinoDest, $codUbicazione);
+        $this->loop_job_panthera($id, $esisteUbicazioneinMagazzino);
     }
 
     private function trasferisciUbicazioneVuota($codUbicazione, $codMagazzinoDest) {
@@ -1434,6 +1435,47 @@ class CaricamentiMassaManager {
 
     $panthera->execute_update($sql);
   }
+
+  function aggiorna_scheduled_jobMagazzini($id) {
+    global $panthera, $logged_user, $DATA_ORIGIN, $ID_AZIENDA, $COD_SCHEDULED_JOB;
+    $parametri = [
+      "PageTo=0",
+      "PageFrom=0",
+      "ImmediateExecution=N",
+      "PrintPreviewEnabled=N",
+      "ExportType=P",
+      "ReportId=CMDocMagTraVal",
+      "OnlyGroupLeader=N",
+      "PrinterId=000",
+      "CopyNumber=",
+      "ExecutePrint=N",
+      "SSDEnabled=N",
+      "RunParameter.EntityIdService=YGenUbTras",
+      "RunParameter.DataOrigin=$DATA_ORIGIN",
+      "RunParameter.OnlySimulator=N",
+      "RunParameter.PrintValidData=N",
+      "RunParameter.NumRecords=0",
+      "RunParameter.RunId=$id",
+      "RunParameter.PrintError=Y",
+      "NumeratorHandler.IdSottoserie=",
+      "NumeratorHandler.IdNumeratore=",
+      "NumeratorHandler.IdSerie=",
+      "NumeratorHandler.IdAzienda=$ID_AZIENDA",
+    ];
+    $separatore = "',CHAR(18),'";
+    $par_joined = "CONCAT('" . join($separatore, $parametri) . "',CHAR(18))";
+    if($logged_user->nome_utente == "finsoft"){
+      $logged_user->nome_utente = "ADMIN";
+      // lmarosaitest non esiste in prod;
+    }
+    $sql = "UPDATE THERA.SCHEDULED_JOB
+            SET JOB_PARAMETERS=$par_joined, USER_ID='{$logged_user->nome_utente}_$ID_AZIENDA'
+            WHERE SCHEDULED_JOB_ID='$COD_SCHEDULED_JOB'";
+
+    // echo $sql; die();
+
+    $panthera->execute_update($sql);
+  }
   //se ritorno 0 carica la lista
     
   function chiama_ws_panthera() {
@@ -1446,6 +1488,26 @@ class CaricamentiMassaManager {
     $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     if ($httpcode != 200) {
       $msg = "Errore nell'invocazione del webservice. HTTP code $httpcode. Response: " . $result;
+      error_log($msg);
+      print_error(500, $msg);
+    }
+    curl_close($curl);
+
+    // il $result è assolutamente inutile, se non magari per il JobId
+    return $result;
+
+  }
+
+  function chiama_ws_pantheraMagazzini() {
+    global $URL_YGEN;
+
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_URL, $URL_YGEN);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    $result = curl_exec($curl);
+    $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    if ($httpcode != 200) {
+      $msg = "Errore nell'invocazione del webservice $URL_YGEN. HTTP code $httpcode. Response: " . $result;
       error_log($msg);
       print_error(500, $msg);
     }
@@ -1479,7 +1541,7 @@ class CaricamentiMassaManager {
     return false;
   }
 
-  function loop_job_panthera($id) {
+  function loop_job_panthera($id, $esisteUbicazioneinMagazzino = null) {
     //USATI I SEMAFORI (BLOCCO PER CARICAMENTI SUCCESSIVI SE CE NE UNO IN AZIONE) DEL SISTEMA OPERATIVI
     //migliorare magari con file di lock? (chiedere a Mauri e Gio usano in datastage/Oracle) (php esempio F_LCOK)
     $semaforo = sem_get(167167);
@@ -1488,7 +1550,12 @@ class CaricamentiMassaManager {
       print_error(500, 'Troppi caricamenti di massa contemporanei, impossibile acquisire il semaforo!');
     }
     $this->aggiorna_scheduled_job($id);
+    if($esisteUbicazioneinMagazzino >= 0){
+      $this->chiama_ws_pantheraMagazzini();
+      sleep(20);
+    }
     $this->chiama_ws_panthera();
+   
     if (!$this->checkCM($id)) {
       $errore_cm = true;
     }
@@ -1498,5 +1565,5 @@ class CaricamentiMassaManager {
     if ($errore_cm) {
       print_error(500, 'Il caricamento di massa non è andato a buon fine');
     }
-  }
+  }  
 }

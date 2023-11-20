@@ -24,9 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if($count > 0){
         print_error(500, "Sono presenti $count Articoli con quantità inferiori a 0 non è possibile cambiare magazzino");
     }
+    
     $caricamentiMassaManager->trasferisciUbicazione($codUbicazione, $codMagazzinoDest);
     header('Content-Type: application/json');
     echo '{"msg":"OK"}';
+    
 } else {
     //==========================================================
     print_error(405, "Unsupported method in request: " . $_SERVER['REQUEST_METHOD']);
