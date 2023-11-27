@@ -17,10 +17,22 @@
                 text-align: center;
                 margin: 0px 0px 30px 0px;
             }
+            div.filtroRicerca {
+                float:left;
+                width: 100%;
+                text-align: center;
+                margin: 0px 0px 30px 0px;
+            }
+            .input-group-append {
+                margin-left: 10px;
+            }
+            .input-group-prepend {
+                margin-right: 10px;
+            }
             div.settings {
                 float: left;
                 width: 13%;
-                margin: 0px 0px 30px 0px;
+                margin: 30px 0px 30px 0px;
             }
             .settings a {                
                 min-width: auto;
@@ -74,8 +86,13 @@
         </nav>
         <div style="float: left;width: 100%;">
             <div class="qrcode" style="display:none">
+                <label>Ubicazione di Arrivo</label>
                 <input type="text" class="form-control focus" id="qrcode" placeholder="UBICAZIONE ARRIVO" aria-describedby="basic-addon2">
                 <input type="hidden" id="ubi_arrivo">            
+            </div>
+            <div class="filtroRicerca" style="display:none">
+                <label>Articolo / Commessa</label>
+                <input type="text" class="form-control focusRicerca" id="filtroRicerca" placeholder="Articolo / Commessa" aria-describedby="basic-addon2">
             </div>
             <div class="settings"  style="display:none">
                 <a class="btn btn_setting" href="javascript:void(0);" data-open="false"><i class="fa-solid fa-gear"></i></a>

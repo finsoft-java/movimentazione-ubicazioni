@@ -14,6 +14,7 @@ $idAnnoDoc = isset($_GET['idAnnoDoc']) ? $panthera->escape_string($_GET['idAnnoD
 $idNumeroDoc = isset($_GET['idNumeroDoc']) ? $panthera->escape_string($_GET['idNumeroDoc']) : null;
 $skip = isset($_GET['skip']) ? $panthera->escape_string($_GET['skip']) : null;
 $top = isset($_GET['top']) ? $panthera->escape_string($_GET['top']) : null;
+$search = isset($_GET['search']) ? $panthera->escape_string($_GET['search']) : null;
 
 $riga = isset($_POST['riga']) ? $_POST['riga'] : null;
 $testata = isset($_POST['testata']) ? $_POST['testata'] : null;
@@ -22,13 +23,20 @@ $isCompleta = isset($_POST['isCompleta']) ? $_POST['isCompleta'] : null;
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (!empty($idNumeroDoc)) {
         if($idAnnoDoc == null){
-            $righe = $richiesteMovimentazioneManager->getRichiestaByNumeroDoc($idNumeroDoc);
+            [$lista, $cnt] = $richiesteMovimentazioneManager->getRichiestaByNumeroDoc($idNumeroDoc);
+            header('Content-Type: application/json');
+            echo json_encode(['data' => $lista, 'count' => $cnt]);
         } else {
-            $righe = $richiesteMovimentazioneManager->getRichiesta($idAnnoDoc, $idNumeroDoc);
-        }
-        
-        header('Content-Type: application/json');
-        echo json_encode(['data' => $righe]);
+            if($search != null && $search != ""){
+                $righe = $richiesteMovimentazioneManager->getRichiesteFiltro($idAnnoDoc, $idNumeroDoc, $search);
+                header('Content-Type: application/json');
+                echo json_encode(['data' => $righe]);
+            } else {
+                $righe = $richiesteMovimentazioneManager->getRichiesta($idAnnoDoc, $idNumeroDoc);
+                header('Content-Type: application/json');
+                echo json_encode(['data' => $righe]);
+            }            
+        }        
     } else {
         [$lista, $cnt] = $richiesteMovimentazioneManager->getRichieste($skip, $top);
         header('Content-Type: application/json');

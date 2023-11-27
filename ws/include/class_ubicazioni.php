@@ -29,7 +29,7 @@ class UbicazioniManager {
       return [$data, $count];
     }
 
- /**
+     /**
      * Restituisce tutti i saldi (per commessa) di un certo articolo in una certa ubicazione
      */
     function getContenutoUbicazioneArticoloWithQty($codUbicazione, $codArticolo) {
@@ -84,6 +84,59 @@ class UbicazioniManager {
           //echo $sql1 . $sql2 . $sql3;
          $count = $panthera->select_single_value($sql0 . $sql2);
           $data = $panthera->select_list($sql1 . $sql2 . $sql3);
+      }
+      
+      // se l'ubicazione e' vuota non do' errori
+      return [$data, $count];
+    }
+
+/**
+     * Restituisce tutti i saldi (per commessa) di un certo articolo in una certa ubicazione
+     */
+    function getStatoRigaQnt($idMagazzino, $codCommessa, $articolo) {
+      global $panthera, $ID_AZIENDA;
+
+      if ($panthera->mock) {
+          $data = [ [ 'ID_ARTICOLO' => '00000564                 ',
+                      'ID_MAGAZZINO' => 'E01',
+                      'ID_COMMESSA' => 'COMMESSA1',
+                      'ID_UBICAZIONE' => 'EEE',
+                      'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
+                      'DISEGNO' => 'ABC',
+                      'R_UM_PRM_MAG' => 'NR',
+                      'QTA_GIAC_PRM' => 10,
+                      'TRASFERIBILE' => 'Y',
+                      'R_UTENTE_AGG' => '001_finsoft         ',
+                      'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410'
+                    ],
+                    [ 'ID_ARTICOLO' => '00000564                 ',
+                    'ID_MAGAZZINO' => 'E01',
+                    'ID_COMMESSA' => 'COMMESSA2',
+                    'ID_UBICAZIONE' => 'EEE',
+                    'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
+                    'DISEGNO' => 'ABC',
+                    'R_UM_PRM_MAG' => 'NR',
+                    'QTA_GIAC_PRM' => 12,
+                    'TRASFERIBILE' => 'Y',
+                    'R_UTENTE_AGG' => '001_finsoft         ',
+                    'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410'
+                ]]; 
+          $count = 1;
+          
+      } else {
+
+          $this->check_articolo($articolo);
+
+          $sql = "SELECT S.QTA_GIAC_PRM FROM THIP.UBICAZIONI_LL U
+                  JOIN THIPPERS.YUBICAZIONI_LL YU
+                    ON U.ID_AZIENDA=YU.ID_AZIENDA AND U.ID_UBICAZIONE=YU.ID_UBICAZIONE AND U.ID_MAGAZZINO=YU.ID_MAGAZZINO
+                  JOIN THIP.SALDI_UBICAZIONE S
+                    ON U.ID_AZIENDA=S.ID_AZIENDA AND U.ID_UBICAZIONE=S.ID_UBICAZIONE AND U.ID_MAGAZZINO=S.ID_MAGAZZINO
+                  JOIN THIP.ARTICOLI A
+                    ON S.ID_AZIENDA=A.ID_AZIENDA AND S.ID_ARTICOLO=A.ID_ARTICOLO
+                  WHERE U.ID_AZIENDA='$ID_AZIENDA' AND U.ID_MAGAZZINO='$idMagazzino' AND S.ID_ARTICOLO='$articolo' AND S.ID_COMMESSA = '$codCommessa' AND U.STATO='V' AND S.QTA_GIAC_PRM > 0 ORDER BY S.ID_ARTICOLO";
+          //echo $sql1 . $sql2 . $sql3;
+          $data = $panthera->select_list($sql);
       }
       
       // se l'ubicazione e' vuota non do' errori

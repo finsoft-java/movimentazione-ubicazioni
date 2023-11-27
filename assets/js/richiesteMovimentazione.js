@@ -1,3 +1,4 @@
+let timerOn = true;
 var maxItems = 1000;
 var documenti = [];
 var magazziniDisponibili = null;
@@ -20,6 +21,9 @@ var riga =null;
 let loadedPage = 0;
 var testata =null;
 var prelievi = [];
+let datiUbicazionePartenza;
+let annoDoc=null;
+let numeroDoc=null;
 /**
  * Inizializza l'interfaccia per un certo stato i
  */
@@ -46,12 +50,16 @@ function initStato(i) {
         $("#navigateRichieste").show();
         $(".qrcode").hide();
         $(".settings").hide();
+        $(".filtroRicerca").hide();
         $("#search").show();
+        annoDoc = null;
+        numeroDoc = null;
     } else if (statoCorrente == 1) {
         // griglia delle righe del documento
         // deve anche mostrare l'ubicazione 
         $('.btn_setting').attr("data-open","false").removeClass("activebtn redColor");
         $('.err_box').remove();
+        $(".filtroRicerca").show();
         $("#pagNumLabel").hide();
         $("#navigateRichieste").hide();
         rigaSelezionata = null;
@@ -70,6 +78,7 @@ function initStato(i) {
         // maschera di scelta dell'ubicazione
         $('.err_box').remove();
         $("#pagNumLabel").hide();
+        $(".filtroRicerca").hide();
         $("#ubi_arrivo").val("");
         $("#navigateRichieste").hide();
         $("#divElencoDocumentiContainer").hide();
@@ -183,16 +192,38 @@ function openDoc(idDoc, idAnnoDoc, idNumeroDoc) {
                 // aggiungo i campi che non esistono server-side
                 riga.PRELIEVI = [];
                 riga.QTA_RESIDUA = parseFloat(riga.QTA_UM_PRM);
+                controllaStatoRiga(riga);
             });
-            console.log("item (da doc testata)",item);
-            console.log("documenti[documentoSelezionato]",documenti[documentoSelezionato]);
-            ridisegnaElencoRigheDocumenti();
         },
         error: function(data, status) {
             console.log('ERRORE nel caricare la documenti delle righe', data);
             showError(data);
         }
     });    
+}
+
+function controllaStatoRiga(riga){
+    let qntVolutaDoc = riga.QTA_UM_PRM;
+    let articolo = riga.R_ARTICOLO;
+    let commessaPartenza = riga.R_COMMESSA;    
+    let magazzinoPartenza = riga.R_MAGAZZINO;
+    $.get({
+        url: "./ws/GetStatoRiga.php?qntVolutaDoc=" + qntVolutaDoc.trim() +"&articolo="+articolo.trim()+"&commessaPartenza="+commessaPartenza.trim()+"&magazzinoPartenza="+magazzinoPartenza.trim(),
+        dataType: 'json',
+        headers: {
+            'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+        },
+        success: function(data, status) {
+            riga.STATO_RIGA = data.data;
+            annoDoc = riga.ID_ANNO_DOC;
+            numeroDoc = riga.ID_NUMERO_DOC;
+            ridisegnaElencoRigheDocumenti();
+        },
+        error: function(data, status) {
+            
+        }
+    });   
+
 }
 
 function ridisegnaElencoRigheDocumenti() {
@@ -214,11 +245,28 @@ function ridisegnaElencoRigheDocumenti() {
 
 function getHtmlGrigliaRighe(idDoc, idRiga, riga) {
     // QUI x dovrebbe essere documenti[id].RIGHE[id2]
+    
+    console.log("rigaAA ",riga);
+    console.log("riga statO ",riga.STATO_RIGA);
     let commessa = riga.R_COMMESSA || '-';
-    return `<div class="rigaDocumenti" onclick="openRow(${idDoc},${idRiga})" style="text-align:center;border-top: 1px solid rgba(0,0,0,.1);padding: 20px 15px;">
+    let styleRiga = "";
+    switch (riga.STATO_RIGA) {
+        case "Evadibile":
+            styleRiga = 'background-color: #00800096';
+            break;
+        case "Parziale":
+            styleRiga = 'background-color: #ffff006b';
+            break;
+        default:
+            styleRiga = 'background-color: #ff00006e';
+            break;
+    }
+    return `<div class="rigaDocumenti" onclick="openRow(${idDoc},${idRiga})" style="text-align:center;border-top: 1px solid #000;padding: 20px 15px;${styleRiga}">
                <p style="margin:0px;">
-                Articolo: <strong> ${riga.R_ARTICOLO}</strong> <br/> Commessa :<strong>${commessa} </strong> <br/>
-                Qta. richiesta <strong>${riga.QTA_UM_PRM} </strong>
+                Articolo: <strong> ${riga.R_ARTICOLO}</strong> <br/> 
+                Commessa :<strong>${commessa} </strong> <br/>
+                Qta. richiesta <strong>${riga.QTA_UM_PRM} ${riga.R_UM_PRM}</strong><br/>
+                <strong>${riga.STATO_RIGA}</strong>
                </p>
             </div>`;
 }
@@ -241,156 +289,198 @@ function openRow(idDoc, idRiga) {
     risUte1 = x.STRINGA_RIS_UTE_1;
     risUte2 = x.STRINGA_RIS_UTE_2;
     noteRichiesta = x.NOTA == null ? "" : x.NOTA;
-    
+    unitaMisura = x.R_UM_PRM;
     qntResidua = x.QTA_RESIDUA;
-    $("#boxqnt").html(`
-                        <p>Quantità richiesta Documento : <strong>${qntTotaleRichiestaHtml}</strong></p>
-                        <p>Quantità residua da Prelevare:  <strong>${qntResidua}</strong></p>
-                        `);
-    $("#qrcode").val(ubicazioneDest);
-    $(".magArrLabel").remove();
-    $("#boxqnt").prepend("<p class='magArrLabel'>Magazzino Arrivo: <strong>"+magazzinoDest+"</strong> </br></p>");
-    let rigaPrelieviEffettuati="";
-    if (x.PRELIEVI.length > 0) {
-      rigaPrelieviEffettuati = `<div class="prelievoAccordion"><button class="accordion">Prelievi</button>
-                               <div class="panel">`;
-      for (let i = 0; i < x.PRELIEVI.length; i++) {
-        let item = x.PRELIEVI[i];
-        let qntHtmlFormat = item.QUANTITA.replace(/\.000$/,'');
-        console.log("qntHtmlFormat",qntHtmlFormat);
-        rigaPrelieviEffettuati += `<p style="text-align:center;border-bottom: 1px solid;padding-bottom: 15px;">
-                                        Commessa Partenza: <strong>${item.COMMESSA}</strong> <br/>
-                                        Ubicazione Partenza: <strong>${item.UBICAZIONE}</strong><br/>
-                                        Quantità richiesta Documento : <strong>${qntHtmlFormat}</strong>
-                                    </p>`;
-      }
-      rigaPrelieviEffettuati += `</div></div>`;
-    }
-    $("#divSingolaRiga").html(`<button class="accordion">Dati Riga</button>
-                               <div class="panel">
-                                    <p id="qntComm" style="text-align:center"></p>
-                                    <p style="text-align:center">
-                                        Articolo: <strong>  ${x.R_ARTICOLO} </strong> </br>
-                                        Commessa Partenza: <strong>${commessaCorrente}</strong> <br/>
-                                        Commessa Arrivo: <strong>${commessaDest}</strong> </br>
-                                        Ubicazione Partenza: <strong>${ubicazioneCorrente}</strong><br/>
-                                        Ubicazione Arrivo: <strong>${ubicazioneDest}</strong> </br>
-                                        Sottocommessa Partenza: <strong>${risUte1}</strong></br>
-                                        Sottocommessa Arrivo: <strong>${risUte2}</strong>
-                                    </p>
-                                </div>`);
-    
-    $(".prelievoAccordion").remove();
-    $(".btnDiv").prepend(rigaPrelieviEffettuati);
-    $("#ubi_arrivo").val(ubicazioneDest);
     $.get({
-        url: "./ws/GetMagazziniAlternativi.php",
+        url: "./ws/GetUbicazione.php?codUbicazione=" + ubicazioneCorrente,
         dataType: 'json',
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
         },
-        success: function(data, status) { 
-            magazziniDisponibili = data["data"];
+        success: function(data, status) {
+            datiUbicazionePartenza = data.value;
+            console.log("aa",datiUbicazionePartenza);
+            let notePartenza="";
+            if(datiUbicazionePartenza.NOTE != "" && datiUbicazionePartenza.NOTE != null){
+                notePartenza = datiUbicazionePartenza.NOTE;
+            }
             
+            let notePosizionePartenza="";
+            if(datiUbicazionePartenza.NOTE_POSIZIONE != "" && datiUbicazionePartenza.NOTE_POSIZIONE != null){
+                notePosizionePartenza = datiUbicazionePartenza.NOTE_POSIZIONE;
+            }
+
+            $("#boxqnt").html(`<p class='magArrLabel'>Magazzino Arrivo: <strong>${magazzinoDest}</strong> </br></p>
+                       <p>Quantità richiesta Documento : <strong>${qntTotaleRichiestaHtml} ${unitaMisura}</strong></p>
+                       <p>Quantità residua da Prelevare:  <strong>${qntResidua} ${unitaMisura}</strong></p>
+                       <p>Descrizione: <strong>${notePartenza}</strong></p>
+                       <p>Note Posizione: <strong>${notePosizionePartenza}</strong></p>`);
+            if(blackListUbicazioni.includes(ubicazioneDest.trim())) {        
+                $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>UBICAZIONE '"+ubicazioneDest.trim()+"' NON SELEZIONABILE<br></p>");
+            }                                          
+            $("#qrcode").val(ubicazioneDest.trim());
+            $(".magArrLabel").remove();
+            let rigaPrelieviEffettuati="";
+            if (x.PRELIEVI.length > 0) {
+                rigaPrelieviEffettuati = `<div class="prelievoAccordion"><button class="accordion">Prelievi</button>
+                                        <div class="panel">`;
+                for (let i = 0; i < x.PRELIEVI.length; i++) {
+                    let item = x.PRELIEVI[i];
+                    let qntHtmlFormat = item.QUANTITA.replace(/\.000$/,'');
+                    console.log("qntHtmlFormat",qntHtmlFormat);
+                    rigaPrelieviEffettuati += `<p style="text-align:center;border-bottom: 1px solid;padding-bottom: 15px;">
+                                                    Ubicazione Partenza: <strong>${item.UBICAZIONE}</strong><br/>
+                                                    Commessa Partenza: <strong>${item.COMMESSA}</strong> <br/>                                                    
+                                                    Quantità richiesta Documento : <strong>${qntHtmlFormat}</strong>
+                                                </p>`;
+                }
+                rigaPrelieviEffettuati += `</div></div>`;
+            }
+            
+            
+            $("#divSingolaRiga").html(`<button class="accordion">Dati Riga</button>
+                                    <div class="panel">
+                                            <p style="text-align:center;margin-bottom:0px;">
+                                                Articolo: <strong>  ${x.R_ARTICOLO} </strong> </br>
+                                                Ubicazione Partenza: <strong>${ubicazioneCorrente}</strong><br/>
+                                                Commessa Partenza: <strong>${commessaCorrente}</strong> <br/>
+                                                Sottocommessa Partenza: <strong>${risUte1}</strong></br>                                            
+                                                Ubicazione Arrivo: <strong>${ubicazioneDest}</strong> </br>
+                                                Commessa Arrivo: <strong>${commessaDest}</strong> </br>                                                    
+                                                Sottocommessa Arrivo: <strong>${risUte2}</strong></br>
+                                            </p>
+                                        </div>`);
+            
+            $(".prelievoAccordion").remove();
+            $(".btnDiv").prepend(rigaPrelieviEffettuati);
+            $("#ubi_arrivo").val(ubicazioneDest);
             $.get({
-                url: `./ws/Interrogazione.php?mov=Y&codArticolo=${x.R_ARTICOLO}`,
+                url: "./ws/GetMagazziniAlternativi.php",
                 dataType: 'json',
                 headers: {
                     'Authorization': 'Bearer ' + sessionStorage.getItem('token')
                 },
                 success: function(data, status) { 
-                    let dati = data["data"];
-                    datiUbicazione = dati.filter((value, index, self) =>
-                        index === self.findIndex((t) => (
-                            t.ID_UBICAZIONE === value.ID_UBICAZIONE
-                        ))
-                    );
-                    datiMagazzino = dati.filter((value, index, self) =>
-                        index === self.findIndex((t) => (
-                            t.ID_MAGAZZINO === value.ID_MAGAZZINO
-                        ))
-                    );
-                    let datiStampati = "";
-                    arrUbicazioniDest = dati;
-                    if(dati[0] == null || dati.length === 0) {
-                        showError("Nessuna ubicazione disponibile per l'Articolo "+articoloMovimentazione);
-                        $("#qrcode").val('');
-                        return false;
-                    }
+                    magazziniDisponibili = data["data"];
+                    
+                    $.get({
+                        url: `./ws/Interrogazione.php?mov=Y&codArticolo=${x.R_ARTICOLO}`,
+                        dataType: 'json',
+                        headers: {
+                            'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                        },
+                        success: function(data, status) { 
+                            let dati = data["data"];
+                            datiUbicazione = dati.filter((value, index, self) =>
+                                index === self.findIndex((t) => (
+                                    t.ID_UBICAZIONE === value.ID_UBICAZIONE
+                                ))
+                            );
+                            console.log("datiUbicazione ",datiUbicazione);
+                            datiMagazzino = dati.filter((value, index, self) =>
+                                index === self.findIndex((t) => (
+                                    t.ID_MAGAZZINO === value.ID_MAGAZZINO
+                                ))
+                            );
+                            let datiStampati = "";
+                            arrUbicazioniDest = dati;
+                            if(dati[0] == null || dati.length === 0) {
+                                showError("Nessuna ubicazione disponibile per l'Articolo "+articoloMovimentazione);
+                                $("#qrcode").val('');
+                                return false;
+                            }
 
-                    datiStampati += "<div id='magazPrelievo' style='display:none'><label>Magazzino Prelievo</label>";
-                    datiStampati += "<select onchange='onChangeMagazzino();' onclick='timerOn = false' id='magazzinoOrigine' onfocusout='timerOn = true' class='form-control'>";    
-                    datiStampati += "<option value='-1'> Seleziona magazzino disponibile </option>";                            
-                    for (let i = 0; i < datiMagazzino.length; i++) {
-                        let selected = "";
-                        if(magazzinoCorrente == datiMagazzino[i].ID_MAGAZZINO){
-                            selected = "selected='selected'";
-                        }
-                        datiStampati += "<option "+selected+" value='"+datiMagazzino[i].ID_MAGAZZINO+"'>" + datiMagazzino[i].ID_MAGAZZINO + "</option>";                    
-                    } 
-                    datiStampati+= "</select></div>";
+                            datiStampati += "<div id='magazPrelievo' style='display:none'><label>Magazzino Prelievo</label>";
+                            datiStampati += "<select onchange='onChangeMagazzino();' onclick='timerOn = false' id='magazzinoOrigine' onfocusout='timerOn = true' class='form-control'>";    
+                            datiStampati += "<option value='-1'> Seleziona magazzino disponibile </option>";                            
+                            for (let i = 0; i < datiMagazzino.length; i++) {
+                                let selected = "";
+                                if(magazzinoCorrente == datiMagazzino[i].ID_MAGAZZINO){
+                                    selected = "selected='selected'";
+                                }
+                                datiStampati += "<option "+selected+" value='"+datiMagazzino[i].ID_MAGAZZINO+"'>" + datiMagazzino[i].ID_MAGAZZINO + "</option>";                    
+                            } 
+                            datiStampati+= "</select></div>";
 
-                    let magazzinoDestinazioneHtml = "";
-                    magazzinoDestinazioneHtml += "<div id='magazArrivo' style='display:none'><label>Magazzino di Arrivo</label>";
-                    magazzinoDestinazioneHtml += "<select onchange='onChangeMagazzinoDest();' onclick='timerOn = false' id='magazzinoDest' onfocusout='timerOn = true' class='form-control'>";    
-                    magazzinoDestinazioneHtml += "<option value='-1'> Seleziona magazzino disponibile </option>";                            
-                    for (let i = 0; i < magazziniDisponibili.length; i++) {
-                        let selected = "";
-                        if(magazzinoDest == magazziniDisponibili[i]){
-                            selected = "selected='selected'";
+                            let magazzinoDestinazioneHtml = "";
+                            magazzinoDestinazioneHtml += "<div id='magazArrivo' style='display:none'><label>Magazzino di Arrivo</label>";
+                            magazzinoDestinazioneHtml += "<select onchange='onChangeMagazzinoDest();' onclick='timerOn = false' id='magazzinoDest' onfocusout='timerOn = true' class='form-control'>";    
+                            magazzinoDestinazioneHtml += "<option value='-1'> Seleziona magazzino disponibile </option>";                            
+                            for (let i = 0; i < magazziniDisponibili.length; i++) {
+                                let selected = "";
+                                if(magazzinoDest == magazziniDisponibili[i]){
+                                    selected = "selected='selected'";
 
+                                }
+                                magazzinoDestinazioneHtml += "<option "+selected+" value='"+magazziniDisponibili[i]+"'>" + magazziniDisponibili[i] + "</option>";                    
+                            } 
+                            magazzinoDestinazioneHtml+= "</select></div>";
+                            datiStampati += "<p style='text-align:center;margin-top:15px;'>Magazzino di Prelievo Documento: <strong>"+magazzinoCorrente+"</strong> <br/></p>";
+                            datiStampati += "<div class='ubiPrelievoDiv'><label>Ubicazione di Prelievo</label>";
+                            datiStampati += "<select id='ubicazioneOrigine' onclick='timerOn = false' onfocusout='timerOn = true' class='form-control'>";    
+                            datiStampati += "<option value='-1'> Seleziona ubicazione disponibile </option>";                            
+                            console.log("datiUbicazione dentro ",datiUbicazione);
+                            let optUbicazioni = "";
+                            for (let i = 0; i < datiUbicazione.length; i++) {
+                                let selected = "";
+                                let comm = datiUbicazione[i].ID_COMMESSA ? datiUbicazione[i].ID_COMMESSA.trim() : "";
+                                let disabled = "";
+                                if((ubicazioneCorrente.trim() === datiUbicazione[i].ID_UBICAZIONE.trim() && commessaCorrente.trim() === comm) || (ubicazioneCorrente.trim() !== datiUbicazione[i].ID_UBICAZIONE.trim() && commessaCorrente.trim() === comm )){
+                                    selected = "selected='selected'";
+                                }
+                                if(blackListUbicazioni.includes(datiUbicazione[i].ID_UBICAZIONE.trim())){
+                                    disabled = "disabled";
+                                }
+                                if(magazzinoCorrente == datiUbicazione[i].ID_MAGAZZINO){
+                                    optUbicazioni = optUbicazioni+"<option "+selected+" "+disabled+" value='"+datiUbicazione[i].ID_UBICAZIONE+"' data-qta='"+datiUbicazione[i].QTA_GIAC_PRM+"'>" + datiUbicazione[i].ID_UBICAZIONE + " </option>";                    
+                                }
+                            } 
+                            datiStampati += optUbicazioni+"</select>";
+                            datiStampati += magazzinoDestinazioneHtml;                    
+                            datiStampati += "<label>Note</label>";
+                            datiStampati += "<textarea class='form-control' id='note' rows='3' onclick='timerOn = false' onfocusout='timerOn = true' >"+noteRichiesta+"</textarea></div>";
+                            $("#divSingolaRiga").append(datiStampati);                  
+                            $("#ubicazioneOrigine").trigger("change");   
+                            $("#magazzinoOrigine").trigger("change");    
+                            $("#magazzinoDest").trigger("change");  
+                        }, error: function(data, status) {
+                            console.log('ERRORE -> Interrogazione', data);
+                            showError(data);
                         }
-                        magazzinoDestinazioneHtml += "<option "+selected+" value='"+magazziniDisponibili[i]+"'>" + magazziniDisponibili[i] + "</option>";                    
-                    } 
-                    magazzinoDestinazioneHtml+= "</select></div>";
-                    datiStampati += "<p style='text-align:center;margin-top:15px;'>Magazzino di Prelievo Documento: <strong>"+magazzinoCorrente+"</strong> <br/></p>";
-                    datiStampati += "<div class='ubiPrelievoDiv'><label>Ubicazione di Prelievo</label>";
-                    datiStampati += "<select onclick='timerOn = false' id='ubicazioneOrigine' onfocusout='timerOn = true' class='form-control'>";    
-                    datiStampati += "<option value='-1'> Seleziona ubicazione disponibile </option>";                            
-                    for (let i = 0; i < datiUbicazione.length; i++) {
-                        let selected = "";
-                        let disabled = "";
-                        console.log("arr Interrogazione.php?codArticolo=-> "+dati[i]);
-                        if(ubicazioneCorrente === datiUbicazione[i].ID_UBICAZIONE){
-                            selected = "selected='selected'";
-                        }
-                        if(blackListUbicazioni.includes(datiUbicazione[i].ID_UBICAZIONE)){
-                            disabled = "disabled";
-                        }
-                        datiStampati += "<option "+selected+" "+disabled+" value='"+datiUbicazione[i].ID_UBICAZIONE+"' data-qta='"+datiUbicazione[i].QTA_GIAC_PRM+"'>" + datiUbicazione[i].ID_UBICAZIONE + " </option>";                    
-                    } 
-                    datiStampati += "</select>";
-                    datiStampati += magazzinoDestinazioneHtml;                    
-                    datiStampati += "<label>Note</label>";
-                    datiStampati += "<textarea class='form-control' id='note' rows='3'>"+noteRichiesta+"</textarea></div>";
-                    $("#divSingolaRiga").append(datiStampati);                  
-                    $("#ubicazioneOrigine").trigger("change");                  
-                    $("#magazzinoOrigine").trigger("change");              
-                    $("#magazzinoDest").trigger("change");                   
+                    });
+
                 }, error: function(data, status) {
-                    console.log('ERRORE -> Interrogazione', data);
+                    console.log('ERRORE -> getMagazziniAlternativi', data);
                     showError(data);
                 }
             });
 
-        }, error: function(data, status) {
-            console.log('ERRORE -> getMagazziniAlternativi', data);
+
+        },
+        error: function(data, status){
+            $("#qrcode").attr('placeholder','UBICAZIONE ORIG.');
+            console.log('ERRORE -> Interrogazione', data);
             showError(data);
+            $("#qrcode").val('');
+            ubicazione = null;
         }
-    });
+    });   
+
+
+    
             
 }
 
 function setGiacenzaCommessaSelezionata() {
     qntSelezionata = $("#selectCommessa option:selected").val();
+    unitaSelezionata = $("#selectCommessa option:selected").attr("data-prm");
     let item = documenti[documentoSelezionato].RIGHE[rigaSelezionata];
 
     if(item.QTA_RESIDUA != null && item.QTA_RESIDUA != "") qntTotaleRichiesta = item.QTA_RESIDUA;
 
     if(parseFloat(qntSelezionata) > 0) {
-        $("#divSingolaRiga > p#qntComm").html("Quantità disp. commessa: <strong>"+qntSelezionata+"</strong>");
-    } else {
-        $("#divSingolaRiga > p#qntComm").html("");
+        $(".dispCommessa").remove();
+        $("#boxqnt").append("<p class='dispCommessa'>Quantità disp. Ubicazione/Commessa: <strong>"+qntSelezionata+" "+unitaSelezionata+"</strong></p>");
     }
 
     if(parseFloat(qntSelezionata) >= parseFloat(qntTotaleRichiesta)){
@@ -433,10 +523,16 @@ function checkQty() {
         $("#btnConfirmPart button").attr('disabled',false);        
         $("#btnPreleva button").attr('disabled',true);
     }    
+    if(blackListUbicazioni.includes($("#ubi_arrivo").val().trim())) {        
+        $("#btnPreleva button").attr('disabled', true);
+        $("#btnConfirm button").attr('disabled', true);
+        $("#btnConfirmPart button").attr('disabled', true);   
+    }
 }
 
 function conferma() {
 
+    $("#btnConfirm button").attr("disabled",true);
     let item = documenti[documentoSelezionato].RIGHE[rigaSelezionata];
 
     let commessa = $("#selectCommessa option:selected").text();
@@ -487,6 +583,7 @@ function conferma() {
             showSuccessMsg("Riga confermata con successo");
             console.log("data->",data);
             checkStatoTrasferimento(data["id"], isCompleta);
+            $("#btnConfirm button").attr("disabled",false);
         },
         error: function(data, status){
             console.log('ERRORE -> cambioMagazzinoUbicazione', data);
@@ -497,7 +594,9 @@ function conferma() {
 }
 
 function confermaParziale() {
-
+    $("#btnConfirmPart button").attr("disabled",true);
+    $("#btnPreleva button").attr("disabled",true);
+    
     let item = documenti[documentoSelezionato].RIGHE[rigaSelezionata];
 
     let commessa = $("#selectCommessa option:selected").text();
@@ -548,6 +647,8 @@ function confermaParziale() {
             showSuccessMsg("Riga confermata con successo");
             console.log("data->",data);
             checkStatoTrasferimento(data["id"], null);
+            $("#btnConfirmPart button").attr("disabled",false);
+            $("#btnPreleva button").attr("disabled",false);    
         },
         error: function(data, status){
             console.log('ERRORE -> cambioMagazzinoUbicazione', data);
@@ -653,6 +754,20 @@ function minus(minimum = 1) {
 }
 
 
+function plus10(maxQty) {
+    if(parseFloat(qntSelezionata) >= parseFloat(maxQty) && $("#qty").val() <= parseFloat(maxQty) - 10) {
+        $("#qty").val((parseFloat($("#qty").val())+10).toFixed(3));    
+    }
+    checkQty();
+}
+
+function minus10(minimum = 1) {
+    if($("#qty").val() >= minimum + 10) {
+        $("#qty").val((parseFloat($("#qty").val())-10).toFixed(3));
+    }
+    checkQty();
+}
+
 function interrogaUbicazione(ubicazione, articolo, callback) {
     $.get({
         url: "./ws/Interrogazione.php?codUbicazione=" + ubicazione + "&codArticolo=" + articolo + "&mov=Y",
@@ -662,6 +777,8 @@ function interrogaUbicazione(ubicazione, articolo, callback) {
         },
         success: function(data, status) {
             let documenti = data["data"];
+            $("#ArtBox").remove();
+            $("#divSingolaRiga > .panel > p").append("<div id='ArtBox'>Descrizione Art: <strong>"+ documenti[0].DESCRIZIONE+"</strong><br/>Disegno: <strong>"+ documenti[0].DISEGNO+"</strong><br/></div>" );
             callback(documenti);
         },
         error: function(data, status) {
@@ -674,10 +791,13 @@ function interrogaUbicazione(ubicazione, articolo, callback) {
 $(document).on("change","#ubicazioneOrigine",function() {
     
     ubicazioneCorrente = $("#ubicazioneOrigine option:selected").val();
-    if (ubicazioneCorrente != -1) {
+    if (ubicazioneCorrente != null && ubicazioneCorrente != -1) {
         interrogaUbicazione(ubicazioneCorrente, articoloMovimentazione, (documentiGiacenze) => {
-            
-            let datiStampati = `<div class='commessaBox'>
+            stylecomm = "style='display:none'";
+            if($(".btn_setting").hasClass("activebtn")){
+                stylecomm = '';
+            } 
+            let datiStampati = `<div class='commessaBox' `+stylecomm+` >
                                     <label>Commesse disponibili</label>
                                     <select id='selectCommessa' class='form-control' onchange='setGiacenzaCommessaSelezionata()'>
                                         <option value='0'>Seleziona una commessa </option>`;
@@ -712,24 +832,33 @@ $(document).on("change","#ubicazioneOrigine",function() {
                                 if(x.QTA_GIAC_PRM > 0) {
                                     opt += `<option value='${x.QTA_GIAC_PRM}' data-prm='${x.R_UM_PRM_MAG}' ${selected}>${commessa}</option>`
                                 }
-                            }               
-                            
+                            }           
                         });
                 datiStampati += `${opt}</select>
                              </div>`;
             datiStampati += `<div class='input-group inputDiv qntBox'>  
                                 <div class='input-group-prepend'>
-                                    <button class='btn btnInputForm btnMinus' type='button' onClick='minus(1)'>-</button>
+                                    <button class='btn btnInputForm btnMinus' type='button' onfocusout='timerOn = true' onClick='timerOn = false;minus10(1)'>-10</button>
+                                </div>
+                                <div class='input-group-prepend'>
+                                    <button class='btn btnInputForm btnMinus' type='button' onfocusout='timerOn = true' onClick='timerOn = false;minus(1)'>-</button>
                                 </div>`;
-            datiStampati += `   <input type='number' class='form-control inputOsai' disabled id='qty' class='inputOsai' value='${qntTotaleRichiesta}' min='0.001' onchange='checkQty()' placeholder='Quantità da prelevare' aria-label='Quantità da prelevare' aria-describedby='basic-addon2'>`;
+            datiStampati += `   <input type='number' onclick='timerOn = false' onfocusout='timerOn = true' disabled class='form-control inputOsai' id='qty' class='inputOsai' value='${qntTotaleRichiesta}' min='0.001' onchange='checkQty()' placeholder='Quantità da prelevare' aria-label='Quantità da prelevare' aria-describedby='basic-addon2'>`;
             datiStampati += `   <div class='input-group-append'>
-                                    <button class='btn btnInputForm btnPlus' type='button' onClick='plus("${qntTotaleRichiesta}")'>+</button>
+                                    <button class='btn btnInputForm btnPlus' type='button' onfocusout='timerOn = true' onClick='timerOn = false; plus("${qntTotaleRichiesta}")'>+</button>
+                                </div>
+                                <div class='input-group-append'>
+                                    <button class='btn btnInputForm btnPlus' type='button' onfocusout='timerOn = true' onClick='timerOn = false; plus10("${qntTotaleRichiesta}")'>+10</button>
                                 </div>
                             </div>`;
             $(".commessaBox").remove();
             $(".qntBox").remove();
             $("#divSingolaRiga").append(datiStampati);
             $('.err_box').remove();
+            
+            if(blackListUbicazioni.includes($("#ubi_arrivo").val().trim())) {        
+                $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>UBICAZIONE '"+ubicazioneDest.trim()+"' NON SELEZIONABILE<br></p>");
+            }
             if($("#selectCommessa").val() == 0){
                 $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>COMMESSA MANCANTE <br></p>");
             }
@@ -748,33 +877,47 @@ $(document).on("change","#ubicazioneOrigine",function() {
             $("#selectCommessa").trigger("change");
             if(($("#selectCommessa").val() == 0 || $("#magazzinoOrigine").val() == -1 || $("#ubicazioneOrigine").val() == -1 || $("#magazzinoDest").val() == -1) 
                 && !$(".btn_setting").hasClass("activebtn")){
-                $(".commessaBox").hide();
                 $(".btn_setting").addClass("redColor");
             }
         })
     } else {
-        //$("#divSingolaRiga").append("<p style='margin: 0px 15px;'>Scegliere una ubicazione:</p>");
+        $(".err_box").remove();
+        if($("#selectCommessa").val() == 0){
+            $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>COMMESSA MANCANTE <br></p>");
+        }
+        
+        if($("#magazzinoOrigine").val() == -1 || $("#magazzinoOrigine").val() == null){
+            $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>MAGAZZINO PARTENZA MANCANTE <br></p>");
+        }
+        
+        if($("#ubicazioneOrigine").val() == -1 || $("#ubicazioneOrigine").val() == null){
+            $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>UBICAZIONE PARTENZA MANCANTE <br></p>");
+        }
+        if($("#magazzinoDest").val() == -1  || $("#magazzinoDest").val() == null){
+            $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>MAGAZZINO DESTINAZIONE MANCANTE <br></p>");
+        }
+        if(blackListUbicazioni.includes($("#ubi_arrivo").val().trim())) {        
+            $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>UBICAZIONE '"+ubicazioneDest.trim()+"' NON SELEZIONABILE<br></p>");
+        }
+        $("#selectCommessa").trigger("change");
+        if(($("#selectCommessa").val() == 0 || $("#magazzinoOrigine").val() == -1 || $("#ubicazioneOrigine").val() == -1 || $("#magazzinoDest").val() == -1) 
+            && !$(".btn_setting").hasClass("activebtn")){
+            $(".btn_setting").addClass("redColor");
+        }
     }
 });
 
 function onChangeMagazzino() {
     let datiUbicazioneFiltrati;
-    if($("#magazzinoOrigine").val() != -1){
-        datiUbicazioneFiltrati = datiUbicazione.filter((value, index, self) =>
-                            index === self.findIndex((t) => (
-                                t.ID_MAGAZZINO === $("#magazzinoOrigine").val()
-                            ))
-                        );
-    } else {
-        datiUbicazioneFiltrati = datiUbicazione;
-    }
     let datiStampati = "";
-    for (let i = 0; i < datiUbicazioneFiltrati.length; i++) {
+    for (let i = 0; i < datiUbicazione.length; i++) {
         let selected = "";
-        if(ubicazioneCorrente === datiUbicazioneFiltrati[i].ID_UBICAZIONE){
+        if(ubicazioneCorrente === datiUbicazione[i].ID_UBICAZIONE){
             selected = "selected='selected'";
         }
-        datiStampati += "<option "+selected+" value='"+datiUbicazioneFiltrati[i].ID_UBICAZIONE+"' data-qta='"+datiUbicazioneFiltrati[i].QTA_GIAC_PRM+"'>" + datiUbicazioneFiltrati[i].ID_UBICAZIONE + " </option>";                    
+        if($("#magazzinoOrigine").val() == datiUbicazione[i].ID_MAGAZZINO){
+            datiStampati += "<option "+selected+" value='"+datiUbicazione[i].ID_UBICAZIONE+"' data-qta='"+datiUbicazione[i].QTA_GIAC_PRM+"'>" + datiUbicazione[i].ID_UBICAZIONE + " </option>";                    
+        }
     }      
     $("#ubicazioneOrigine").html(datiStampati);
     $("#ubicazioneOrigine").trigger("change");
@@ -810,14 +953,13 @@ document.getElementById("search").addEventListener("keyup", function(event) {
                 'Authorization': 'Bearer ' + sessionStorage.getItem('token')
             },
             success: function(data, status) {
-                console.log(data);
                 $("#divElencoDocumenti").html("");
-                maxItems = data.count;
+                maxItems = data.count;                
                 let elementiCaricati = data.data;
                 documenti = elementiCaricati;
-                console.log("----------------",elementiCaricati);
+                let i = 0;
                 elementiCaricati.forEach(x => {
-                    $("#divElencoDocumenti").append(getHtmlGrigliaDocumenti(loaded++, x));
+                    $("#divElencoDocumenti").append(getHtmlGrigliaDocumenti(i++, x));
                 });
             },
             error: function(data, status) {
@@ -834,6 +976,12 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
     this.value = this.value.toUpperCase();
     console.log("listening to keyup")
     if (event.keyCode === 13) {
+        if(blackListUbicazioni.includes($("#qrcode").val().trim())) { 
+            $('.err_box').remove();
+            $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>UBICAZIONE '"+$("#qrcode").val().trim()+"' NON SELEZIONABILE<br></p>");
+            return false;
+        } 
+
         $.get({
             url: "./ws/Interrogazione.php?idMagazzino=" + $("#magazzinoDest").val()+ "&codUbicazione="+$("#qrcode").val(),
             dataType: 'json',
@@ -855,6 +1003,37 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
         }); 
     }
 });
+
+
+document.getElementById("filtroRicerca").addEventListener("keyup", function(event) {
+    this.value = this.value.toUpperCase().trim();    
+    let item = documenti[documentoSelezionato];
+    if (event.keyCode === 13) {
+        $.get({
+            url: "./ws/RichiesteMovimentazione.php?idAnnoDoc=" + annoDoc + "&idNumeroDoc="+numeroDoc+ "&search=" + this.value,
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+            },
+            success: function(data, status) {
+                item.RIGHE = data.data;
+                item.RIGHE.forEach(riga => {
+                    // aggiungo i campi che non esistono server-side
+                    riga.PRELIEVI = [];
+                    riga.QTA_RESIDUA = parseFloat(riga.QTA_UM_PRM);
+                });
+                annoDoc = annoDoc;
+                numeroDoc = numeroDoc;
+                ridisegnaElencoRigheDocumenti();
+            },
+            error: function(data, status) {
+                console.log('ERRORE nel caricare la documenti delle righe', data);
+                showError(data);
+            }
+        }); 
+    }
+});
+
 
 
 /* PAGINAZIONE */ 
@@ -940,3 +1119,18 @@ $(document).on('click','.btn_setting',function(){
         $(".commessaBox, #magazArrivo, #magazPrelievo").hide();
     }
 });
+
+/*
+$(document).ready(function(){
+    $(".focus").focus();
+    $(".focusRicerca").focus();
+    setInterval(function() {
+        if(timerOn) {
+            console.log("Focusing");
+            $("#qrcode").get(0).focus();
+            $("#filtroRicerca").get(0).focus();
+            $("#search").get(0).focus();
+        }
+    }, 1000);
+});
+*/

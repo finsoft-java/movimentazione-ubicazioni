@@ -145,12 +145,73 @@ R_CAU_DOC_TRA
                 WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_ANNO_DOC='$idAnnoDoc' AND ID_NUMERO_DOC='$idNumeroDoc'
                 AND STATO= 'V' AND STATO_AVANZAMENTO='1'
                 ORDER BY ID_RIGA_DOC";
-/*
-       $sql = "SELECT * FROM THIP.DOC_TRA_RIG
-                WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_ANNO_DOC='$idAnnoDoc' AND ID_NUMERO_DOC='$idNumeroDoc'
-                AND STATO= 'V' AND STATO_AVANZAMENTO='1'
-                ORDER BY ID_RIGA_DOC";
-          */
+                
+        $data = $panthera->select_list($sql);
+      }
+      
+      return $data;
+    }
+
+    function getRichiesteFiltro($idAnnoDoc, $idNumeroDoc, $search) {
+      global $panthera, $ID_AZIENDA;
+      $idAnnoDoc = trim($idAnnoDoc);
+      $idNumeroDoc = trim($idNumeroDoc);
+      $search = trim($search);
+      if ($panthera->mock) {
+          $data = [ [
+                      'ID_ANNO_DOC' => '2022',
+                      'ID_NUMERO_DOC' => 'BL 007106',
+                      'ID_RIGA_DOC' => '1',
+                      'DATA_DOC' => '2022-10-07 00:00:00.000',
+                      'R_CAU_DOC_TRA' => 'T01',
+                      'NUMERO_DOC_FMT' => '2022/BL/ 007106',
+                      'R_MAGAZZINO' => '001',
+                      'R_MAGAZZINO_ARR' => '002',
+                      'STATO' => 'V',
+                      'R_UTENTE_CRZ' => 'mfalosai_001',
+                      'R_ARTICOLO' => '00000000',
+                      'R_COMMESSA' => null,
+                      'R_UM_PRM_MAG' => 'NR',
+                      'QTA_UM_PRM' => '10'
+                    ],
+                    [
+                      'ID_ANNO_DOC' => '2022',
+                      'ID_NUMERO_DOC' => 'BL 007106',
+                      'ID_RIGA_DOC' => '2',
+                      'DATA_DOC' => '2022-10-07 00:00:00.000',
+                      'R_CAU_DOC_TRA' => 'T01',
+                      'NUMERO_DOC_FMT' => '2022/BL/ 007106',
+                      'R_MAGAZZINO' => '001',
+                      'R_MAGAZZINO_ARR' => '002',
+                      'STATO' => 'V',
+                      'R_UTENTE_CRZ' => 'mfalosai_001',
+                      'R_ARTICOLO' => '11111111',
+                      'R_COMMESSA' => null,
+                      'R_UM_PRM_MAG' => 'NR',
+                      'QTA_UM_PRM' => '100'
+                    ],
+                    [
+                      'ID_ANNO_DOC' => '2022',
+                      'ID_NUMERO_DOC' => 'BL 007106',
+                      'ID_RIGA_DOC' => '3',
+                      'DATA_DOC' => '2022-10-07 00:00:00.000',
+                      'R_CAU_DOC_TRA' => 'T01',
+                      'NUMERO_DOC_FMT' => '2022/BL/ 007106',
+                      'R_MAGAZZINO' => '001',
+                      'R_MAGAZZINO_ARR' => '002',
+                      'STATO' => 'V',
+                      'R_UTENTE_CRZ' => 'mfalosai_001',
+                      'R_ARTICOLO' => '22222222',
+                      'R_COMMESSA' => 'C0001',
+                      'R_UM_PRM_MAG' => 'LT',
+                      'QTA_UM_PRM' => '1000'
+                    ]
+                  ];
+      } else {
+       
+        $sql = "SELECT * FROM THIP.DOC_TRA_RIG 
+                WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_ANNO_DOC='$idAnnoDoc' AND ID_NUMERO_DOC='$idNumeroDoc' AND STATO= 'V' AND STATO_AVANZAMENTO='1' 
+                AND (R_COMMESSA LIKE '%$search%' OR R_ARTICOLO LIKE '%$search%') ORDER BY ID_RIGA_DOC";
         $data = $panthera->select_list($sql);
       }
       
@@ -303,7 +364,7 @@ $sql = "SELECT DISTINCT * FROM (
 
         $sql = "SELECT * FROM THIP.DOC_TRA_TES
                 WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_ANNO_DOC='$idAnnoDoc' AND ID_NUMERO_DOC='$idNumeroDoc'
-                AND STATO= 'V' AND STATO_AVANZAMENTO='1'";
+                AND STATO= 'V' AND STATO_AVANZAMENTO='1' ";
         $data = $panthera->select_list($sql);
       }
       
@@ -332,16 +393,17 @@ $sql = "SELECT DISTINCT * FROM (
                     ]
                   ];
       } else {
-
-        $sql = "SELECT DISTINCT * FROM THIP.DOC_TRA_TES
-                WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_NUMERO_DOC LIKE '%$idNumeroDoc%'
-                AND STATO= 'V' AND STATO_AVANZAMENTO='1'";
+        $sql0  = "SELECT count(*) FROM THIP.DOC_TRA_TES T ";
+        $sql1 = "SELECT DISTINCT T.*, (select count(*) from THIP.DOC_TRA_RIG R2 where R2.ID_AZIENDA=T.ID_AZIENDA AND R2.ID_ANNO_DOC=T.ID_ANNO_DOC AND R2.ID_NUMERO_DOC=T.ID_NUMERO_DOC AND R2.STATO= 'V' AND R2.STATO_AVANZAMENTO='1' ) as CNT FROM THIP.DOC_TRA_TES T ";
+        $sql  = "WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_NUMERO_DOC LIKE '%$idNumeroDoc%'
+                AND STATO= 'V' AND STATO_AVANZAMENTO='1' AND EXISTS( SELECT 1 FROM THIP.DOC_TRA_RIG R
+                WHERE R.ID_AZIENDA=T.ID_AZIENDA AND R.ID_ANNO_DOC=T.ID_ANNO_DOC AND R.ID_NUMERO_DOC=T.ID_NUMERO_DOC AND R.STATO= 'V' AND R.STATO_AVANZAMENTO='1')";
         
-        $data = $panthera->select_list($sql);
-
+        $data = $panthera->select_list($sql1 . $sql);
+        $count = $panthera->select_single_value($sql0 . $sql);
       }
       
-      return $data;
+      return [$data, $count];
     }
 
     function checkStatusBatch(){
