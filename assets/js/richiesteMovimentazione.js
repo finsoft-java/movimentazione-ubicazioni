@@ -315,10 +315,13 @@ function openRow(idDoc, idRiga) {
                        <p>Quantità residua da Prelevare:  <strong>${qntResidua} ${unitaMisura}</strong></p>
                        <p>Descrizione: <strong>${notePartenza}</strong></p>
                        <p>Note Posizione: <strong>${notePosizionePartenza}</strong></p>`);
-            if(blackListUbicazioni.includes(ubicazioneDest.trim())) {        
+            if(blackListUbicazioni.includes(ubicazioneDest.trim())) {                  
+                $("#qrcode").val("");
                 $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>UBICAZIONE '"+ubicazioneDest.trim()+"' NON SELEZIONABILE<br></p>");
-            }                                          
-            $("#qrcode").val(ubicazioneDest.trim());
+            } else {
+                $("#qrcode").val(ubicazioneDest.trim());
+            }                                         
+            $("#ubi_arrivo").val(ubicazioneDest.trim());
             $(".magArrLabel").remove();
             let rigaPrelieviEffettuati="";
             if (x.PRELIEVI.length > 0) {
@@ -353,7 +356,6 @@ function openRow(idDoc, idRiga) {
             
             $(".prelievoAccordion").remove();
             $(".btnDiv").prepend(rigaPrelieviEffettuati);
-            $("#ubi_arrivo").val(ubicazioneDest);
             $.get({
                 url: "./ws/GetMagazziniAlternativi.php",
                 dataType: 'json',
@@ -856,7 +858,8 @@ $(document).on("change","#ubicazioneOrigine",function() {
             $("#divSingolaRiga").append(datiStampati);
             $('.err_box').remove();
             
-            if(blackListUbicazioni.includes($("#ubi_arrivo").val().trim())) {        
+            if(blackListUbicazioni.includes($("#ubi_arrivo").val().trim())) {
+                $("#qrcode").val("");  
                 $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>UBICAZIONE '"+ubicazioneDest.trim()+"' NON SELEZIONABILE<br></p>");
             }
             if($("#selectCommessa").val() == 0){
@@ -896,7 +899,8 @@ $(document).on("change","#ubicazioneOrigine",function() {
         if($("#magazzinoDest").val() == -1  || $("#magazzinoDest").val() == null){
             $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>MAGAZZINO DESTINAZIONE MANCANTE <br></p>");
         }
-        if(blackListUbicazioni.includes($("#ubi_arrivo").val().trim())) {        
+        if(blackListUbicazioni.includes($("#ubi_arrivo").val().trim())) {    
+            $("#qrcode").val("");
             $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>UBICAZIONE '"+ubicazioneDest.trim()+"' NON SELEZIONABILE<br></p>");
         }
         $("#selectCommessa").trigger("change");
@@ -979,6 +983,7 @@ document.getElementById("qrcode").addEventListener("keyup", function(event) {
         if(blackListUbicazioni.includes($("#qrcode").val().trim())) { 
             $('.err_box').remove();
             $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>UBICAZIONE '"+$("#qrcode").val().trim()+"' NON SELEZIONABILE<br></p>");
+            $("#qrcode").val("");
             return false;
         } 
 
@@ -1034,33 +1039,24 @@ document.getElementById("filtroRicerca").addEventListener("keyup", function(even
     }
 });
 
-
-
-/* PAGINAZIONE */ 
-
-
-function prevPage()
-{
+function prevPage() {
     if (current_page > 0) {
         current_page--;
         changePage("prev");
     }
 }
-function firstPage()
-{
+
+function firstPage() {
     current_page = 0;
-    changePage("prev");
-    
-}
-function lastPage()
-{
-    current_page = numPages()-1;
-    changePage("next");
-    
+    changePage("prev");    
 }
 
-function nextPage()
-{
+function lastPage() {
+    current_page = numPages()-1;
+    changePage("next");
+}
+
+function nextPage() {
     if (current_page < numPages()) {
         current_page++;
         changePage("next");
@@ -1069,8 +1065,7 @@ function nextPage()
 
 changePage(current_page);
 
-function changePage(operazione)
-{
+function changePage(operazione) {
     var btn_next = document.getElementById("btn_next");
     var btn_prev = document.getElementById("btn_prev");
     var btn_first = document.getElementById("btn_first");
@@ -1119,18 +1114,3 @@ $(document).on('click','.btn_setting',function(){
         $(".commessaBox, #magazArrivo, #magazPrelievo").hide();
     }
 });
-
-/*
-$(document).ready(function(){
-    $(".focus").focus();
-    $(".focusRicerca").focus();
-    setInterval(function() {
-        if(timerOn) {
-            console.log("Focusing");
-            $("#qrcode").get(0).focus();
-            $("#filtroRicerca").get(0).focus();
-            $("#search").get(0).focus();
-        }
-    }, 1000);
-});
-*/
