@@ -354,6 +354,36 @@ class CaricamentiMassaManager {
     }
 
     /**
+     * FUNZIONE "Svuota ubicazione"
+     */
+    function trasferisciContenuto($codUbicazione, $codUbicazioneDest) {
+      global $panthera, $ubicazioniManager, $CAU_TESTATA, $CAU_RIGA, $COD_MAGAZ_SVUOTA, $UBIC_SVUOTA;
+
+      if ($panthera->mock) {
+          return;
+      }
+
+      $ubi1 = $ubicazioniManager->getUbicazione($codUbicazione);
+      if ($ubi1 === null) print_error(400, "Ubicazione '$codUbicazione' inesistente");
+      $codMagazzinoSrc = $ubi1['ID_MAGAZZINO'];
+
+      $id = $panthera->get_numeratore('MOVUBI');
+
+      // BATCH_LOAD_HDR
+      $this->creaTestataCaricamento($id);
+
+      // CM_DOC_TRA_TES
+      $this->creaTestataDocumento($id, $CAU_TESTATA, $codMagazzinoSrc, $codMagazzinoSrc);
+
+      // CM_DOC_TRA_RIG
+      $this->creaRigheDocumento($id, $CAU_RIGA, $codMagazzinoSrc, $codUbicazione, $codMagazzinoSrc, $codUbicazioneDest);
+
+      $this->loop_job_panthera($id);
+      
+      $ubicazioniManager->updateDatiComuniUbicazione($codUbicazione);
+  }
+
+    /**
      * FUNZIONE "Trasferimento carrello"
      */
     function trasferisciCarrello($codCarrello, $codMagazzinoDest) {
