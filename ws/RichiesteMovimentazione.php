@@ -15,10 +15,8 @@ $idNumeroDoc = isset($_GET['idNumeroDoc']) ? $panthera->escape_string($_GET['idN
 $skip = isset($_GET['skip']) ? $panthera->escape_string($_GET['skip']) : null;
 $top = isset($_GET['top']) ? $panthera->escape_string($_GET['top']) : null;
 $search = isset($_GET['search']) ? $panthera->escape_string($_GET['search']) : null;
-
 $riga = isset($_POST['riga']) ? $_POST['riga'] : null;
 $testata = isset($_POST['testata']) ? $_POST['testata'] : null;
-$isCompleta = isset($_POST['isCompleta']) ? $_POST['isCompleta'] : null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (!empty($idNumeroDoc)) {
@@ -45,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $testata = $richiesteMovimentazioneManager->getTestataRichiesta($riga["ID_ANNO_DOC"],$riga["ID_NUMERO_DOC"]);
     $id = $panthera->get_numeratore('MOVUBI');
-    $caricamentiMassaManager->richiestaMovimentazione($riga, $testata, $isCompleta, $id);    
+    $caricamentiMassaManager->richiestaMovimentazione($riga, $testata,$riga['IS_COMPLETA'], $id);    
     header('Content-Type: application/json');
     echo '{"msg":"OK", "annoDoc":"'.$riga["ID_ANNO_DOC"].'", "numeroDoc":"'.$riga["ID_NUMERO_DOC"].'", "id": "'.$id.'", "isCompleta": "'.$isCompleta.'"}';
 } else {

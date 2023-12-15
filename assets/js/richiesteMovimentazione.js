@@ -566,17 +566,17 @@ function conferma() {
                                         ));
     item.QTA_RESIDUA -= qty;
     console.log(item.PRELIEVI);
-    let isCompleta = false;
+    item.IS_COMPLETA = false;
     if(item.QTA_RESIDUA == 0){
-        isCompleta = true;
+        item.IS_COMPLETA = true;
     }
+    let isCompleta = item.IS_COMPLETA;
     $.post({
         url: "./ws/RichiesteMovimentazione.php",
         dataType: 'json',
         data: {
             riga: item,
-            testata : documenti[documentoSelezionato],
-            isCompleta : isCompleta
+            testata : documenti[documentoSelezionato]
         },
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
@@ -950,6 +950,7 @@ document.getElementById("search").addEventListener("keyup", function(event) {
     this.value = this.value.toUpperCase();
     console.log("listening to keyup");
     if (event.keyCode === 13) {
+        $("#navigateRichieste").hide();
         $.get({
             url: "./ws/RichiesteMovimentazione.php?idNumeroDoc=" + this.value,
             dataType: 'json',
@@ -965,9 +966,16 @@ document.getElementById("search").addEventListener("keyup", function(event) {
                 elementiCaricati.forEach(x => {
                     $("#divElencoDocumenti").append(getHtmlGrigliaDocumenti(i++, x));
                 });
+                let startLoad = 1;
+                let endLoad = 10;
+                if(loaded != 0){
+                    endLoad = loaded+1;
+                }
+                $("#pagNumLabel").html(startLoad+"-"+data.count+" di "+data.count+" Documenti");
             },
             error: function(data, status) {
                 console.log('ERRORE nel caricare la documenti delle righe', data);
+                $("#navigateRichieste").show();
                 showError(data);
             }
         }); 
@@ -975,11 +983,12 @@ document.getElementById("search").addEventListener("keyup", function(event) {
     return false;
 });
 
-document.getElementById("qrcode").addEventListener("keyup", function(event) {
+document.getElementById("qrcode").addEventListener("keydown", function(event) {
     $("#ubi_arrivo").val("");
     this.value = this.value.toUpperCase();
     console.log("listening to keyup")
-    if (event.keyCode === 13) {
+    console.log("event.keyCode", event.keyCode);
+    if (event.keyCode === 13 || event.keyCode === 9) {
         if(blackListUbicazioni.includes($("#qrcode").val().trim())) { 
             $('.err_box').remove();
             $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>UBICAZIONE '"+$("#qrcode").val().trim()+"' NON SELEZIONABILE<br></p>");
@@ -1026,10 +1035,11 @@ document.getElementById("filtroRicerca").addEventListener("keyup", function(even
                     // aggiungo i campi che non esistono server-side
                     riga.PRELIEVI = [];
                     riga.QTA_RESIDUA = parseFloat(riga.QTA_UM_PRM);
+                    controllaStatoRiga(riga);
                 });
                 annoDoc = annoDoc;
                 numeroDoc = numeroDoc;
-                ridisegnaElencoRigheDocumenti();
+                
             },
             error: function(data, status) {
                 console.log('ERRORE nel caricare la documenti delle righe', data);

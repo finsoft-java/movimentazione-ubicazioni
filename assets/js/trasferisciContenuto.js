@@ -1,63 +1,134 @@
 let timerOn = true;
+
 $(document).ready(function(){
     $(".focus").focus();
     setInterval(function() {
         if(timerOn) {
-            console.log("Focusing");
+           console.log("Focusing");
             $("#qrcode").get(0).focus();
         }
     }, 1000);
-});
+});   
 
-//TODO stampa articolo quantità e unità
+let i = 0;
+// i e' uno STATO
+// 0 = initial
+// 1 = e' stato sparato il primo barcode (ubicazione)
+// 2 = e' stato sparato il secondo barcode (ubicazioneDest)
+
 let ubicazione;
+let ubicazioneDest;
 
 document.getElementById("qrcode").addEventListener("keyup", function(event) {
-    const qrcode = $("#qrcode");
+    $("#btnTrasferimento").attr('disabled', true);
     this.value = this.value.toUpperCase();
+
     if (event.keyCode === 13) {
-        ubicazione = qrcode.val();
-            $.get({
-                url: "./ws/Interrogazione.php?codUbicazione=" + ubicazione,
-                dataType: 'json',
-                headers: {
-                    'Authorization': 'Bearer ' + sessionStorage.getItem('token')
-                },
-                success: function(data, status) {
-                    let dati = data["data"];
-                    if(dati[0] == null || dati.length === 0) {   
-                        showError("Ubicazione vuota");
+        event.preventDefault();
+        i++;
+        barCode = $("#qrcode").val();
+        if(i == 1) {
+            $("#btnTrasferimento").attr('disabled', true);
+            if(barCode.trim() != ""){       
+                ubicazione =  barCode;
+                $.get({
+                    url: "./ws/GetUbicazione.php?codUbicazione=" + ubicazione,
+                    dataType: 'json',
+                    headers: {
+                        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                    },
+                    success: function(data, status) {
+                        const dati = data.value;
+                        let datiStampati = ""; 
+                        datiStampati += "<p class='pOsai'> Ubicazione di partenza: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
+                        datiStampati += "<p class='pOsai'> Magazzino: <strong>"+dati.ID_MAGAZZINO+"</strong></p>";
+                        $("#appendData").html(datiStampati);
+                        $("#qrcode").val("").attr('placeholder','UBICAZIONE DESTINAZIONE');
+                    },
+                    error: function(data, status){
+                        $("#qrcode").attr('placeholder','UBICAZIONE ORIGINE');
+                        console.log('ERRORE -> Interrogazione', data);
+                        showError(data);
                         $("#qrcode").val('');
+                        ubicazione = null;
+                        i = 0;
                         return false;
                     }
-                    let datiStampati = "<p class='pOsai'> Ubicazione: <strong style='text-transform:uppercase'>" + ubicazione + "</strong></p>";
-                    for(let i = 0; i < Object.keys(dati).length; i++){      
-                        datiStampati += getHtml(dati[i]);
+                });
+            } else {
+                showError("Digitare qualcosa nel campo ubicazione!");
+                i=0;
+                return false;
+            }
+        }
+        if(i == 2) {             
+            if(barCode.trim() != ""){     
+                ubicazioneDest = barCode;
+                $.get({
+                    url: "./ws/GetUbicazione.php?codUbicazione=" + ubicazioneDest,
+                    dataType: 'json',
+                    headers: {
+                        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+                    },
+                    success: function(data, status) {
+                        const dati = data.value;
+                        let datiStampati = ""; 
+                        datiStampati += "<p class='pOsai'> Ubicazione dest.: <strong>"+dati.ID_UBICAZIONE+"</strong></p>";
+                        datiStampati += "<p class='pOsai'> Magazzino destinazione: <strong>"+dati.ID_MAGAZZINO+"</strong></p>";
+                        $("#appendData").append(datiStampati);
+                        $("#qrcode").val("").attr('placeholder', 'UBICAZIONE DESTINAZIONE');
+                        $("#btnTrasferisci").attr('disabled', false);
+                        $("#qrcode").val('').attr('disabled', true);
+                        
+                    },
+                    error: function(data, status){
+                        $("#qrcode").attr('placeholder','UBICAZIONE DESTINAZIONE');
+                        console.log('ERRORE -> Interrogazione', data);
+                        showError(data);
+                        $("#qrcode").val('');
+                        ubicazioneDest = null;
+                        i = 1;
+                        return false;
                     }
-                    $("#appendData").html(datiStampati);
-                    timerOn = false;
-                    $("#btnSvuota").attr('disabled', false);
-                    qrcode.attr('disabled', true);
-                },
-                error: function(data, status){
-                    showError(data);
-                    qrcode.val('');
-                    $("#appendData").html('');
-                }
-            });
-            qrcode.val('');
+                });  
+            } else {
+                showError("Ubicazione destinazione inesistente si prega di riprovare");
+                $("#qrcode").val("").attr('placeholder','UBICAZIONE DESTINAZIONE');
+                i=1;
+                return false;
+            }
        }
+    }
 });
 
-function getHtml(x) {
-    return "<p class='pOsai'>Articolo: <strong>" + x.ID_ARTICOLO + "</strong> | Quantita: <strong>" + x.QTA_GIAC_PRM + " " + x.R_UM_PRM_MAG + "</strong></p>"
-        + "<p class='pOsai'>Disegno: <strong>" + x.DISEGNO + "</strong></p>"
-        + "<p class='pOsai'>Descrizione: <strong>" + x.DESCRIZIONE + "</strong></p>"
-        + "<hr/>";
+function trasferisciContenuto()  {
+    const qrcode = $("#qrcode");
+    qrcode.attr("disabled", true);
+    
+    $("#btnTrasferimento").attr('disabled',true);
+
+
+    //TODO cambiare la post
+    $.post({
+        url: "./ws/TrasferisciContenuto.php?codUbicazione=" + ubicazione + "&codUbicazioneDest=" +ubicazioneDest,
+        dataType: 'json',
+        headers: {
+            'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+        },
+        success: function(data, status) {
+            showSuccessMsg("Trasferimento avvenuto con successo \n (ubicazione di partenza: " + ubicazione + ", ubicazione dest.: " + ubicazioneDest + ")");
+        },
+        error: function(data, status){
+            console.log("ERRORE in trasferimentoArticoli", data);
+            showError(data);
+            qrcode.val('');
+        }
+    });
 }
 
-function showSuccessMsg(msg) {
-    alert(msg);
+function cancel() {
+    $("#btnTrasferimento").attr('disabled',true);
+    window.location.reload();
 }
 
 function showError(data) {
@@ -67,25 +138,10 @@ function showError(data) {
     alert(err);
 }
 
-function svuotaUbicazione() {
-    $("#btnSvuota").attr('disabled', true);
-
-    $.post({
-        url: "./ws/SvuotaUbicazione.php?codUbicazione=" + ubicazione,
-        dataType: 'json',
-        headers: {
-            'Authorization': 'Bearer ' + sessionStorage.getItem('token')
-        },
-        success: function(data, status) {
-            showSuccessMsg("Ubicazione " + ubicazione + " svuotata con successo");
-        },
-        error: function(data, status){            
-            console.log("ERRORE in svuotaUbicazione", data, status);
-            showError(data);
-            $("#qrcode").val('');
-        }
-    });
-
-    $("#appendData").html('');
-    $("#qrcode").attr('disabled', false);
+function showSuccessMsg(msg) {
+    $('#success_message').text(msg);
+    $('#success_message').show();
+    setTimeout(() => {
+        $('#success_message').hide();
+    }, "1000");
 }

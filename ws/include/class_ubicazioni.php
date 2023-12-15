@@ -207,7 +207,7 @@ class UbicazioniManager {
      * Restituisce tutti gli articoli contenuti in una certa ubicazione
      */
     function getUbicazioneByMagazzino($idMagazzino,$codUbicazione) {
-      global $panthera, $ID_AZIENDA;
+      global $panthera, $ID_AZIENDA, $caricamentiMassaManager;
 
       if ($panthera->mock) {
           $data = [ [ 'ID_ARTICOLO' => '00000000                 ','ID_COMMESSA' => 'COMMESSA1', 'ID_MAGAZZINO' => 'E01', 'ID_UBICAZIONE' => 'EEE', 'DESCRIZIONE' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 'DISEGNO' => 'ABC', 'R_UM_PRM_MAG' => 'NR', 'QTA_GIAC_PRM' => 10, 'TRASFERIBILE' => 'Y', 'R_UTENTE_AGG' => '001_finsoft         ', 'TIMESTAMP_AGG' => '2022-09-21 16:25:53.410' ],
@@ -232,6 +232,10 @@ class UbicazioniManager {
           $sql3 = " ";
           $count = $panthera->select_single_value($sql0 . $sql2);
           $data = $panthera->select_list($sql1 . $sql2 . $sql3);
+
+          if($count == 0){
+            $caricamentiMassaManager->chiama_ws_pantheraMagazzini();
+          }
       }
       
       // se l'ubicazione e' vuota non do' errori
@@ -658,7 +662,7 @@ class UbicazioniManager {
       $logManager->log($old['ID_MAGAZZINO'], $codUbicazione, 'Note Posizione', $old['NOTE_POSIZIONE'], $notePosizione);
     }
 
-    function updateDatiComuniUbicazione($codUbicazione) {
+    function updateDatiComuniUbicazione($codUbicazione, $codMagazzino = null) {
       global $panthera, $ID_AZIENDA, $logged_user;
 
       // lo setto a tappeto su tutti i magazzini!
@@ -666,6 +670,9 @@ class UbicazioniManager {
               SET R_UTENTE_AGG='{$logged_user->nome_utente}_$ID_AZIENDA',
                   TIMESTAMP_AGG=CURRENT_TIMESTAMP
               WHERE ID_AZIENDA='$ID_AZIENDA' AND ID_UBICAZIONE='$codUbicazione' ";
+      if($codMagazzino != null) {
+        $sql .= "AND ID_MAGAZZINO = '$codMagazzino' ";
+      }
       $panthera->execute_update($sql);
     }
 }
