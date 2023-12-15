@@ -1112,7 +1112,11 @@ function numPages()
 
 
 function showSuccessMsg(msg) {
-    alert(msg);
+    $('#success_message').text(msg);
+    $('#success_message').show();
+    setTimeout(() => {
+        $('#success_message').hide();
+      }, "1000");
 }
 
 $(document).on('click','.btn_setting',function(){
