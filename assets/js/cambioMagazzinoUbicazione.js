@@ -201,5 +201,5 @@ function showSuccessMsg(msg) {
     $('#success_message').show();
     setTimeout(() => {
         $('#success_message').hide();
-      }, "1000");
+      }, "3000");
 }

@@ -1589,7 +1589,6 @@ class CaricamentiMassaManager {
     $SLEEP_SECONDI = 1;
     for ($i = 0; $i <= $MAX_TENTATIVI; $i++) {
       $l = $panthera->select_single($sql);
-      print_r($l);
       if ($l["WRONG_RECS"] > 0) {
         return false;
       } else if($l["TOTAL_RECS"] > 0 && $l["TRANSFERRED_RECS"] > 0 && $l["WRONG_RECS"] == 0){
