@@ -602,6 +602,15 @@ input::-webkit-inner-spin-button {
 	float: right !important;
 }
 
+.close {
+	width: 48px !important;
+    height: 48px;
+    line-height: 43px;
+    font-size: 30px !important;
+    border: 0px !important;
+    opacity: .8;
+}
+
 .alert {
 	display: none;
 	position: fixed;

@@ -495,7 +495,7 @@ function setGiacenzaCommessaSelezionata() {
 function checkQty() {
     let qty = $("#qty").val();
     
-    if($("#ubi_arrivo").val() != null && $("#ubi_arrivo").val() != ""){
+    if($("#ubi_arrivo").val() != null && $("#ubi_arrivo").val().trim() != ""){
         if(parseFloat(qty) === parseFloat(qntTotaleRichiesta) ){
             $("#btnConfirm").show();
             $("#btnConfirm button").attr('disabled',false);
@@ -540,14 +540,14 @@ function conferma() {
     let commessa = $("#selectCommessa option:selected").text();
     if (commessa == '-') commessa = null;
     let qty = parseFloat($("#qty").val());
-    if($("#selectCommessa").val() != 0) {
+    if($("#selectCommessa").val() != 0 && $("#ubi_arrivo").val().trim() != "") {
         item.PRELIEVI.push({
             MAGAZZINO: $("#magazzinoOrigine").val(),
             UBICAZIONE: $("#ubicazioneOrigine").val(),
             COMMESSA: commessa,
             QUANTITA: $("#qty").val(),
             MAGAZZINO_ARRIVO: $("#magazzinoDest").val(),
-            UBICAZIONE_ARRIVO: $("#ubi_arrivo").val(),
+            UBICAZIONE_ARRIVO: $("#ubi_arrivo").val().trim(),
             COMMESSA_ARRIVO: item.R_COMMESSA_ARR,
             ID_ANNO_DOC: item.ID_ANNO_DOC,
             ID_RIGA_DOC: item.ID_RIGA_DOC,
@@ -575,8 +575,7 @@ function conferma() {
         url: "./ws/RichiesteMovimentazione.php",
         dataType: 'json',
         data: {
-            riga: item,
-            testata : documenti[documentoSelezionato]
+            riga: item
         },
         headers: {
             'Authorization': 'Bearer ' + sessionStorage.getItem('token')
@@ -639,7 +638,6 @@ function confermaParziale() {
         dataType: 'json',
         data: {
             riga: item,
-            testata : documenti[documentoSelezionato],
             isCompleta : isCompleta
         },
         headers: {
@@ -714,7 +712,7 @@ function checkStatoTrasferimento(id, completa) {
 
 function preleva() {
     let item = documenti[documentoSelezionato].RIGHE[rigaSelezionata];
-    if($("#ubi_arrivo").val() != null && $("#ubi_arrivo").val() != "") {    
+    if($("#ubi_arrivo").val() != null && $("#ubi_arrivo").val().trim() != "") {    
         let commessa = $("#selectCommessa option:selected").text();
         if (commessa == '-') commessa = null;
         let qty = parseFloat($("#qty").val());
@@ -989,6 +987,13 @@ document.getElementById("qrcode").addEventListener("keydown", function(event) {
     console.log("listening to keyup")
     console.log("event.keyCode", event.keyCode);
     if (event.keyCode === 13 || event.keyCode === 9) {
+        if($("#qrcode").val().trim() == ""){
+            $('.err_box').remove();
+            $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>INSERISCI UNA UBICAZIONE VALIDA<br></p>");
+            $("#qrcode").val("");
+            checkQty();
+            return false;
+        }
         if(blackListUbicazioni.includes($("#qrcode").val().trim())) { 
             $('.err_box').remove();
             $("#boxqnt").prepend("<p class='err_box' style='color: red;text-decoration: underline;font-weight: bold;'>UBICAZIONE '"+$("#qrcode").val().trim()+"' NON SELEZIONABILE<br></p>");

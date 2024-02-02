@@ -989,167 +989,164 @@ class CaricamentiMassaManager {
     //ROW_ID = PROGRESSIVO
    
     $testata = $testata[0];
-   
-   $dataDoc = date('Ymd', strtotime($testata["DATA_DOC"]));
-   $dataRifDoc = date('Ymd', strtotime($testata["DTA_RIFER_DOC"]));
-   $timestampCrz = date('Ymd H:i:s', strtotime($testata["TIMESTAMP_CRZ"]));
-   $timestampAgg = date('Ymd H:i:s', strtotime($testata["TIMESTAMP_AGG"]));
+    $dataDoc = date('Ymd', strtotime($testata["DATA_DOC"]));
+    $dataRifDoc = date('Ymd', strtotime($testata["DTA_RIFER_DOC"]));
+    $timestampCrz = date('Ymd H:i:s', strtotime($testata["TIMESTAMP_CRZ"]));
+    $timestampAgg = date('Ymd H:i:s', strtotime($testata["TIMESTAMP_AGG"]));
+    $testata['STATO_AVANZAMENTO'] = $testata['STATO_AVANZAMENTO'] != "" ? "'".$testata['STATO_AVANZAMENTO']."'" : 1;
+    $testata['RIFER_DOC'] = $testata['RIFER_DOC'] != "" ? "'".$testata['RIFER_DOC']."'" : 'null';
+    $testata['R_COMMESSA'] = $testata['R_COMMESSA'] != "" ? "'".$testata['R_COMMESSA']."'" : 'null';  // Corretto l'uso di STATO_AVANZAMENTO con R_COMMESSA
+    $testata['DTA_RIFER_DOC'] = $testata['DTA_RIFER_DOC'] != "" ? "'".$testata['DTA_RIFER_DOC']."'" : 'null';
+    $testata['WF_CLASS_ID'] = $testata['WF_CLASS_ID'] != "" ? "'".$testata['WF_CLASS_ID']."'" : 'null';
+    $testata['WF_ID'] = $testata['WF_ID'] != "" ? "'".$testata['WF_ID']."'" : 'null';
+    $testata['WF_NODE_ID'] = $testata['WF_NODE_ID'] != "" ? "'".$testata['WF_NODE_ID']."'" : 'null';
+    $testata['WF_SUB_NODE_ID'] = $testata['WF_SUB_NODE_ID'] != "" ? "'".$testata['WF_SUB_NODE_ID']."'" : 'null';
+    $testata['R_DOCUMENTO_MM'] = $testata['R_DOCUMENTO_MM'] != "" ? "'".$testata['R_DOCUMENTO_MM']."'" : 'null';
+    $testata['R_CENTRO_COSTO'] = $testata['R_CENTRO_COSTO'] != "" ? "'".$testata['R_CENTRO_COSTO']."'" : 'null';
+    $testata['R_CENTRO_RICAVO'] = $testata['R_CENTRO_RICAVO'] != "" ? "'".$testata['R_CENTRO_RICAVO']."'" : 'null';
+    $testata['R_GRP_CNT_CA'] = $testata['R_GRP_CNT_CA'] != "" ? "'".$testata['R_GRP_CNT_CA']."'" : 'null';
+    $testata['STRINGA_RIS_UTE_1'] = $testata['STRINGA_RIS_UTE_1'] != "" ? "'".$testata['STRINGA_RIS_UTE_1']."'" : 'null';
+    $testata['STRINGA_RIS_UTE_2'] = $testata['STRINGA_RIS_UTE_2'] != "" ? "'".$testata['STRINGA_RIS_UTE_2']."'" : 'null';
+    $testata['R_COMMESSA_ARR'] = $testata['R_COMMESSA_ARR'] != "" ? "'".$testata['R_COMMESSA_ARR']."'" : 'null';
+    $testata['ANNO_DOC_RIF'] = $testata['ANNO_DOC_RIF'] != "" ? "'".$testata['ANNO_DOC_RIF']."'" : 'null';
+    $testata['NUMERO_DOC_RIF'] = $testata['NUMERO_DOC_RIF'] != "" ? "'".$testata['NUMERO_DOC_RIF']."'" : 'null';
+    $testata['ID_ANNO_DOC_PPL'] = $testata['ID_ANNO_DOC_PPL'] != "" ? "'".$testata['ID_ANNO_DOC_PPL']."'" : 'null';
+    $testata['ID_NUMERO_DOC_PPL'] = $testata['ID_NUMERO_DOC_PPL'] != "" ? "'".$testata['ID_NUMERO_DOC_PPL']."'" : 'null';  
+    $testata['ID_RIGA_DOC_PPL'] = $testata['ID_RIGA_DOC_PPL'] != "" ? "'".$testata['ID_RIGA_DOC_PPL']."'" : 'null';
+    $testata['ID_DET_RIGA_DOC_PPL'] = $testata['ID_DET_RIGA_DOC_PPL'] != "" ? "'".$testata['ID_DET_RIGA_DOC_PPL']."'" : 'null';
+    $testata['ID_RIGA_LOTTO_PPL'] = $testata['ID_RIGA_LOTTO_PPL'] != "" ? "'".$testata['ID_RIGA_LOTTO_PPL']."'" : 'null';
+    $testata['ID_LISTA_PRL'] = $testata['ID_LISTA_PRL'] != "" ? "'".$testata['ID_LISTA_PRL']."'" : 'null';
+    $testata['ID_RIGA_LISTA_PRL'] = $testata['ID_RIGA_LISTA_PRL'] != "" ? "'".$testata['ID_RIGA_LISTA_PRL']."'" : 'null';          
+    $testata['R_CLIENTE'] = $testata['R_CLIENTE'] != "" ? "'".$testata['R_CLIENTE']."'" : 'null';
+    $testata['R_CLIENTE_ARR'] = $testata['R_CLIENTE_ARR'] != "" ? "'".$testata['R_CLIENTE_ARR']."'" : 'null';
+    $testata['R_FORNITORE'] = $testata['R_FORNITORE'] != "" ? "'".$testata['R_FORNITORE']."'" : 'null';
+    $testata['R_FORNITORE_ARR'] = $testata['R_FORNITORE_ARR'] != "" ? "'".$testata['R_FORNITORE_ARR']."'" : 'null';
 
+$sql = "INSERT INTO THIP.CM_DOC_TRA_TES (
+    DATA_ORIGIN,            -- 1
+    RUN_ID,
+    ROW_ID,
+    RUN_ACTION,
+    TRASF_STATUS,
+    STATO_AVANZAMENTO,
+    ID_AZIENDA,
+    R_CAU_DOC_TRA,
+    ID_ANNO_DOC,
+    ID_ORIGINALE,           -- 10
+    ID_NUMERO_DOC,
+    DATA_DOC,
+    NUMERO_DOC_FMT,
+    R_MAGAZZINO,
+    R_MAGAZZINO_ARR,
+    R_COMMESSA,
+    RIFER_DOC,
+    DTA_RIFER_DOC,
+    WF_CLASS_ID,
+    WF_ID,                  -- 20
+    WF_NODE_ID,
+    WF_SUB_NODE_ID,
+    NOTA,
+    R_GES_COMMENTI,
+    R_DOCUMENTO_MM,
+    R_CENTRO_COSTO,
+    R_CENTRO_RICAVO,
+    COL_MAGAZZINO,
+    LIS_CTL_STP_DOC,
+    R_GRP_CNT_CA,           -- 30
+    FLAG_RIS_UTE_1,
+    FLAG_RIS_UTE_2,
+    FLAG_RIS_UTE_3,
+    FLAG_RIS_UTE_4,
+    FLAG_RIS_UTE_5,
+    STRINGA_RIS_UTE_1,
+    STRINGA_RIS_UTE_2,
+    NUM_RIS_UTE_1,
+    NUM_RIS_UTE_2,
+    STATO,                  -- 40
+    R_UTENTE_CRZ,
+    R_UTENTE_AGG,
+    TIMESTAMP_CRZ,
+    TIMESTAMP_AGG,
+    R_COMMESSA_ARR,
+    ANNO_DOC_RIF,
+    NUMERO_DOC_RIF,
+    TIPO_DOC_RIF,
+    DA_LOGIS_LIGHT,
+    DA_GEST_DOC_ORIG,       -- 50
+    ID_ANNO_DOC_PPL,
+    ID_NUMERO_DOC_PPL,
+    ID_RIGA_DOC_PPL,
+    ID_DET_RIGA_DOC_PPL,
+    ID_RIGA_LOTTO_PPL,
+    ID_LISTA_PRL,
+    ID_RIGA_LISTA_PRL,
+    R_CLIENTE,
+    R_CLIENTE_ARR,
+    R_FORNITORE,            -- 60
+    R_FORNITORE_ARR)
+VALUES (
+    '$DATA_ORIGIN',                     -- 1
+    '$id',
+    '1',
+    'U',
+    '0',
+    {$testata["STATO_AVANZAMENTO"]},
+    '$ID_AZIENDA',
+    '{$testata["R_CAU_DOC_TRA"]}',
+    '{$testata["ID_ANNO_DOC"]}',
+    '{$testata["ID_NUMERO_DOC"]}',           --10
+    '{$testata["ID_NUMERO_DOC"]}',
+    '$dataDoc',
+    '{$testata["NUMERO_DOC_FMT"]}',
+    '{$testata["R_MAGAZZINO"]}',
+    '{$testata["R_MAGAZZINO_ARR"]}',
+    {$testata["R_COMMESSA"]},
+    {$testata["RIFER_DOC"]},
+    '$dataRifDoc',
+    {$testata["WF_CLASS_ID"]},
+    {$testata["WF_ID"]},                  --20
+    {$testata["WF_NODE_ID"]},
+    {$testata["WF_SUB_NODE_ID"]},
+    '{$testata["NOTA"]}',
+    '{$testata["R_GES_COMMENTI"]}',
+    {$testata["R_DOCUMENTO_MM"]},
+    {$testata["R_CENTRO_COSTO"]},
+    {$testata["R_CENTRO_RICAVO"]},
+    '{$testata["COL_MAGAZZINO"]}',
+    '{$testata["LIS_CTL_STP_DOC"]}',
+    {$testata["R_GRP_CNT_CA"]},
+    '{$testata["FLAG_RIS_UTE_1"]}',
+    '{$testata["FLAG_RIS_UTE_2"]}',
+    '{$testata["FLAG_RIS_UTE_3"]}',
+    '{$testata["FLAG_RIS_UTE_4"]}',
+    '{$testata["FLAG_RIS_UTE_5"]}',
+    {$testata["STRINGA_RIS_UTE_1"]},
+    {$testata["STRINGA_RIS_UTE_2"]},
+    {$testata["NUM_RIS_UTE_1"]},
+    {$testata["NUM_RIS_UTE_2"]},
+    '{$testata["STATO"]}',
+    '{$testata["R_UTENTE_CRZ"]}',
+    '{$testata["R_UTENTE_AGG"]}',
+    '$timestampCrz',
+    '$timestampAgg',
+    {$testata["R_COMMESSA_ARR"]},
+    {$testata["ANNO_DOC_RIF"]},
+    {$testata["NUMERO_DOC_RIF"]},
+    '{$testata["TIPO_DOC_RIF"]}',
+    '{$testata["DA_LOGIS_LIGHT"]}',
+    '{$testata["DA_GEST_DOC_ORIG"]}',       
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null)";
 
-   $testata['STATO_AVANZAMENTO'] = $testata['STATO_AVANZAMENTO'] != "" ? "'".$testata['STATO_AVANZAMENTO']."'" : 1;
-   $testata['RIFER_DOC'] = $testata['RIFER_DOC'] != "" ? "'".$testata['RIFER_DOC']."'" : 'null';
-   $testata['R_COMMESSA'] = $testata['R_COMMESSA'] != "" ? "'".$testata['STATO_AVANZAMENTO']."'" : 'null';
-   $testata['DTA_RIFER_DOC'] = $testata['DTA_RIFER_DOC'] != "" ? "'".$testata['DTA_RIFER_DOC']."'" : 'null';
-   $testata['WF_CLASS_ID'] = $testata['WF_CLASS_ID'] != "" ? "'".$testata['WF_CLASS_ID']."'" : 'null';
-   $testata['WF_ID'] = $testata['WF_ID'] != "" ? "'".$testata['WF_ID']."'" : 'null';
-   $testata['WF_NODE_ID'] = $testata['WF_NODE_ID'] != "" ? "'".$testata['WF_NODE_ID']."'" : 'null';
-   $testata['WF_SUB_NODE_ID'] = $testata['WF_SUB_NODE_ID'] != "" ? "'".$testata['WF_SUB_NODE_ID']."'" : 'null';
-   $testata['R_DOCUMENTO_MM'] = $testata['R_DOCUMENTO_MM'] != "" ? "'".$testata['R_DOCUMENTO_MM']."'" : 'null';
-   $testata['R_CENTRO_COSTO'] = $testata['R_CENTRO_COSTO'] != "" ? "'".$testata['R_CENTRO_COSTO']."'" : 'null';
-   $testata['R_CENTRO_RICAVO'] = $testata['R_CENTRO_RICAVO'] != "" ? "'".$testata['R_CENTRO_RICAVO']."'" : 'null';
-   $testata['R_GRP_CNT_CA'] = $testata['R_GRP_CNT_CA'] != "" ? "'".$testata['R_GRP_CNT_CA']."'" : 'null';
-   $testata['STRINGA_RIS_UTE_1'] = $testata['STRINGA_RIS_UTE_1'] != "" ? "'".$testata['STRINGA_RIS_UTE_1']."'" : 'null';
-   $testata['STRINGA_RIS_UTE_2'] = $testata['STRINGA_RIS_UTE_2'] != "" ? "'".$testata['STRINGA_RIS_UTE_2']."'" : 'null';
-   $testata['R_COMMESSA_ARR'] = $testata['R_COMMESSA_ARR'] != "" ? "'".$testata['R_COMMESSA_ARR']."'" : 'null';
-   $testata['ANNO_DOC_RIF'] = $testata['ANNO_DOC_RIF'] != "" ? "'".$testata['ANNO_DOC_RIF']."'" : 'null';
-   $testata['NUMERO_DOC_RIF'] = $testata['NUMERO_DOC_RIF'] != "" ? "'".$testata['NUMERO_DOC_RIF']."'" : 'null';
-   $testata['ID_ANNO_DOC_PPL'] = $testata['ID_ANNO_DOC_PPL'] != "" ? "'".$testata['ID_ANNO_DOC_PPL']."'" : 'null';
-   $testata['ID_NUMERO_DOC_PPL'] = $testata['ID_NUMERO_DOC_PPL'] != "" ? "'".$testata['ID_NUMERO_DOC_PPL']."'" : 'null';  
-   $testata['ID_RIGA_DOC_PPL'] = $testata['ID_RIGA_DOC_PPL'] != "" ? "'".$testata['ID_RIGA_DOC_PPL']."'" : 'null';
-   $testata['ID_DET_RIGA_DOC_PPL'] = $testata['ID_DET_RIGA_DOC_PPL'] != "" ? "'".$testata['ID_DET_RIGA_DOC_PPL']."'" : 'null';
-   $testata['ID_RIGA_LOTTO_PPL'] = $testata['ID_RIGA_LOTTO_PPL'] != "" ? "'".$testata['ID_RIGA_LOTTO_PPL']."'" : 'null';
-   $testata['ID_LISTA_PRL'] = $testata['ID_LISTA_PRL'] != "" ? "'".$testata['ID_LISTA_PRL']."'" : 'null';
-   $testata['ID_RIGA_LISTA_PRL'] = $testata['ID_RIGA_LISTA_PRL'] != "" ? "'".$testata['ID_RIGA_LISTA_PRL']."'" : 'null';          
-   $testata['R_CLIENTE'] = $testata['R_CLIENTE'] != "" ? "'".$testata['R_CLIENTE']."'" : 'null';
-   $testata['R_CLIENTE_ARR'] = $testata['R_CLIENTE_ARR'] != "" ? "'".$testata['R_CLIENTE_ARR']."'" : 'null';
-   $testata['R_FORNITORE'] = $testata['R_FORNITORE'] != "" ? "'".$testata['R_FORNITORE']."'" : 'null';
-   $testata['R_FORNITORE_ARR'] = $testata['R_FORNITORE_ARR'] != "" ? "'".$testata['R_FORNITORE_ARR']."'" : 'null';
-  
-   
-      $sql = "INSERT INTO THIP.CM_DOC_TRA_TES (
-        DATA_ORIGIN,            -- 1
-        RUN_ID,
-        ROW_ID,
-        RUN_ACTION,
-        TRASF_STATUS,
-        STATO_AVANZAMENTO,
-        ID_AZIENDA,
-        R_CAU_DOC_TRA,
-        ID_ANNO_DOC,
-        ID_ORIGINALE,           -- 10
-        ID_NUMERO_DOC,
-        DATA_DOC,
-        NUMERO_DOC_FMT,
-        R_MAGAZZINO,
-        R_MAGAZZINO_ARR,
-        R_COMMESSA,
-        RIFER_DOC,
-        DTA_RIFER_DOC,
-        WF_CLASS_ID,
-        WF_ID,                  -- 20
-        WF_NODE_ID,
-        WF_SUB_NODE_ID,
-        NOTA,
-        R_GES_COMMENTI,
-        R_DOCUMENTO_MM,
-        R_CENTRO_COSTO,
-        R_CENTRO_RICAVO,
-        COL_MAGAZZINO,
-        LIS_CTL_STP_DOC,
-        R_GRP_CNT_CA,           -- 30
-        FLAG_RIS_UTE_1,
-        FLAG_RIS_UTE_2,
-        FLAG_RIS_UTE_3,
-        FLAG_RIS_UTE_4,
-        FLAG_RIS_UTE_5,
-        STRINGA_RIS_UTE_1,
-        STRINGA_RIS_UTE_2,
-        NUM_RIS_UTE_1,
-        NUM_RIS_UTE_2,
-        STATO,                  -- 40
-        R_UTENTE_CRZ,
-        R_UTENTE_AGG,
-        TIMESTAMP_CRZ,
-        TIMESTAMP_AGG,
-        R_COMMESSA_ARR,
-        ANNO_DOC_RIF,
-        NUMERO_DOC_RIF,
-        TIPO_DOC_RIF,
-        DA_LOGIS_LIGHT,
-        DA_GEST_DOC_ORIG,       -- 50
-        ID_ANNO_DOC_PPL,
-        ID_NUMERO_DOC_PPL,
-        ID_RIGA_DOC_PPL,
-        ID_DET_RIGA_DOC_PPL,
-        ID_RIGA_LOTTO_PPL,
-        ID_LISTA_PRL,
-        ID_RIGA_LISTA_PRL,
-        R_CLIENTE,
-        R_CLIENTE_ARR,
-        R_FORNITORE,            -- 60
-        R_FORNITORE_ARR)
-      VALUES (
-        '$DATA_ORIGIN',                     -- 1
-        '$id',
-        '1',
-        'U',
-        '0',
-        {$testata["STATO_AVANZAMENTO"]},
-        '$ID_AZIENDA',
-        '{$testata["R_CAU_DOC_TRA"]}',
-        '{$testata["ID_ANNO_DOC"]}',
-        '{$testata["ID_NUMERO_DOC"]}',           
-        '{$testata["ID_NUMERO_DOC"]}',
-        '$dataDoc',
-        '{$testata["NUMERO_DOC_FMT"]}',
-        '{$testata["R_MAGAZZINO"]}',
-        '{$testata["R_MAGAZZINO_ARR"]}',
-        {$testata["R_COMMESSA"]},
-        {$testata["RIFER_DOC"]},
-        '$dataRifDoc',
-        {$testata["WF_CLASS_ID"]},
-        {$testata["WF_ID"]},                  
-        {$testata["WF_NODE_ID"]},
-        {$testata["WF_SUB_NODE_ID"]},
-        '{$testata["NOTA"]}',
-        '{$testata["R_GES_COMMENTI"]}',
-        {$testata["R_DOCUMENTO_MM"]},
-        {$testata["R_CENTRO_COSTO"]},
-        {$testata["R_CENTRO_RICAVO"]},
-        '{$testata["COL_MAGAZZINO"]}',
-        '{$testata["LIS_CTL_STP_DOC"]}',
-        {$testata["R_GRP_CNT_CA"]},
-        '{$testata["FLAG_RIS_UTE_1"]}',
-        '{$testata["FLAG_RIS_UTE_2"]}',
-        '{$testata["FLAG_RIS_UTE_3"]}',
-        '{$testata["FLAG_RIS_UTE_4"]}',
-        '{$testata["FLAG_RIS_UTE_5"]}',
-        {$testata["STRINGA_RIS_UTE_1"]},
-        {$testata["STRINGA_RIS_UTE_2"]},
-        {$testata["NUM_RIS_UTE_1"]},
-        {$testata["NUM_RIS_UTE_2"]},
-        '{$testata["STATO"]}',
-        '{$testata["R_UTENTE_CRZ"]}',
-        '{$testata["R_UTENTE_AGG"]}',
-        '$timestampCrz',
-        '$timestampAgg',
-        {$testata["R_COMMESSA_ARR"]},
-        {$testata["ANNO_DOC_RIF"]},
-        {$testata["NUMERO_DOC_RIF"]},
-        '{$testata["TIPO_DOC_RIF"]}',
-        '{$testata["DA_LOGIS_LIGHT"]}',
-        '{$testata["DA_GEST_DOC_ORIG"]}',       
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null)";
       $panthera->execute_update($sql);
   }
 
@@ -1540,24 +1537,6 @@ class CaricamentiMassaManager {
   }
   //se ritorno 0 carica la lista
     
-  function chiama_ws_panthera() {
-    global $URL_CM;
-
-    $curl = curl_init();
-    curl_setopt($curl, CURLOPT_URL, $URL_CM);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    $result = curl_exec($curl);
-    $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    if ($httpcode != 200) {
-      $msg = "Errore nell'invocazione del webservice. HTTP code $httpcode. Response: " . $result;
-      error_log($msg);
-      print_error(500, $msg);
-    }
-    curl_close($curl);
-
-    // il $result è assolutamente inutile, se non magari per il JobId
-    return $result;
-  }
 
   function chiama_ws_pantheraMagazzini() {
     global $URL_YGEN;
@@ -1578,8 +1557,27 @@ class CaricamentiMassaManager {
     return $result;
 
   }
+  
+  function chiama_ws_panthera() {
+    global $URL_CM;
 
-  function checkCM($id) {
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_URL, $URL_CM);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    $result = curl_exec($curl);
+    $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    if ($httpcode != 200) {
+      $msg = "Errore nell'invocazione del webservice. HTTP code $httpcode. Response: " . $result;
+      error_log($msg);
+      print_error(500, $msg);
+    }
+    curl_close($curl);
+
+    // il $result è assolutamente inutile, se non magari per il JobId
+    return $result;
+  }
+
+  function checkCM($id, $semaforo) {
     global $panthera, $DATA_ORIGIN;
     $sql = "SELECT TOTAL_RECS,TRANSFERRED_RECS,WRONG_RECS
             FROM THERA.BATCH_LOAD_HDR
@@ -1587,13 +1585,16 @@ class CaricamentiMassaManager {
     
     $MAX_TENTATIVI = 10;
     $SLEEP_SECONDI = 1;
+    
     for ($i = 0; $i <= $MAX_TENTATIVI; $i++) {
       $l = $panthera->select_single($sql);
+      
       if ($l["WRONG_RECS"] > 0) {
         return false;
       } else if($l["TOTAL_RECS"] > 0 && $l["TRANSFERRED_RECS"] > 0 && $l["WRONG_RECS"] == 0){
         return true;
       }
+      $SLEEP_SECONDI= $SLEEP_SECONDI + 1;
       sleep($SLEEP_SECONDI);
     }
     if($l["TOTAL_RECS"] == null){
@@ -1610,18 +1611,23 @@ class CaricamentiMassaManager {
     if (!sem_acquire($semaforo)) {
       print_error(500, 'Troppi caricamenti di massa contemporanei, impossibile acquisire il semaforo!');
     }
-    $this->aggiorna_scheduled_job($id);
-    $this->chiama_ws_panthera();
-   
-    if (!$this->checkCM($id)) {
-      $errore_cm = true;
-    }
+    try {
+      $this->aggiorna_scheduled_job($id);
+      $this->chiama_ws_panthera();
     
-    sem_release($semaforo);
-    sem_remove($semaforo);
+      if (!$this->checkCM($id, $semaforo)) {
+        $errore_cm = true;
+      }
+    } catch (Exception $e) {
+      error_log($e->getMessage());
+      print_error(500, $e->getMessage());
+    } finally {
+      sem_release($semaforo);
+      sem_remove($semaforo);
+    }
 
     if ($errore_cm) {
       print_error(500, 'Il caricamento di massa non è andato a buon fine');
     }
-  }  
+  }
 }
